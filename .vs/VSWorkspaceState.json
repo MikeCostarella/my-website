@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Colleges"
+    "\\Colleges",
+    "\\Schools",
+    "\\Schools\\Ohio",
+    "\\Schools\\Ohio\\Trumbull"
   ],
+  "SelectedNode": "\\Schools\\Ohio\\Trumbull",
   "PreviewInSolutionExplorer": false
 }
