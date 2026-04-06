@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ohio Institutions of Higher Learning 2026</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f3; color: #1a1a1a; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  #header { padding: 14px 20px 0; flex-shrink: 0; }
+  h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: -0.3px; }
+  #subtitle { font-size: 13px; color: #777; margin-top: 2px; }
+  #controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 20px; align-items: center; flex-shrink: 0; }
+  #search { height: 32px; padding: 0 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 8px; background: #fff; color: #1a1a1a; min-width: 180px; max-width: 240px; flex: 1; outline: none; }
+  #search:focus { border-color: #93c5fd; }
+  .filter-btn { padding: 4px 12px; font-size: 12px; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; background: #fff; color: #555; transition: all 0.15s; white-space: nowrap; }
+  .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+  #count-label { font-size: 12px; color: #888; margin-left: auto; white-space: nowrap; }
+  #main { display: flex; flex: 1; padding: 0 20px 14px; gap: 14px; min-height: 0; }
+  #map { flex: 1; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; z-index: 0; }
+  #info-panel { width: 268px; flex-shrink: 0; background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; display: flex; flex-direction: column; overflow: hidden; }
+  #info-header { padding: 12px 14px 10px; border-bottom: 1px solid #eee; font-size: 13px; font-weight: 500; color: #888; }
+  #info-content { flex: 1; overflow-y: auto; padding: 14px; }
+  #info-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 220px; gap: 10px; color: #bbb; font-size: 13px; text-align: center; }
+  .info-name { font-size: 15px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; color: #1a1a1a; }
+  .info-badge { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 11px; margin-bottom: 12px; font-weight: 500; }
+  .info-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid #f2f2f2; gap: 8px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-lbl { font-size: 12px; color: #999; flex-shrink: 0; }
+  .info-val { font-size: 12px; color: #1a1a1a; text-align: right; font-weight: 500; }
+  .info-addr { font-size: 12px; color: #888; line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f2f2f2; }
+  .enr-bar-wrap { margin-top: 12px; }
+  .enr-bar-lbl { font-size: 11px; color: #999; margin-bottom: 5px; }
+  .enr-bar-bg { height: 6px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
+  .enr-bar-fill { height: 6px; border-radius: 99px; }
+  .links-section { margin-top: 12px; padding-top: 10px; border-top: 1px solid #f2f2f2; display: flex; flex-direction: column; gap: 6px; }
+  .links-lbl { font-size: 11px; color: #999; font-weight: 500; margin-bottom: 2px; }
+  .link-btn { display: flex; align-items: center; gap: 7px; width: 100%; padding: 7px 10px; border-radius: 8px; border: 1px solid #e5e5e5; background: #fafafa; font-size: 12px; text-decoration: none; transition: background 0.15s; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .link-btn:hover { background: #f0f0f0; }
+  .link-btn.inst { color: #1d4ed8; }
+  .link-btn.city { color: #15803d; }
+  #legend { padding: 0 20px 12px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; flex-shrink: 0; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #555; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .leaflet-container { background: #e8f0f8 !important; }
+  #tt { position: fixed; background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: 6px; pointer-events: none; display: none; z-index: 9999; white-space: nowrap; max-width: 260px; white-space: normal; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>Ohio Institutions of Higher Learning 2026</h1>
+  <div id="subtitle">115 institutions mapped &mdash; Fall 2024 enrollment data</div>
+</div>
+
+<div id="controls">
+  <input id="search" type="text" placeholder="Search institution or city..."/>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="public4">Public 4-yr</button>
+  <button class="filter-btn" data-filter="private4">Private 4-yr</button>
+  <button class="filter-btn" data-filter="community">2-yr / CC</button>
+  <button class="filter-btn" data-filter="branch">Branch campuses</button>
+  <span id="count-label">115 shown</span>
+</div>
+
+<div id="main">
+  <div id="map"></div>
+  <div id="info-panel">
+    <div id="info-header">Institution details</div>
+    <div id="info-content">
+      <div id="info-empty">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.4"><circle cx="12" cy="10" r="4"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        <span>Click any dot on the map<br>to see institution details</span>
+      </div>
+      <div id="info-card" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div id="legend">
+  <span style="font-size:12px;color:#666;font-weight:500;margin-right:2px;">Type:</span>
+  <div class="leg"><div class="leg-dot" style="background:#1d6ab5"></div>Public 4-yr</div>
+  <div class="leg"><div class="leg-dot" style="background:#2d7d46"></div>Private 4-yr</div>
+  <div class="leg"><div class="leg-dot" style="background:#b86e0a"></div>2-yr / CC</div>
+  <div class="leg"><div class="leg-dot" style="background:#8b2252"></div>Branch campus</div>
+  <span style="font-size:12px;color:#999;margin-left:4px;">Circle size = enrollment</span>
+</div>
+
+<div id="tt"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const OHIO_BOUNDS = L.latLngBounds([37.75, -84.85], [42.38, -80.40]);
+
+const map = L.map('map', {
+  center: [40.2, -82.65],
+  zoom: 7,
+  minZoom: 6,
+  maxZoom: 13,
+  maxBounds: OHIO_BOUNDS,
+  maxBoundsViscosity: 1.0
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
+const DATA = [
+  ["Air Force Inst. of Technology",39.814,-84.050,"public4",1070,"Wright-Patterson AFB","2950 Hobson Way","45433","University","Public","https://www.afit.edu","https://www.wpafb.af.mil"],
+  ["Allegheny Wesleyan College",40.902,-80.859,"private4",60,"Salem","2161 Woodsdale Rd","44460","College","Private","https://www.awc.edu","https://www.cityofsalemohio.org"],
+  ["American Inst. of Alt. Medicine",40.089,-82.919,"private4",251,"Columbus","6685 Doubletree Ave","43229","College","Private","https://www.aiam.edu","https://www.columbus.gov"],
+  ["Antioch College",39.803,-83.888,"private4",121,"Yellow Springs","1 Morgan Pl","45387","College","Private","https://www.antiochcollege.edu","https://www.yellowspringsohio.org"],
+  ["Antioch University",39.804,-83.886,"private4",486,"Yellow Springs","900 Dayton St","45387","University","Private","https://www.antioch.edu","https://www.yellowspringsohio.org"],
+  ["Art Academy of Cincinnati",39.101,-84.512,"private4",213,"Cincinnati","1212 Jackson St","45202","College","Private","https://www.artacademy.edu","https://www.cincinnati-oh.gov"],
+  ["Ashland University",40.866,-82.318,"private4",4106,"Ashland","401 College Ave","44805","University","Private","https://www.ashland.edu","https://www.ashland.oh.us"],
+  ["Athenaeum of Ohio",39.073,-84.399,"private4",156,"Cincinnati","6616 Beechmont Ave","45230","College","Private","https://www.athenaeum.edu","https://www.cincinnati-oh.gov"],
+  ["Aultman College of Nursing",40.808,-81.382,"private4",286,"Canton","2600 6th St SW","44710","College","Private","https://www.aultmancollege.edu","https://www.cantonohio.gov"],
+  ["Baldwin Wallace University",41.366,-81.858,"private4",3305,"Berea","275 Eastland Rd","44017","University","Private","https://www.bw.edu","https://www.cityofberea.org"],
+  ["Belmont College",40.082,-80.901,"community",2020,"St. Clairsville","68094 Hammond Rd","43950","College","Public","https://www.belmontcollege.edu","https://www.stclairsvilleohio.gov"],
+  ["Bluffton University",40.895,-83.888,"private4",646,"Bluffton","1 University Dr","45817","University","Private","https://www.bluffton.edu","https://www.blufftonohio.org"],
+  ["Bowling Green State University",41.376,-83.652,"public4",17594,"Bowling Green","1851 N Research Dr","43403","University","Public","https://www.bgsu.edu","https://www.bgohio.org"],
+  ["BGSU Firelands",41.224,-82.549,"branch",2097,"Huron","One University Dr","44839","Branch","Public","https://www.bgsu.edu/firelands","https://www.cityofhuron.org"],
+  ["Capital University",39.964,-82.901,"private4",2263,"Bexley","1 College and Main","43209","University","Private","https://www.capital.edu","https://www.bexley.org"],
+  ["Case Western Reserve Univ.",41.506,-81.608,"private4",12475,"Cleveland","10900 Euclid Ave","44106","University","Private","https://www.case.edu","https://www.clevelandohio.gov"],
+  ["Cedarville University",39.744,-83.816,"private4",6318,"Cedarville","251 N Main St","45314","University","Private","https://www.cedarville.edu","https://www.cedarville.gov"],
+  ["Central Ohio Technical College",40.060,-82.394,"community",3182,"Newark","1179 University Dr","43055","College","Public","https://www.cotc.edu","https://www.newarkohio.net"],
+  ["Central State University",39.717,-83.869,"public4",2708,"Wilberforce","1400 Brush Row Rd","45384","University","Public","https://www.centralstate.edu","https://www.xenia.oh.us"],
+  ["Cincinnati State Tech. & CC",39.157,-84.530,"community",9683,"Cincinnati","3520 Central Pkwy","45223","Comm. College","Public","https://www.cincinnatistate.edu","https://www.cincinnati-oh.gov"],
+  ["Clark State College",39.924,-83.791,"community",5077,"Springfield","570 E Leffel Ln","45505","College","Public","https://www.clarkstate.edu","https://www.springfieldohio.gov"],
+  ["Cleveland Institute of Art",41.510,-81.608,"private4",545,"Cleveland","11610 Euclid Ave","44106","College","Private","https://www.cia.edu","https://www.clevelandohio.gov"],
+  ["Cleveland Institute of Music",41.509,-81.610,"private4",293,"Cleveland","11021 East Blvd","44106","College","Private","https://www.cim.edu","https://www.clevelandohio.gov"],
+  ["Cleveland State University",41.502,-81.676,"public4",14074,"Cleveland","2121 Euclid Ave","44115","University","Public","https://www.csuohio.edu","https://www.clevelandohio.gov"],
+  ["Columbus College of Art & Design",39.960,-82.995,"private4",916,"Columbus","60 Cleveland Ave","43215","College","Private","https://www.ccad.edu","https://www.columbus.gov"],
+  ["Columbus State Community College",39.964,-82.998,"community",28081,"Columbus","550 E Spring St","43215","Comm. College","Public","https://www.cscc.edu","https://www.columbus.gov"],
+  ["Cuyahoga Community College",41.502,-81.686,"community",17840,"Cleveland","700 Carnegie Ave","44115","Comm. College","Public","https://www.tri-c.edu","https://www.clevelandohio.gov"],
+  ["Defiance College",41.286,-84.356,"private4",568,"Defiance","701 N Clinton St","43512","College","Private","https://www.defiance.edu","https://www.cityofdefiance.com"],
+  ["Denison University",40.073,-82.518,"private4",2394,"Granville","100 W College St","43023","University","Private","https://www.denison.edu","https://www.granville.oh.us"],
+  ["Edison State Community College",40.153,-84.233,"community",4624,"Piqua","1973 Edison Dr","45356","Comm. College","Public","https://www.edisonohio.edu","https://www.piquaoh.org"],
+  ["Franciscan Univ. of Steubenville",40.356,-80.635,"private4",3976,"Steubenville","1235 University Blvd","43952","University","Private","https://www.franciscan.edu","https://www.cityofsteubenville.us"],
+  ["Franklin University",39.959,-82.998,"private4",9457,"Columbus","201 S Grant Ave","43215","University","Private","https://www.franklin.edu","https://www.columbus.gov"],
+  ["Heidelberg University",41.117,-83.185,"private4",1091,"Tiffin","310 E Market St","44883","University","Private","https://www.heidelberg.edu","https://www.tiffinohio.gov"],
+  ["Hiram College",41.315,-81.140,"private4",1061,"Hiram","11694 Hayden St","44234","College","Private","https://www.hiram.edu","https://www.hiramohio.org"],
+  ["Hocking College",39.458,-82.231,"community",1486,"Nelsonville","3301 Hocking Pkwy","45764","College","Public","https://www.hocking.edu","https://www.nelsonvilleohio.net"],
+  ["Hondros College of Nursing",40.078,-82.906,"community",3857,"Westerville","4140 Executive Pkwy","43081","College","Private","https://www.hondros.edu","https://www.westerville.org"],
+  ["James A. Rhodes State College",40.748,-84.105,"community",4124,"Lima","4240 Campus Dr","45804","College","Public","https://www.rhodesstate.edu","https://www.cityhall.lima.oh.us"],
+  ["John Carroll University",41.487,-81.536,"private4",2864,"University Heights","1 John Carroll Blvd","44118","University","Private","https://www.jcu.edu","https://www.universityheights.com"],
+  ["Kent State University",41.154,-81.343,"public4",40962,"Kent","1025 Risman Dr","44242","University","Public","https://www.kent.edu","https://www.kentohio.org"],
+  ["Kenyon College",40.373,-82.401,"private4",2249,"Gambier","103 College-Park St","43022","College","Private","https://www.kenyon.edu","https://www.gambierohio.org"],
+  ["Kettering College",39.671,-84.149,"private4",757,"Kettering","3737 Southern Blvd","45429","College","Private","https://www.kc.edu","https://www.ketteringoh.org"],
+  ["Lake Erie College",41.728,-81.243,"private4",1108,"Painesville","391 W Washington St","44077","College","Private","https://www.lec.edu","https://www.painesville.com"],
+  ["Lakeland Community College",41.595,-81.331,"community",4358,"Kirtland","7700 Clocktower Dr","44094","Comm. College","Public","https://www.lakelandcc.edu","https://www.kirtlandohio.com"],
+  ["Lorain County Community College",41.368,-82.118,"community",9350,"Elyria","1005 N Abbe Rd","44035","Comm. College","Public","https://www.lorainccc.edu","https://www.cityofelyria.org"],
+  ["Lourdes University",41.663,-83.714,"private4",964,"Sylvania","6832 Convent Blvd","43560","University","Private","https://www.lourdes.edu","https://www.sylvaniaohio.net"],
+  ["Malone University",40.806,-81.381,"private4",1256,"Canton","2600 Cleveland Ave NW","44709","University","Private","https://www.malone.edu","https://www.cantonohio.gov"],
+  ["Marietta College",39.420,-81.452,"private4",1109,"Marietta","215 Fifth St","45750","College","Private","https://www.marietta.edu","https://www.mariettaoh.net"],
+  ["Marion Technical College",40.557,-83.115,"community",3346,"Marion","1467 Mt. Vernon Ave","43302","College","Public","https://www.mtc.edu","https://www.marionohio.us"],
+  ["Mercy College of Ohio",41.666,-83.552,"private4",1096,"Toledo","2221 Madison Ave","43604","College","Private","https://www.mercycollege.edu","https://www.toledo.oh.gov"],
+  ["Miami University",39.508,-84.734,"public4",22508,"Oxford","501 E High St","45056","University","Public","https://www.miamioh.edu","https://www.oxford.oh.us"],
+  ["Mount Carmel College of Nursing",39.958,-83.042,"private4",670,"Columbus","127 S Davis Ave","43222","College","Private","https://www.mccn.edu","https://www.columbus.gov"],
+  ["Mount St. Joseph University",39.140,-84.618,"private4",2265,"Cincinnati","5701 Delhi Rd","45233","University","Private","https://www.msj.edu","https://www.cincinnati-oh.gov"],
+  ["Mount Vernon Nazarene Univ.",40.398,-82.485,"private4",1671,"Mount Vernon","800 Martinsburg Rd","43050","University","Private","https://www.mvnu.edu","https://www.mountvernonohio.org"],
+  ["Muskingum University",40.004,-81.735,"private4",1751,"New Concord","163 Stormont St","43762","University","Private","https://www.muskingum.edu","https://www.newconcordohio.org"],
+  ["North Central State College",40.755,-82.529,"community",2553,"Mansfield","2441 Kenwood Circle","44906","College","Public","https://www.ncstatecollege.edu","https://www.ci.mansfield.oh.us"],
+  ["Northeast Ohio Medical Univ.",41.088,-81.244,"public4",1029,"Rootstown","4209 State Route 44","44272","University","Public","https://www.neomed.edu","https://www.rootstowntwp.com"],
+  ["Northwest State Community College",41.597,-84.306,"community",4082,"Archbold","22600 State Route 34","43502","Comm. College","Public","https://www.northweststate.edu","https://www.archboldohio.gov"],
+  ["Oberlin College",41.293,-82.218,"private4",2909,"Oberlin","70 N Professor St","44074","College","Private","https://www.oberlin.edu","https://www.cityofoberlinhio.com"],
+  ["Ohio Christian University",39.606,-82.955,"private4",1431,"Circleville","1476 Lancaster Pike","43113","University","Private","https://www.ohiochristian.edu","https://www.circlevilleohio.gov"],
+  ["Ohio Dominican University",40.017,-82.949,"private4",1209,"Columbus","1216 Sunbury Rd","43219","University","Private","https://www.ohiodominican.edu","https://www.columbus.gov"],
+  ["Ohio Northern University",40.770,-83.827,"private4",3140,"Ada","525 S Main St","45810","University","Private","https://www.onu.edu","https://www.adaoh.org"],
+  ["Ohio State University",40.007,-83.031,"public4",66408,"Columbus","281 W Lane Ave","43210","University","Public","https://www.osu.edu","https://www.columbus.gov"],
+  ["Ohio Technical College",41.518,-81.638,"community",683,"Cleveland","1374 E 51st St","44103","College","Private","https://www.ohiotechnical.edu","https://www.clevelandohio.gov"],
+  ["Ohio University",39.323,-82.101,"public4",35580,"Athens","1 Ohio University","45701","University","Public","https://www.ohio.edu","https://www.ci.athens.oh.us"],
+  ["Ohio Wesleyan University",40.297,-83.068,"private4",1525,"Delaware","61 S Sandusky St","43015","University","Private","https://www.owu.edu","https://www.delawareohio.net"],
+  ["Otterbein University",40.123,-82.912,"private4",2332,"Westerville","1 S Grove St","43081","University","Private","https://www.otterbein.edu","https://www.westerville.org"],
+  ["Owens Community College",41.561,-83.720,"community",7854,"Perrysburg","30335 Oregon Rd","43551","Comm. College","Public","https://www.owens.edu","https://www.ci.perrysburg.oh.us"],
+  ["Pontifical College Josephinum",40.089,-83.024,"private4",88,"Columbus","7625 N High St","43235","College","Private","https://www.pcj.edu","https://www.columbus.gov"],
+  ["Shawnee State University",38.731,-82.998,"public4",3231,"Portsmouth","940 2nd St","45662","University","Public","https://www.shawnee.edu","https://www.portsmouthoh.org"],
+  ["Sinclair Community College",39.760,-84.192,"community",19415,"Dayton","444 W 3rd St","45402","Comm. College","Public","https://www.sinclair.edu","https://www.daytonohio.gov"],
+  ["Southern State Community College",39.200,-83.611,"community",2227,"Hillsboro","100 Hobart Dr","45133","Comm. College","Public","https://www.sscc.edu","https://www.hillsboroohio.net"],
+  ["Stark State College",40.864,-81.397,"community",10128,"North Canton","6200 Frank Ave NW","44720","College","Public","https://www.starkstate.edu","https://www.northcantonohio.gov"],
+  ["Terra State Community College",41.364,-83.122,"community",2214,"Fremont","2830 Napoleon Rd","43420","Comm. College","Public","https://www.terra.edu","https://www.fremontohio.org"],
+  ["The College of Wooster",40.809,-81.936,"private4",1738,"Wooster","1189 Beall Ave","44691","College","Private","https://www.wooster.edu","https://www.woosterohio.gov"],
+  ["Tiffin University",41.115,-83.183,"private4",3831,"Tiffin","155 Miami St","44883","University","Private","https://www.tiffin.edu","https://www.tiffinohio.gov"],
+  ["University of Akron",41.073,-81.509,"public4",13332,"Akron","302 Buchtel Common","44325","University","Public","https://www.uakron.edu","https://www.akronohio.gov"],
+  ["Univ. of Akron Wayne College",40.853,-81.940,"branch",1411,"Orrville","1901 Smucker Rd","44667","Branch","Public","https://www.uakron.edu/wayne","https://www.orrville.com"],
+  ["University of Cincinnati",39.133,-84.516,"public4",62292,"Cincinnati","2600 Clifton Ave","45221","University","Public","https://www.uc.edu","https://www.cincinnati-oh.gov"],
+  ["University of Dayton",39.740,-84.174,"private4",10506,"Dayton","300 College Park","45469","University","Private","https://www.udayton.edu","https://www.daytonohio.gov"],
+  ["University of Findlay",41.043,-83.652,"private4",5016,"Findlay","1000 N Main St","45840","University","Private","https://www.findlay.edu","https://www.findlayohio.com"],
+  ["University of Mount Union",40.917,-81.103,"private4",2461,"Alliance","1972 Clark Ave","44601","University","Private","https://www.mountunion.edu","https://www.cityofalliance.com"],
+  ["Univ. of Northwestern Ohio",40.769,-84.108,"private4",2525,"Lima","1441 N Cable Rd","45805","University","Private","https://www.unoh.edu","https://www.cityhall.lima.oh.us"],
+  ["University of Rio Grande",38.870,-82.366,"private4",2258,"Rio Grande","218 N College Ave","45674","University","Private","https://www.rio.edu","https://www.gallipolisohio.com"],
+  ["University of Toledo",41.659,-83.607,"public4",14358,"Toledo","2801 W Bancroft St","43606","University","Public","https://www.utoledo.edu","https://www.toledo.oh.gov"],
+  ["Ursuline College",41.479,-81.468,"private4",970,"Pepper Pike","2550 Lander Rd","44124","College","Private","https://www.ursuline.edu","https://www.pepperpike.org"],
+  ["Walsh University",40.875,-81.383,"private4",2192,"North Canton","2020 E Maple St NW","44720","University","Private","https://www.walsh.edu","https://www.northcantonohio.gov"],
+  ["Washington State CC",39.414,-81.450,"community",2025,"Marietta","710 Colegate Dr","45750","Comm. College","Public","https://www.wscc.edu","https://www.mariettaoh.net"],
+  ["Wilberforce University",39.716,-83.872,"private4",838,"Wilberforce","1055 N Bickett Rd","45384","University","Private","https://www.wilberforce.edu","https://www.xenia.oh.us"],
+  ["Wilmington College",39.445,-83.829,"private4",1040,"Wilmington","1870 Quaker Way","45177","College","Private","https://www.wilmington.edu","https://www.wilmingtonohio.gov"],
+  ["Wittenberg University",39.927,-83.804,"private4",1285,"Springfield","200 W Ward St","45501","University","Private","https://www.wittenberg.edu","https://www.springfieldohio.gov"],
+  ["Wright State University",39.784,-84.054,"public4",11959,"Fairborn","3640 Colonel Glenn Hwy","45435","University","Public","https://www.wright.edu","https://www.fairborn.com"],
+  ["Xavier University",39.150,-84.473,"private4",5501,"Cincinnati","3800 Victory Pkwy","45207","University","Private","https://www.xavier.edu","https://www.cincinnati-oh.gov"],
+  ["Youngstown State University",41.100,-80.650,"public4",12204,"Youngstown","1 University Plaza","44555","University","Public","https://www.ysu.edu","https://www.youngstownohio.gov"],
+  ["Zane State College",39.949,-81.994,"community",1769,"Zanesville","1555 Newark Rd","43701","Comm. College","Public","https://www.zanestate.edu","https://www.coz.org"],
+  ["Kent State - Ashtabula",41.876,-80.806,"branch",1850,"Ashtabula","3300 Lake Rd W","44004","Branch","Public","https://www.kent.edu/ashtabula","https://www.ashtabula.com"],
+  ["Kent State - East Liverpool",40.620,-80.573,"branch",900,"East Liverpool","400 E Fourth St","43920","Branch","Public","https://www.kent.edu/eastliverpool","https://www.eastliverpoolohio.gov"],
+  ["Kent State - Geauga",41.483,-81.126,"branch",1276,"Burton","14111 Claridon-Troy Rd","44021","Branch","Public","https://www.kent.edu/geauga","https://www.burtonohio.gov"],
+  ["Kent State - Salem",40.892,-80.859,"branch",1200,"Salem","2491 State Route 45 S","44460","Branch","Public","https://www.kent.edu/salem","https://www.cityofsalemohio.org"],
+  ["Kent State - Stark",40.934,-81.435,"branch",7250,"North Canton","6000 Frank Ave NW","44720","Branch","Public","https://www.kent.edu/stark","https://www.northcantonohio.gov"],
+  ["Kent State - Trumbull",41.244,-80.818,"branch",1158,"Warren","4314 Mahoning Ave NW","44483","Branch","Public","https://www.kent.edu/trumbull","https://www.cityofwarren.org"],
+  ["Kent State - Tuscarawas",40.478,-81.438,"branch",2000,"New Philadelphia","330 University Dr NE","44663","Branch","Public","https://www.kent.edu/tuscarawas","https://www.newphiladelphiaohio.org"],
+  ["Miami Univ. - Hamilton",39.410,-84.564,"branch",1800,"Hamilton","1601 University Blvd","45011","Branch","Public","https://www.miamioh.edu/regionals/campuses-locations/hamilton","https://www.hamilton-oh.gov"],
+  ["Miami Univ. - Middletown",39.525,-84.361,"branch",1500,"Middletown","4200 N University Blvd","45042","Branch","Public","https://www.miamioh.edu/regionals/campuses-locations/middletown","https://www.cityofmiddletown.org"],
+  ["Miami Univ. - West Chester",39.351,-84.413,"branch",350,"West Chester","7847 VOA Park Dr","45069","Branch","Public","https://www.miamioh.edu/regionals","https://www.westchesteroh.org"],
+  ["Ohio State - Lima",40.748,-84.115,"branch",780,"Lima","4240 Campus Dr","45804","Branch","Public","https://lima.osu.edu","https://www.cityhall.lima.oh.us"],
+  ["Ohio State - Mansfield",40.765,-82.539,"branch",900,"Mansfield","1760 University Dr","44906","Branch","Public","https://mansfield.osu.edu","https://www.ci.mansfield.oh.us"],
+  ["Ohio State - Marion",40.580,-83.125,"branch",850,"Marion","1465 Mt. Vernon Ave","43302","Branch","Public","https://osumarion.osu.edu","https://www.marionohio.us"],
+  ["Ohio State - Newark",40.070,-82.404,"branch",2470,"Newark","1179 University Dr","43055","Branch","Public","https://newark.osu.edu","https://www.newarkohio.net"],
+  ["Ohio State - ATI Wooster",40.823,-81.926,"branch",760,"Wooster","1328 Dover Rd","44691","Branch","Public","https://ati.osu.edu","https://www.woosterohio.gov"],
+  ["Ohio Univ. - Chillicothe",39.333,-82.982,"branch",2304,"Chillicothe","101 University Dr","45601","Branch","Public","https://www.ohio.edu/chillicothe","https://www.chillicotheohio.com"],
+  ["Ohio Univ. - Eastern",40.074,-80.904,"branch",1328,"St. Clairsville","45425 National Rd W","43950","Branch","Public","https://www.ohio.edu/eastern","https://www.stclairsvilleohio.gov"],
+  ["Ohio Univ. - Lancaster",39.719,-82.607,"branch",2273,"Lancaster","1570 Granville Pike","43130","Branch","Public","https://www.ohio.edu/lancaster","https://www.ci.lancaster.oh.us"],
+  ["Ohio Univ. - Southern",38.537,-82.682,"branch",1844,"Ironton","1804 Liberty Ave","45638","Branch","Public","https://www.ohio.edu/southern","https://www.irontoncity.com"],
+  ["Ohio Univ. - Zanesville",39.959,-81.984,"branch",2088,"Zanesville","1425 Newark Rd","43701","Branch","Public","https://www.ohio.edu/zanesville","https://www.coz.org"],
+  ["Wright State - Lake Campus",40.506,-84.385,"branch",1100,"Celina","7600 Lake Campus Dr","45822","Branch","Public","https://lake.wright.edu","https://www.cityofcelina.com"],
+];
+
+const MAX_ENR = 66408;
+const COLORS  = {public4:"#1d6ab5",private4:"#2d7d46",community:"#b86e0a",branch:"#8b2252"};
+const BG      = {public4:"#dbeafe",private4:"#dcfce7",community:"#fef3c7",branch:"#fce7f3"};
+const LABELS  = {public4:"Public 4-yr",private4:"Private 4-yr",community:"2-yr / CC",branch:"Branch campus"};
+
+const globeSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+const houseSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+
+function radius(enr){ return Math.max(5, Math.min(22, Math.sqrt(enr / Math.PI) * 0.7)); }
+
+function makeIcon(type, enr, active){
+  const r = radius(enr), color = COLORS[type];
+  const size = active ? r * 2 + 6 : r * 2;
+  const border = active ? `3px solid white; box-shadow:0 0 0 2px ${color}` : "1.5px solid white";
+  const opacity = active ? "1" : "0.87";
+  return L.divIcon({
+    className: "",
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:${border};opacity:${opacity};cursor:pointer;"></div>`,
+    iconAnchor: [size/2, size/2]
+  });
+}
+
+function showInfo(d){
+  const [name,,,type,enr,city,addr,zip,kind,ctrl,instUrl,cityUrl] = d;
+  const color=COLORS[type], bg=BG[type];
+  const pct = Math.round(enr/MAX_ENR*100);
+  const iDomain = instUrl.replace(/https?:\/\//,"").split("/")[0];
+  const cDomain = cityUrl.replace(/https?:\/\//,"").split("/")[0];
+  document.getElementById("info-empty").style.display="none";
+  const card=document.getElementById("info-card");
+  card.style.display="block";
+  card.innerHTML=`
+    <div class="info-name">${name}</div>
+    <span class="info-badge" style="background:${bg};color:${color}">${LABELS[type]}</span>
+    <div class="info-row"><span class="info-lbl">City</span><span class="info-val">${city}, OH</span></div>
+    <div class="info-row"><span class="info-lbl">ZIP</span><span class="info-val">${zip}</span></div>
+    <div class="info-row"><span class="info-lbl">Institution</span><span class="info-val">${kind}</span></div>
+    <div class="info-row"><span class="info-lbl">Control</span><span class="info-val">${ctrl}</span></div>
+    <div class="info-row"><span class="info-lbl">Enrollment</span><span class="info-val" style="color:${color}">${enr.toLocaleString()}</span></div>
+    <div class="enr-bar-wrap">
+      <div class="enr-bar-lbl">Size vs. largest (Ohio State)</div>
+      <div class="enr-bar-bg"><div class="enr-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>
+    <div class="info-addr">${addr}<br>${city}, OH ${zip}</div>
+    <div class="links-section">
+      <div class="links-lbl">Websites</div>
+      <a class="link-btn inst" href="${instUrl}" target="_blank" rel="noopener">${globeSVG}&nbsp;${iDomain}</a>
+      <a class="link-btn city" href="${cityUrl}" target="_blank" rel="noopener">${houseSVG}&nbsp;${cDomain}</a>
+    </div>`;
+}
+
+function clearInfo(){
+  document.getElementById("info-empty").style.display="flex";
+  document.getElementById("info-card").style.display="none";
+}
+
+let markers=[], selectedMarker=null, currentFilter="all", currentSearch="";
+
+DATA.forEach(d => {
+  const [name,lat,lon,type,enr,,city] = d;
+  const m = L.marker([lat,lon], {icon: makeIcon(type,enr,false)});
+  m._data = d;
+  m.on("mouseover", function(e){
+    if(selectedMarker!==m){ const el=m.getElement(); if(el) el.querySelector("div").style.opacity="1"; }
+    const tt=document.getElementById("tt");
+    tt.textContent=name + " — " + d[5];
+    tt.style.display="block";
+    tt.style.left=(e.originalEvent.clientX+14)+"px";
+    tt.style.top=(e.originalEvent.clientY-36)+"px";
+  });
+  m.on("mousemove", function(e){
+    const tt=document.getElementById("tt");
+    tt.style.left=(e.originalEvent.clientX+14)+"px";
+    tt.style.top=(e.originalEvent.clientY-36)+"px";
+  });
+  m.on("mouseout", function(){
+    if(selectedMarker!==m){ const el=m.getElement(); if(el) el.querySelector("div").style.opacity="0.87"; }
+    document.getElementById("tt").style.display="none";
+  });
+  m.on("click", function(e){
+    L.DomEvent.stopPropagation(e);
+    if(selectedMarker && selectedMarker!==m){
+      const sd=selectedMarker._data; selectedMarker.setIcon(makeIcon(sd[3],sd[4],false));
+    }
+    if(selectedMarker===m){ m.setIcon(makeIcon(type,enr,false)); selectedMarker=null; clearInfo(); }
+    else { m.setIcon(makeIcon(type,enr,true)); selectedMarker=m; showInfo(d); }
+  });
+  m.addTo(map);
+  markers.push({m, data:d});
+});
+
+map.on("click", function(){
+  if(selectedMarker){ const sd=selectedMarker._data; selectedMarker.setIcon(makeIcon(sd[3],sd[4],false)); selectedMarker=null; clearInfo(); }
+  document.getElementById("tt").style.display="none";
+});
+
+function updateCount(n){ document.getElementById("count-label").textContent=n+" shown"; }
+
+function applyFilters(){
+  let shown=0;
+  markers.forEach(({m,data}) => {
+    const [name,,,type,,city] = data;
+    const typeOk   = currentFilter==="all" || type===currentFilter;
+    const searchOk = !currentSearch || name.toLowerCase().includes(currentSearch) || city.toLowerCase().includes(currentSearch);
+    if(typeOk && searchOk){ m.addTo(map); shown++; }
+    else { m.remove(); if(selectedMarker===m){selectedMarker=null; clearInfo();} }
+  });
+  updateCount(shown);
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", function(){
+    document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+    this.classList.add("active");
+    currentFilter=this.dataset.filter;
+    applyFilters();
+  });
+});
+document.getElementById("search").addEventListener("input", function(){
+  currentSearch=this.value.toLowerCase(); applyFilters();
+});
+</script>
+</body>
+</html>
