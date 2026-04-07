@@ -1,11 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Colleges",
-    "\\Schools",
-    "\\Schools\\Ohio",
-    "\\Schools\\Ohio\\Trumbull"
+    "\\Governments",
+    "\\Governments\\Ohio",
+    "\\Governments\\Ohio\\Trumbull",
+    "\\Governments\\Ohio\\Trumbull\\Girard",
+    "\\Schools\\Ohio\\Trumbull\\PollingLocations"
   ],
-  "SelectedNode": "\\Schools\\Ohio\\Trumbull",
+  "SelectedNode": "\\Governments\\Ohio",
   "PreviewInSolutionExplorer": false
 }
