@@ -1,34 +1,67 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Index — Site Navigation</title>
-    <style>
-      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:36px;background:#fafafa;color:#111}
-      .wrap{max-width:840px;margin:0 auto}
-      h1{font-size:20px;margin-bottom:6px}
-      p{color:#555;margin-top:0}
-      ul{list-style:none;padding:0;margin:20px 0}
-      li{margin:10px 0}
-      a{display:inline-block;padding:10px 14px;background:#fff;border:1px solid #e6e6e6;border-radius:8px;color:#0366d6;text-decoration:none}
-      a:hover{background:#f3f9ff}
-      .note{font-size:13px;color:#666;margin-top:22px}
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <h1>Site Index</h1>
-      <p>Click a section to open the index page for that directory.</p>
-      <ul>
-        <li><a href="Colleges/">Colleges/</a></li>
-        <li><a href="Elections/">Elections/</a></li>
-        <li><a href="Elections/Ohio/">Elections/Ohio/</a></li>
-        <li><a href="Schools/">Schools/</a></li>
-        <li><a href="Schools/Ohio/">Schools/Ohio/</a></li>
-        <li><a href="Schools/Ohio/Trumbull/">Schools/Ohio/Trumbull/</a></li>
-      </ul>
-      <div class="note">If a link opens a directory, the browser will load that directory's `index.html` file if present.</div>
+
+<style>
+  .menu-wrap { padding: 1.5rem 0; max-width: 720px; margin: 0 auto; }
+  .section-label { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-secondary); margin: 2rem 0 0.75rem; padding-bottom: 6px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .section-label:first-child { margin-top: 0; }
+  .project-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; text-decoration: none; color: inherit; transition: border-color 0.15s, background 0.15s; cursor: pointer; }
+  .project-card:hover { border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+  .project-name { font-size: 19px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+  .project-url { font-size: 14px; color: var(--color-text-secondary); margin: 3px 0 0; font-family: var(--font-mono); word-break: break-all; }
+  .arrow { font-size: 18px; color: var(--color-text-secondary); flex-shrink: 0; }
+  .header { margin-bottom: 1.75rem; }
+  .header h1 { font-size: 28px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .header p { font-size: 17px; color: var(--color-text-secondary); margin: 0; }
+</style>
+
+<div class="menu-wrap">
+  <div class="header">
+    <h1>Mike Costarella — Projects</h1>
+    <p>Active mapping &amp; GIS projects</p>
+  </div>
+
+  <div class="section-label">City of Girard, Ohio</div>
+
+  <a class="project-card" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Rentals" target="_blank" rel="noopener">
+    <div>
+      <p class="project-name">Rental Unit Locations Map</p>
+      <p class="project-url">Governments/Ohio/Trumbull/Girard/Rentals</p>
     </div>
-  </body>
-</html>
+    <span class="arrow">↗</span>
+  </a>
+
+  <a class="project-card" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Water" target="_blank" rel="noopener">
+    <div>
+      <p class="project-name">Water Account Locations Map</p>
+      <p class="project-url">Governments/Ohio/Trumbull/Girard/Water</p>
+    </div>
+    <span class="arrow">↗</span>
+  </a>
+
+  <div class="section-label">Trumbull County, Ohio</div>
+
+  <a class="project-card" href="https://mikecostarella.github.io/my-website/Schools/Ohio/Trumbull/PollingLocations/" target="_blank" rel="noopener">
+    <div>
+      <p class="project-name">Polling Locations Map</p>
+      <p class="project-url">Schools/Ohio/Trumbull/PollingLocations</p>
+    </div>
+    <span class="arrow">↗</span>
+  </a>
+
+  <a class="project-card" href="https://mikecostarella.github.io/my-website/Schools/Ohio/Trumbull/" target="_blank" rel="noopener">
+    <div>
+      <p class="project-name">Trumbull County Schools Map</p>
+      <p class="project-url">Schools/Ohio/Trumbull</p>
+    </div>
+    <span class="arrow">↗</span>
+  </a>
+
+  <div class="section-label">State of Ohio</div>
+
+  <a class="project-card" href="https://mikecostarella.github.io/my-website/Colleges/" target="_blank" rel="noopener">
+    <div>
+      <p class="project-name">Colleges Map</p>
+      <p class="project-url">Colleges</p>
+    </div>
+    <span class="arrow">↗</span>
+  </a>
+</div>
