@@ -3,489 +3,796 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trumbull County Ohio Schools</title>
+<title>Trumbull County Ohio Schools Map</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-  header {
-    background: linear-gradient(135deg, #1e3a5f 0%, #1a2f4a 100%);
-    border-bottom: 2px solid #2d6a9f;
-    padding: 10px 20px;
-    display: flex; align-items: center; gap: 16px; flex-shrink: 0;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  :root {
+    --public: #1a6faf;
+    --public-light: #4a9fd4;
+    --private: #c0392b;
+    --private-light: #e74c3c;
+    --gold: #d4a017;
+    --dark: #1c2331;
+    --panel-bg: rgba(255,255,255,0.97);
+    --border: #dde3ec;
+    --shadow: 0 4px 24px rgba(0,0,0,0.13);
+    --radius: 12px;
   }
-  header .logo { font-size: 1.5rem; }
-  header h1 { font-size: 1.2rem; font-weight: 700; color: #93c5fd; letter-spacing: 0.3px; }
-  header p { font-size: 0.78rem; color: #94a3b8; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', sans-serif; background: #f0f4f8; }
+  #map { width: 100%; height: 100vh; }
 
-  .controls {
-    background: #1e293b;
-    border-bottom: 1px solid #334155;
-    padding: 8px 16px;
-    display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0;
+  /* === HEADER === */
+  #header {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 1000;
+    background: linear-gradient(135deg, #1c2331 0%, #243447 60%, #1a3a5c 100%);
+    padding: 10px 18px 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid var(--gold);
   }
-  .filter-group { display: flex; align-items: center; gap: 6px; }
-  .filter-group label { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-  select, input[type="text"] {
-    background: #0f172a; border: 1px solid #334155; color: #e2e8f0;
-    padding: 5px 10px; border-radius: 6px; font-size: 0.82rem; outline: none;
-    transition: border-color 0.2s;
+  #header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(14px, 2.2vw, 22px);
+    color: #fff;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
   }
-  select:focus, input:focus { border-color: #3b82f6; }
-  .search-input { width: 200px; }
-  .stats { margin-left: auto; font-size: 0.75rem; color: #64748b; }
-  .stats span { color: #60a5fa; font-weight: 600; }
+  #header h1 span { color: var(--gold); }
+  #header-meta {
+    font-size: 11px; color: rgba(255,255,255,0.55);
+    text-align: right; line-height: 1.6;
+  }
+  #header-meta strong { color: rgba(255,255,255,0.8); }
 
-  .main { display: flex; flex: 1; overflow: hidden; }
-
-  #map { flex: 1; }
-
-  .detail-pane {
-    width: 320px; flex-shrink: 0;
-    background: #1e293b;
-    border-left: 1px solid #334155;
-    display: flex; flex-direction: column;
+  /* === SIDE CONTROLS === */
+  .side-panel {
+    position: absolute; z-index: 900;
+    background: var(--panel-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
     overflow: hidden;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+  }
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px;
+    background: var(--dark);
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .panel-header .chevron { transition: transform 0.3s; font-size: 10px; }
+  .panel-header.collapsed .chevron { transform: rotate(-90deg); }
+  .panel-body { transition: max-height 0.3s ease, opacity 0.3s ease; overflow: hidden; }
+  .panel-body.collapsed { max-height: 0 !important; opacity: 0; }
+
+  /* LEGEND */
+  #legend { left: 12px; width: 200px; }
+  #legend-body { padding: 12px 14px; }
+  .legend-section { margin-bottom: 12px; }
+  .legend-section-title {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #888; margin-bottom: 6px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 5px; font-size: 12px; color: var(--dark);
+  }
+  .legend-dot {
+    width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid rgba(0,0,0,0.15);
+  }
+  .legend-icon-wrap {
+    width: 22px; height: 22px; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
   }
 
-  .detail-header {
-    background: linear-gradient(135deg, #1e3a5f, #1a3050);
-    padding: 16px;
-    border-bottom: 1px solid #334155;
+  /* FILTER */
+  #filter-panel { left: 12px; width: 200px; }
+  #filter-body { padding: 12px 14px; }
+  .filter-group { margin-bottom: 10px; }
+  .filter-group-title {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #888; margin-bottom: 6px;
   }
-  .detail-header .badge-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
-  .badge {
-    padding: 2px 8px; border-radius: 20px; font-size: 0.68rem;
-    font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+  .filter-item {
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: 4px; font-size: 12px; cursor: pointer;
   }
-  .badge-sector-Public { background: #1d4ed8; color: #bfdbfe; }
-  .badge-sector-Private { background: #7c3aed; color: #ddd6fe; }
-  .badge-type-Elementary { background: #065f46; color: #a7f3d0; }
-  .badge-type-Middle { background: #92400e; color: #fde68a; }
-  .badge-type-High { background: #7f1d1d; color: #fecaca; }
-  .badge-type-Charter { background: #1e3a5f; color: #bae6fd; }
-  .badge-type-PK-8 { background: #14532d; color: #bbf7d0; }
-  .badge-type-Career-Tech { background: #312e81; color: #c7d2fe; }
-  .badge-type-AltOther { background: #44403c; color: #e7e5e4; }
-  .badge-type-K-12 { background: #4a1d96; color: #ede9fe; }
-  .detail-header h2 { font-size: 1rem; font-weight: 700; color: #f1f5f9; line-height: 1.3; }
-
-  .detail-body { flex: 1; overflow-y: auto; padding: 16px; }
-  .detail-body::-webkit-scrollbar { width: 4px; }
-  .detail-body::-webkit-scrollbar-track { background: #0f172a; }
-  .detail-body::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
-
-  .info-row {
-    display: flex; gap: 10px; align-items: flex-start;
-    padding: 10px 0; border-bottom: 1px solid #1e293b;
+  .filter-item input { cursor: pointer; accent-color: var(--public); }
+  .filter-item label { cursor: pointer; color: var(--dark); }
+  #filter-search {
+    width: 100%; padding: 6px 9px; font-size: 12px;
+    border: 1px solid var(--border); border-radius: 6px;
+    margin-bottom: 10px; font-family: inherit;
+    outline: none;
   }
-  .info-row:last-child { border-bottom: none; }
-  .info-icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
-  .info-label { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
-  .info-value { font-size: 0.88rem; color: #e2e8f0; }
-
-  .enrollment-bar { margin-top: 6px; }
-  .bar-track { background: #0f172a; border-radius: 4px; height: 6px; overflow: hidden; }
-  .bar-fill { background: linear-gradient(90deg, #3b82f6, #60a5fa); height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-
-  .website-link {
-    display: inline-flex; align-items: center; gap: 5px;
-    color: #60a5fa; text-decoration: none; font-size: 0.85rem;
-    padding: 6px 12px; background: #0f172a; border-radius: 6px;
-    border: 1px solid #334155; transition: all 0.2s; margin-top: 4px;
+  #filter-search:focus { border-color: var(--public); }
+  #clear-filters {
+    width: 100%; padding: 5px; font-size: 11px;
+    background: #f4f4f4; border: 1px solid var(--border);
+    border-radius: 6px; cursor: pointer; font-family: inherit;
+    color: #555; transition: background 0.2s;
   }
-  .website-link:hover { background: #1e3a5f; border-color: #3b82f6; }
+  #clear-filters:hover { background: #e8e8e8; }
 
-  .empty-state {
-    flex: 1; display: flex; flex-direction: column;
+  /* TOTALS */
+  #totals-panel { left: 12px; width: 200px; }
+  #totals-body { padding: 12px 14px; }
+  .total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0; font-size: 12px; color: var(--dark);
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .total-row:last-child { border-bottom: none; font-weight: 700; }
+  .total-badge {
+    background: var(--dark); color: #fff;
+    padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600;
+  }
+  .total-badge.pub { background: var(--public); }
+  .total-badge.prv { background: var(--private); }
+
+  /* MODAL */
+  #modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
     align-items: center; justify-content: center;
-    text-align: center; padding: 24px; color: #475569;
   }
-  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
-  .empty-state p { font-size: 0.88rem; line-height: 1.5; }
-
-  /* Legend */
-  .legend {
-    background: #1e293b; border: 1px solid #334155; border-radius: 8px;
-    padding: 10px 14px; font-size: 0.75rem;
+  #modal-overlay.active { display: flex; }
+  #modal {
+    background: #fff; border-radius: 16px;
+    width: min(560px, 94vw); max-height: 88vh;
+    overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    animation: modalIn 0.25s ease;
+    position: relative;
   }
-  .legend-title { font-weight: 700; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.68rem; }
-  .legend-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; color: #cbd5e1; }
-  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  @keyframes modalIn {
+    from { transform: translateY(30px) scale(0.97); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+  #modal-close {
+    position: sticky; top: 0; float: right;
+    background: rgba(0,0,0,0.08); border: none; border-radius: 50%;
+    width: 32px; height: 32px; font-size: 16px; cursor: pointer;
+    margin: 10px 10px 0 0; z-index: 10; transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #modal-close:hover { background: rgba(0,0,0,0.18); }
+  #modal-header {
+    padding: 22px 24px 14px;
+    border-bottom: 2px solid var(--border);
+  }
+  #modal-sector-badge {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  #modal-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; color: var(--dark); line-height: 1.2; margin-bottom: 4px;
+  }
+  #modal-type { font-size: 13px; color: #777; }
+  #modal-body { padding: 18px 24px 22px; }
+  .modal-field {
+    display: flex; gap: 10px; margin-bottom: 11px; font-size: 13px;
+    align-items: flex-start;
+  }
+  .modal-field-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .modal-field-label { font-weight: 600; color: #555; min-width: 90px; }
+  .modal-field-value { color: var(--dark); }
+  .modal-field-value a { color: var(--public); text-decoration: none; }
+  .modal-field-value a:hover { text-decoration: underline; }
+  #modal-directions {
+    display: block; margin-top: 16px;
+    background: linear-gradient(135deg, #1a6faf, #1557a0);
+    color: #fff; text-decoration: none; padding: 11px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600;
+    text-align: center; transition: opacity 0.2s;
+  }
+  #modal-directions:hover { opacity: 0.88; }
 
-  /* Tooltip */
+  /* === DESKTOP LAYOUT === */
+  @media (min-width: 769px) {
+    #map { padding-top: 56px; }
+    #legend { top: 78px; }
+    #filter-panel { top: 78px; left: 224px; }
+    #totals-panel { top: 78px; left: 436px; }
+  }
+
+  /* === MOBILE LAYOUT === */
+  /*
+   * All three panels are docked to the LEFT edge of the map,
+   * stacked vertically below the Leaflet zoom control (+/−).
+   * Leaflet zoom sits at top:~62px (after 52px header).
+   * Each button is 44px tall with 8px gap → stack at 62+90=152px,
+   * then 152+52=204px, then 204+52=256px.
+   *
+   * Collapsed state  → 44×44px square icon button, left:10px
+   * Expanded state   → full panel slides open to the right,
+   *                    still anchored left:10px
+   */
+  @media (max-width: 768px) {
+    #map { padding-top: 52px; height: 100dvh; }
+    #header { padding: 7px 12px 6px; }
+    #header h1 { font-size: 13px; }
+
+    /* Base collapsed pill — just a square icon button */
+    .side-panel {
+      left: 10px !important;
+      width: 44px !important;
+      min-width: 44px;
+      border-radius: 10px !important;
+      overflow: hidden !important;
+      transition: width 0.28s cubic-bezier(0.4,0,0.2,1),
+                  border-radius 0.28s ease;
+    }
+
+    /* Expanded — slides out to the right */
+    .side-panel.mobile-open {
+      width: 200px !important;
+      border-radius: 10px !important;
+    }
+
+    /* Header shrinks to icon-only when collapsed */
+    .panel-header {
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 0;           /* hide label text */
+      letter-spacing: 0;
+      flex-shrink: 0;
+    }
+    .panel-header .panel-icon {
+      font-size: 20px;
+      display: block;
+    }
+    .panel-header .chevron { display: none; }
+
+    /* When open, header shows full label */
+    .side-panel.mobile-open .panel-header {
+      width: 100%;
+      height: auto;
+      padding: 9px 12px;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      justify-content: space-between;
+    }
+    .side-panel.mobile-open .panel-header .panel-icon { display: none; }
+    .side-panel.mobile-open .panel-header .chevron {
+      display: block;
+      transform: rotate(0deg);
+    }
+
+    /* Panel body hidden when collapsed */
+    .panel-body {
+      border-radius: 0 0 10px 10px;
+      overflow: hidden;
+      transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.22s ease;
+    }
+    .panel-body.collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+    }
+
+    /* Vertical stack positions — below zoom control */
+    /* Leaflet zoom top ~62px, each button 30px, gap, total ~102px used */
+    #legend       { top: 152px; }
+    #filter-panel { top: 206px; }
+    #totals-panel { top: 260px; }
+  }
+
+  /* Tooltip style */
   .custom-tooltip {
-    background: #1e293b !important;
-    border: 1px solid #3b82f6 !important;
-    color: #f1f5f9 !important;
-    font-size: 0.8rem !important;
-    padding: 5px 10px !important;
-    border-radius: 6px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-    white-space: nowrap;
+    background: var(--dark) !important; color: #fff !important;
+    border: none !important; border-radius: 7px !important;
+    font-size: 12px !important; padding: 5px 10px !important;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25) !important;
+    white-space: nowrap; max-width: 250px; white-space: normal;
+    font-family: 'Source Sans 3', sans-serif !important;
   }
   .custom-tooltip::before { display: none !important; }
-
-  .leaflet-popup-content-wrapper {
-    background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
-    border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-  .leaflet-popup-tip { background: #1e293b; }
-  .leaflet-popup-content { margin: 0; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🎓</div>
-  <div>
-    <h1>Trumbull County Ohio — Schools Directory</h1>
-    <p>70 Public · 12 Private · 82 Total · Source: NCES CCD 2024-25 &amp; PSS 2023-24</p>
+<div id="header">
+  <h1>Trumbull County <span>Ohio</span> Schools Map</h1>
+  <div id="header-meta">
+    <strong>Created by Mike Costarella</strong><br>
+    April 12, 2025 &nbsp;|&nbsp; 82 Schools
   </div>
-</header>
-
-<div class="controls">
-  <div class="filter-group">
-    <label>Search</label>
-    <input type="text" class="search-input" id="searchInput" placeholder="School or district name…" oninput="applyFilters()"/>
-  </div>
-  <div class="filter-group">
-    <label>Sector</label>
-    <select id="sectorFilter" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="Public">Public</option>
-      <option value="Private">Private</option>
-    </select>
-  </div>
-  <div class="filter-group">
-    <label>Type</label>
-    <select id="typeFilter" onchange="applyFilters()">
-      <option value="">All Types</option>
-      <option value="Elementary">Elementary</option>
-      <option value="Middle">Middle</option>
-      <option value="High">High</option>
-      <option value="PK-8">PK-8</option>
-      <option value="Charter">Charter</option>
-      <option value="Career-Tech">Career-Tech</option>
-      <option value="K-12">K-12</option>
-      <option value="Alt/Other">Alt/Other</option>
-    </select>
-  </div>
-  <div class="filter-group">
-    <label>City</label>
-    <select id="cityFilter" onchange="applyFilters()">
-      <option value="">All Cities</option>
-    </select>
-  </div>
-  <div class="stats">Showing <span id="visibleCount">82</span> of 82 schools</div>
 </div>
 
-<div class="main">
-  <div id="map"></div>
-  <div class="detail-pane" id="detailPane">
-    <div class="empty-state">
-      <div class="icon">📍</div>
-      <p>Click a marker on the map to view school details</p>
+<!-- LEGEND -->
+<div class="side-panel" id="legend">
+  <div class="panel-header" id="legend-hdr" onclick="togglePanel('legend')">
+    <span class="panel-icon">🗺️</span>
+    <span>Legend</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="panel-body" id="legend-body">
+    <div class="legend-section">
+      <div class="legend-section-title">Sector</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--public)"></div>Public School</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--private)"></div>Private School</div>
+    </div>
+    <div class="legend-section">
+      <div class="legend-section-title">School Type</div>
+      <div class="legend-item"><div class="legend-icon-wrap">🏫</div>Elementary</div>
+      <div class="legend-item"><div class="legend-icon-wrap">🎓</div>High School</div>
+      <div class="legend-item"><div class="legend-icon-wrap">📚</div>Middle School</div>
+      <div class="legend-item"><div class="legend-icon-wrap">🌱</div>PK-8</div>
+      <div class="legend-item"><div class="legend-icon-wrap">🏛️</div>K-12</div>
+      <div class="legend-item"><div class="legend-icon-wrap">⭐</div>Charter</div>
+      <div class="legend-item"><div class="legend-icon-wrap">🔧</div>Career-Tech</div>
+      <div class="legend-item"><div class="legend-icon-wrap">🔄</div>Alt/Other</div>
     </div>
   </div>
 </div>
 
+<!-- FILTER -->
+<div class="side-panel" id="filter-panel">
+  <div class="panel-header" id="filter-hdr" onclick="togglePanel('filter')">
+    <span class="panel-icon">🔍</span>
+    <span>Filter</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="panel-body" id="filter-body">
+    <input type="text" id="filter-search" placeholder="Search school name…" oninput="applyFilters()">
+    <div class="filter-group">
+      <div class="filter-group-title">Sector</div>
+      <div class="filter-item"><input type="checkbox" id="f-public" checked onchange="applyFilters()"><label for="f-public">Public</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-private" checked onchange="applyFilters()"><label for="f-private">Private</label></div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-title">School Type</div>
+      <div class="filter-item"><input type="checkbox" id="f-Elementary" checked onchange="applyFilters()"><label for="f-Elementary">Elementary</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-High" checked onchange="applyFilters()"><label for="f-High">High</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-Middle" checked onchange="applyFilters()"><label for="f-Middle">Middle</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-PK-8" checked onchange="applyFilters()"><label for="f-PK-8">PK-8</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-K-12" checked onchange="applyFilters()"><label for="f-K-12">K-12</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-Charter" checked onchange="applyFilters()"><label for="f-Charter">Charter</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-Career-Tech" checked onchange="applyFilters()"><label for="f-Career-Tech">Career-Tech</label></div>
+      <div class="filter-item"><input type="checkbox" id="f-Alt/Other" checked onchange="applyFilters()"><label for="f-Alt/Other">Alt/Other</label></div>
+    </div>
+    <button id="clear-filters" onclick="clearFilters()">Clear All Filters</button>
+  </div>
+</div>
+
+<!-- TOTALS -->
+<div class="side-panel" id="totals-panel">
+  <div class="panel-header" id="totals-hdr" onclick="togglePanel('totals')">
+    <span class="panel-icon">📊</span>
+    <span>Totals</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="panel-body" id="totals-body">
+    <div id="totals-content"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal">
+    <button id="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-header">
+      <div id="modal-sector-badge"></div>
+      <div id="modal-name"></div>
+      <div id="modal-type"></div>
+    </div>
+    <div id="modal-body">
+      <div id="modal-fields"></div>
+      <a id="modal-directions" target="_blank" rel="noopener">🗺️ Get Directions in Google Maps</a>
+    </div>
+  </div>
+</div>
+
+<div id="map"></div>
+
 <script>
+// =============================================
+// SCHOOL DATA (baked in)
+// =============================================
 const SCHOOLS = [
-  {"#":1,"School Name":"Badger Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Joseph Badger Local SD","Street Address":"7119 State Route 7","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"(330) 876-2860","Low Grade":"PK","High Grade":"4","Enrollment":"250","NCES ID":"390501703863","Website":"https://www.josephbadger.org","lat":41.4540,"lng":-80.5790},
-  {"#":2,"School Name":"Badger High School","Sector":"Public","School Type":"High","District / Operator":"Joseph Badger Local SD","Street Address":"7119 State Route 7","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"(330) 876-2820","Low Grade":"9","High Grade":"12","Enrollment":"144","NCES ID":"390501703862","Website":"https://www.josephbadger.org","lat":41.4541,"lng":-80.5791},
-  {"#":3,"School Name":"Badger Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Joseph Badger Local SD","Street Address":"7119 State Route 7","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"(330) 876-2840","Low Grade":"5","High Grade":"8","Enrollment":"168","NCES ID":"390501703865","Website":"https://www.josephbadger.org","lat":41.4542,"lng":-80.5792},
-  {"#":4,"School Name":"Bascom Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"LaBrae Local SD","Street Address":"1015 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-3041","Low Grade":"KG","High Grade":"2","Enrollment":"224","NCES ID":"390502403884","Website":"https://www.labraeschools.org","lat":41.2378,"lng":-80.8892},
-  {"#":5,"School Name":"Bloomfield High School","Sector":"Public","School Type":"High","District / Operator":"Bloomfield-Mespo Local SD","Street Address":"2077 Park West Rd","City":"North Bloomfield","State":"OH","ZIP":"44450","Phone":"(440) 685-4711","Low Grade":"6","High Grade":"12","Enrollment":"83","NCES ID":"390500903835","Website":null,"lat":41.5211,"lng":-80.7670},
-  {"#":6,"School Name":"Bristol Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Bristol Local SD","Street Address":"PO Box 260","City":"Bristolville","State":"OH","ZIP":"44402","Phone":"(330) 889-2700","Low Grade":"KG","High Grade":"6","Enrollment":"232","NCES ID":"390501103837","Website":null,"lat":41.4270,"lng":-80.8530},
-  {"#":7,"School Name":"Bristol High School","Sector":"Public","School Type":"High","District / Operator":"Bristol Local SD","Street Address":"PO Box 260","City":"Bristolville","State":"OH","ZIP":"44402","Phone":"(330) 889-2621","Low Grade":"7","High Grade":"12","Enrollment":"186","NCES ID":"390501103838","Website":null,"lat":41.4271,"lng":-80.8531},
-  {"#":8,"School Name":"Brookfield Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Brookfield Local SD","Street Address":"614 Bedford Rd SE","City":"Brookfield","State":"OH","ZIP":"44403","Phone":"(330) 619-5240","Low Grade":"KG","High Grade":"4","Enrollment":"378","NCES ID":"390501203842","Website":"https://www.brookfieldschools.org","lat":41.2440,"lng":-80.5360},
-  {"#":9,"School Name":"Brookfield High School","Sector":"Public","School Type":"High","District / Operator":"Brookfield Local SD","Street Address":"614 Bedford Rd SE","City":"Brookfield","State":"OH","ZIP":"44403","Phone":"(330) 448-3001","Low Grade":"9","High Grade":"12","Enrollment":"288","NCES ID":"390501203840","Website":"https://www.brookfieldschools.org","lat":41.2441,"lng":-80.5361},
-  {"#":10,"School Name":"Brookfield Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Brookfield Local SD","Street Address":"614 Bedford Rd SE","City":"Brookfield","State":"OH","ZIP":"44403","Phone":"(330) 448-3003","Low Grade":"5","High Grade":"8","Enrollment":"298","NCES ID":"390501203841","Website":"https://www.brookfieldschools.org","lat":41.2442,"lng":-80.5362},
-  {"#":11,"School Name":"Chalker High School","Sector":"Public","School Type":"High","District / Operator":"Southington Local SD","Street Address":"2482 State Route 534","City":"Southington","State":"OH","ZIP":"44470","Phone":"(330) 898-7480","Low Grade":"9","High Grade":"12","Enrollment":"127","NCES ID":"390502303882","Website":null,"lat":41.3040,"lng":-80.9620},
-  {"#":12,"School Name":"Champion Central Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Champion Local SD","Street Address":"5976 Mahoning Ave NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 847-2315","Low Grade":"KG","High Grade":"4","Enrollment":"453","NCES ID":"390501303846","Website":"https://www.championlocal.org","lat":41.2680,"lng":-80.8710},
-  {"#":13,"School Name":"Champion High School","Sector":"Public","School Type":"High","District / Operator":"Champion Local SD","Street Address":"5976 Mahoning Ave NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 847-2305","Low Grade":"9","High Grade":"12","Enrollment":"328","NCES ID":"390501303844","Website":"https://www.championlocal.org","lat":41.2681,"lng":-80.8711},
-  {"#":14,"School Name":"Champion Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Champion Local SD","Street Address":"5976 Mahoning Ave NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 847-2340","Low Grade":"5","High Grade":"8","Enrollment":"366","NCES ID":"390501303845","Website":"https://www.championlocal.org","lat":41.2682,"lng":-80.8712},
-  {"#":15,"School Name":"Children's Rainbow Preschool","Sector":"Private","School Type":"Elementary","District / Operator":"Independent","Street Address":"2860 E Market St","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 394-7534","Low Grade":"PK","High Grade":"K","Enrollment":"158","NCES ID":null,"Website":null,"lat":41.2339,"lng":-80.7990},
-  {"#":16,"School Name":"E J Blott Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Liberty Local SD","Street Address":"4115 Shady Rd","City":"Youngstown","State":"OH","ZIP":"44505","Phone":"(330) 759-1053","Low Grade":"PK","High Grade":"3","Enrollment":"351","NCES ID":"390501903870","Website":"https://www.libertylocal.org","lat":41.1250,"lng":-80.6700},
-  {"#":17,"School Name":"Girard Intermediate Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Girard City SD","Street Address":"702 E Prospect St","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-5219","Low Grade":"4","High Grade":"6","Enrollment":"349","NCES ID":"390440601009","Website":"https://www.girardschools.org","lat":41.1540,"lng":-80.6940},
-  {"#":18,"School Name":"Girard Junior High School","Sector":"Public","School Type":"Middle","District / Operator":"Girard City SD","Street Address":"1244 Shannon Rd","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-5431","Low Grade":"7","High Grade":"8","Enrollment":"221","NCES ID":"390440604533","Website":"https://www.girardschools.org","lat":41.1500,"lng":-80.7050},
-  {"#":19,"School Name":"Girard Senior High School","Sector":"Public","School Type":"High","District / Operator":"Girard City SD","Street Address":"1244 Shannon Rd","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-5431","Low Grade":"9","High Grade":"12","Enrollment":"421","NCES ID":"390440601005","Website":"https://www.girardschools.org","lat":41.1501,"lng":-80.7051},
-  {"#":20,"School Name":"Grapevine School","Sector":"Private","School Type":"Elementary","District / Operator":"Amish","Street Address":"8421 S Girdle Rd","City":"Middlefield","State":"OH","ZIP":"44062","Phone":"(440) 693-4413","Low Grade":"1","High Grade":"8","Enrollment":"42","NCES ID":null,"Website":null,"lat":41.4670,"lng":-81.0770},
-  {"#":21,"School Name":"Holy Trinity Orthodox Christian Academy & Preschool","Sector":"Private","School Type":"Elementary","District / Operator":"Holy Trinity Orthodox","Street Address":"175 Laird Ave NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 399-7642","Low Grade":"PK","High Grade":"6","Enrollment":"46","NCES ID":null,"Website":null,"lat":41.2360,"lng":-80.8140},
-  {"#":22,"School Name":"Howland Glen Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Howland Local SD","Street Address":"8000 Bridle Ln NE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8275","Low Grade":"1","High Grade":"2","Enrollment":"344","NCES ID":"390501603857","Website":"https://www.howlandschools.org","lat":41.2720,"lng":-80.7620},
-  {"#":23,"School Name":"Howland High School","Sector":"Public","School Type":"High","District / Operator":"Howland Local SD","Street Address":"200 Shaffer Dr NE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8220","Low Grade":"9","High Grade":"12","Enrollment":"696","NCES ID":"390501603855","Website":"https://www.howlandschools.org","lat":41.2810,"lng":-80.7500},
-  {"#":24,"School Name":"Howland Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Howland Local SD","Street Address":"8100 South St SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8250","Low Grade":"5","High Grade":"8","Enrollment":"699","NCES ID":"390501603856","Website":"https://www.howlandschools.org","lat":41.2730,"lng":-80.7610},
-  {"#":25,"School Name":"Howland Springs Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Howland Local SD","Street Address":"9500 Howland Springs Rd SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8280","Low Grade":"PK","High Grade":"1","Enrollment":"217","NCES ID":"390501603858","Website":"https://www.howlandschools.org","lat":41.2640,"lng":-80.7580},
-  {"#":26,"School Name":"Hubbard Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Hubbard Exempted Village SD","Street Address":"150 Hall Ave","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-1921","Low Grade":"KG","High Grade":"4","Enrollment":"663","NCES ID":"390454202211","Website":"https://www.hubbardschools.org","lat":41.1570,"lng":-80.5660},
-  {"#":27,"School Name":"Hubbard High School","Sector":"Public","School Type":"High","District / Operator":"Hubbard Exempted Village SD","Street Address":"350 Hall Ave","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-1921","Low Grade":"9","High Grade":"12","Enrollment":"548","NCES ID":"390454202209","Website":"https://www.hubbardschools.org","lat":41.1571,"lng":-80.5661},
-  {"#":28,"School Name":"Hubbard Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Hubbard Exempted Village SD","Street Address":"250 Hall Ave","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-1921","Low Grade":"5","High Grade":"8","Enrollment":"528","NCES ID":"390454202210","Website":"https://www.hubbardschools.org","lat":41.1572,"lng":-80.5662},
-  {"#":29,"School Name":"Jefferson PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"1543 Tod Ave SW","City":"Warren","State":"OH","ZIP":"44485","Phone":"(330) 675-6960","Low Grade":"PK","High Grade":"8","Enrollment":"718","NCES ID":"390449905417","Website":"https://www.warrenlocal.org","lat":41.2270,"lng":-80.8350},
-  {"#":30,"School Name":"John F. Kennedy Catholic School (Lower Campus)","Sector":"Private","School Type":"Elementary","District / Operator":"JFK Catholic Schools","Street Address":"3000 Reeves Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 372-2375","Low Grade":"K","High Grade":"5","Enrollment":"205","NCES ID":null,"Website":"https://www.jfkcatholic.com","lat":41.2520,"lng":-80.7860},
-  {"#":31,"School Name":"John F. Kennedy Catholic School (Upper Campus)","Sector":"Private","School Type":"High","District / Operator":"JFK Catholic Schools","Street Address":"2550 Central Parkway Ave SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 369-1801","Low Grade":"6","High Grade":"12","Enrollment":"321","NCES ID":null,"Website":"https://www.jfkcatholic.com","lat":41.2420,"lng":-80.7950},
-  {"#":32,"School Name":"Kinsman Amish School","Sector":"Private","School Type":"Elementary","District / Operator":"Amish","Street Address":"3515 Bush Rd","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"(330) 360-1366","Low Grade":"1","High Grade":"8","Enrollment":"17","NCES ID":null,"Website":null,"lat":41.4550,"lng":-80.5800},
-  {"#":33,"School Name":"LaBrae High School","Sector":"Public","School Type":"High","District / Operator":"LaBrae Local SD","Street Address":"1001 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-0800","Low Grade":"9","High Grade":"12","Enrollment":"293","NCES ID":"390502403885","Website":"https://www.labraeschools.org","lat":41.2380,"lng":-80.8893},
-  {"#":34,"School Name":"LaBrae Intermediate School","Sector":"Public","School Type":"Elementary","District / Operator":"LaBrae Local SD","Street Address":"1001 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-0800","Low Grade":"3","High Grade":"5","Enrollment":"246","NCES ID":"390502403888","Website":"https://www.labraeschools.org","lat":41.2381,"lng":-80.8894},
-  {"#":35,"School Name":"LaBrae Middle School","Sector":"Public","School Type":"Middle","District / Operator":"LaBrae Local SD","Street Address":"1001 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-0800","Low Grade":"6","High Grade":"8","Enrollment":"236","NCES ID":"390502403887","Website":"https://www.labraeschools.org","lat":41.2382,"lng":-80.8895},
-  {"#":36,"School Name":"Lakeview Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Lakeview Local SD","Street Address":"640 Wakefield Dr","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 638-2145","Low Grade":"KG","High Grade":"4","Enrollment":"551","NCES ID":"390501803866","Website":"https://www.lakeviewschools.org","lat":41.3390,"lng":-80.7270},
-  {"#":37,"School Name":"Lakeview High School","Sector":"Public","School Type":"High","District / Operator":"Lakeview Local SD","Street Address":"300 Hillman Dr","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 637-4921","Low Grade":"8","High Grade":"12","Enrollment":"580","NCES ID":"390501803868","Website":"https://www.lakeviewschools.org","lat":41.3391,"lng":-80.7271},
-  {"#":38,"School Name":"Lakeview Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Lakeview Local SD","Street Address":"640 Wakefield Dr","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 637-4360","Low Grade":"5","High Grade":"7","Enrollment":"370","NCES ID":"390501803869","Website":"https://www.lakeviewschools.org","lat":41.3392,"lng":-80.7272},
-  {"#":39,"School Name":"Liberty High School","Sector":"Public","School Type":"High","District / Operator":"Liberty Local SD","Street Address":"1 Leopard Way","City":"Youngstown","State":"OH","ZIP":"44505","Phone":"(330) 759-2301","Low Grade":"7","High Grade":"12","Enrollment":"492","NCES ID":"390501903871","Website":"https://www.libertylocal.org","lat":41.1251,"lng":-80.6701},
-  {"#":40,"School Name":"Lincoln PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"2253 Atlantic St NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 373-4500","Low Grade":"PK","High Grade":"8","Enrollment":"1,027","NCES ID":"390449905434","Website":"https://www.warrenlocal.org","lat":41.2450,"lng":-80.8110},
-  {"#":41,"School Name":"Lordstown Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Lordstown Local SD","Street Address":"1776 Salt Springs Rd","City":"Warren","State":"OH","ZIP":"44481","Phone":"(330) 824-2572","Low Grade":"KG","High Grade":"6","Enrollment":"210","NCES ID":"390502003874","Website":"https://www.lordstownschools.org","lat":41.1770,"lng":-80.8680},
-  {"#":42,"School Name":"Lordstown High School","Sector":"Public","School Type":"High","District / Operator":"Lordstown Local SD","Street Address":"1824 Salt Springs Rd","City":"Warren","State":"OH","ZIP":"44481","Phone":"(330) 824-2581","Low Grade":"7","High Grade":"12","Enrollment":"173","NCES ID":"390502003875","Website":"https://www.lordstownschools.org","lat":41.1771,"lng":-80.8681},
-  {"#":43,"School Name":"Maplewood Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Maplewood Local SD","Street Address":"4174 Greenville Rd","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 924-2431","Low Grade":"KG","High Grade":"6","Enrollment":"356","NCES ID":"390502103879","Website":"https://www.maplewoodschools.org","lat":41.3000,"lng":-80.7540},
-  {"#":44,"School Name":"Maplewood High School","Sector":"Public","School Type":"High","District / Operator":"Maplewood Local SD","Street Address":"2414 Greenville Rd","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 637-8466","Low Grade":"7","High Grade":"12","Enrollment":"245","NCES ID":"390502103877","Website":"https://www.maplewoodschools.org","lat":41.3001,"lng":-80.7541},
-  {"#":45,"School Name":"Mathews Elementary School (Intermediate)","Sector":"Public","School Type":"Elementary","District / Operator":"Mathews Local SD","Street Address":"4095 Sheridan Dr","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 637-3500","Low Grade":"3","High Grade":"5","Enrollment":"127","NCES ID":"390501503850","Website":"https://www.mathewslocal.org","lat":41.2350,"lng":-80.6880},
-  {"#":46,"School Name":"Mathews Elementary School (Primary)","Sector":"Public","School Type":"Elementary","District / Operator":"Mathews Local SD","Street Address":"4095 Sheridan Dr","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 637-3500","Low Grade":"PK","High Grade":"2","Enrollment":"140","NCES ID":"390501503851","Website":"https://www.mathewslocal.org","lat":41.2351,"lng":-80.6881},
-  {"#":47,"School Name":"Mathews High School","Sector":"Public","School Type":"High","District / Operator":"Mathews Local SD","Street Address":"4429 Warren Sharon Rd","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 637-3500","Low Grade":"9","High Grade":"12","Enrollment":"175","NCES ID":"390501503852","Website":"https://www.mathewslocal.org","lat":41.2360,"lng":-80.6870},
-  {"#":48,"School Name":"Mathews Junior High School","Sector":"Public","School Type":"Middle","District / Operator":"Mathews Local SD","Street Address":"4429 Warren Sharon Rd","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 637-3500","Low Grade":"6","High Grade":"8","Enrollment":"139","NCES ID":"390501503853","Website":"https://www.mathewslocal.org","lat":41.2361,"lng":-80.6871},
-  {"#":49,"School Name":"McDonald High School","Sector":"Public","School Type":"High","District / Operator":"McDonald Local SD","Street Address":"600 Iowa Ave","City":"Mc Donald","State":"OH","ZIP":"44437","Phone":"(330) 530-8051","Low Grade":"7","High Grade":"12","Enrollment":"338","NCES ID":"390502203880","Website":"https://www.mcdonaldschools.org","lat":41.1650,"lng":-80.7130},
-  {"#":50,"School Name":"McGuffey PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"3465 Tod Ave NW","City":"Warren","State":"OH","ZIP":"44485","Phone":"(330) 841-2321","Low Grade":"PK","High Grade":"8","Enrollment":"783","NCES ID":"390449905430","Website":"https://www.warrenlocal.org","lat":41.2530,"lng":-80.8420},
-  {"#":51,"School Name":"McKinley High School","Sector":"Public","School Type":"High","District / Operator":"Niles City SD","Street Address":"616 Dragon Dr","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 652-9968","Low Grade":"9","High Grade":"12","Enrollment":"530","NCES ID":"390444901412","Website":"https://www.nilesschools.org","lat":41.1910,"lng":-80.7670},
-  {"#":52,"School Name":"Mesopotamia Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Bloomfield-Mespo Local SD","Street Address":"PO Box 229","City":"Mesopotamia","State":"OH","ZIP":"44439","Phone":"(440) 693-4125","Low Grade":"PK","High Grade":"5","Enrollment":"115","NCES ID":"390500903836","Website":null,"lat":41.4510,"lng":-80.9620},
-  {"#":53,"School Name":"Mineral Ridge High School","Sector":"Public","School Type":"High","District / Operator":"Weathersfield Local SD","Street Address":"1334 Seaborn St","City":"Mineral Ridge","State":"OH","ZIP":"44440","Phone":"(330) 652-1451","Low Grade":"7","High Grade":"12","Enrollment":"409","NCES ID":"390502503889","Website":"https://www.weathersfieldschools.org","lat":41.1430,"lng":-80.7660},
-  {"#":54,"School Name":"Mines Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Howland Local SD","Street Address":"850 Howland Wilson Rd NE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8270","Low Grade":"3","High Grade":"5","Enrollment":"327","NCES ID":"390501603859","Website":"https://www.howlandschools.org","lat":41.2760,"lng":-80.7550},
-  {"#":55,"School Name":"Newton Falls Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Newton Falls Exempted Village SD","Street Address":"905 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-5225","Low Grade":"KG","High Grade":"3","Enrollment":"249","NCES ID":"390455602279","Website":"https://www.nfschools.org","lat":41.1880,"lng":-81.0060},
-  {"#":56,"School Name":"Newton Falls High School","Sector":"Public","School Type":"High","District / Operator":"Newton Falls Exempted Village SD","Street Address":"907 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-5121","Low Grade":"9","High Grade":"12","Enrollment":"245","NCES ID":"390455602281","Website":"https://www.nfschools.org","lat":41.1881,"lng":-81.0061},
-  {"#":57,"School Name":"Newton Falls Junior High School","Sector":"Public","School Type":"Middle","District / Operator":"Newton Falls Exempted Village SD","Street Address":"907 1/2 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-5445","Low Grade":"6","High Grade":"8","Enrollment":"192","NCES ID":"390455602282","Website":"https://www.nfschools.org","lat":41.1882,"lng":-81.0062},
-  {"#":58,"School Name":"Newton Falls Middle School","Sector":"Public","School Type":"Elementary","District / Operator":"Newton Falls Exempted Village SD","Street Address":"905 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-0695","Low Grade":"4","High Grade":"5","Enrollment":"119","NCES ID":"390455602280","Website":"https://www.nfschools.org","lat":41.1883,"lng":-81.0063},
-  {"#":59,"School Name":"Niles Intermediate School","Sector":"Public","School Type":"Elementary","District / Operator":"Niles City SD","Street Address":"120 E Margaret Ave","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 989-5093","Low Grade":"3","High Grade":"6","Enrollment":"452","NCES ID":"390444901413","Website":"https://www.nilesschools.org","lat":41.1940,"lng":-80.7620},
-  {"#":60,"School Name":"Niles Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Niles City SD","Street Address":"411 Brown St","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 652-5656","Low Grade":"6","High Grade":"8","Enrollment":"440","NCES ID":"390444901407","Website":"https://www.nilesschools.org","lat":41.1941,"lng":-80.7621},
-  {"#":61,"School Name":"Niles Preparatory Academy","Sector":"Public","School Type":"Charter","District / Operator":"Niles Preparatory Academy","Street Address":"45 S Chestnut Ave","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 989-7474","Low Grade":"KG","High Grade":"6","Enrollment":"157","NCES ID":"390163706186","Website":null,"lat":41.1942,"lng":-80.7622},
-  {"#":62,"School Name":"Niles Primary School","Sector":"Public","School Type":"Elementary","District / Operator":"Niles City SD","Street Address":"960 Frederick St","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 989-5091","Low Grade":"PK","High Grade":"2","Enrollment":"455","NCES ID":"390444901411","Website":"https://www.nilesschools.org","lat":41.1943,"lng":-80.7623},
-  {"#":63,"School Name":"Preschool at Warren G. Harding High School","Sector":"Public","School Type":"Elementary","District / Operator":"Warren City SD","Street Address":"860 Elm Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 841-2316","Low Grade":"PK","High Grade":"PK","Enrollment":"70","NCES ID":"390449906046","Website":"https://www.warrenlocal.org","lat":41.2501,"lng":-80.8045},
-  {"#":64,"School Name":"Prospect Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Girard City SD","Street Address":"700 E Prospect St","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-3854","Low Grade":"KG","High Grade":"3","Enrollment":"498","NCES ID":"390440601007","Website":"https://www.girardschools.org","lat":41.1541,"lng":-80.6942},
-  {"#":65,"School Name":"River Gate High School","Sector":"Public","School Type":"Charter","District / Operator":"River Gate High School","Street Address":"458 Franklin St SE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 647-6500","Low Grade":"9","High Grade":"12","Enrollment":"177","NCES ID":"390008403786","Website":null,"lat":41.2280,"lng":-80.8190},
-  {"#":66,"School Name":"Roosevelt Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"McDonald Local SD","Street Address":"410 W 7th St","City":"Mc Donald","State":"OH","ZIP":"44437","Phone":"(330) 530-8051","Low Grade":"KG","High Grade":"6","Enrollment":"383","NCES ID":"390502203881","Website":"https://www.mcdonaldschools.org","lat":41.1651,"lng":-80.7131},
-  {"#":67,"School Name":"Seaborn Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Weathersfield Local SD","Street Address":"3800 Niles Carver Rd","City":"Mineral Ridge","State":"OH","ZIP":"44440","Phone":"(330) 652-9695","Low Grade":"PK","High Grade":"6","Enrollment":"478","NCES ID":"390502503891","Website":"https://www.weathersfieldschools.org","lat":41.1431,"lng":-80.7661},
-  {"#":68,"School Name":"Southington Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Southington Local SD","Street Address":"2482 State Route 534","City":"Southington","State":"OH","ZIP":"44470","Phone":"(330) 898-7480","Low Grade":"PK","High Grade":"5","Enrollment":"206","NCES ID":"390502303883","Website":null,"lat":41.3041,"lng":-80.9621},
-  {"#":69,"School Name":"Southington Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Southington Local SD","Street Address":"2482 State Route 534","City":"Southington","State":"OH","ZIP":"44470","Phone":"(330) 898-1781","Low Grade":"6","High Grade":"8","Enrollment":"104","NCES ID":"390502304355","Website":null,"lat":41.3042,"lng":-80.9622},
-  {"#":70,"School Name":"St. Rose School","Sector":"Private","School Type":"Elementary","District / Operator":"St. Rose Parish","Street Address":"61 E Main St","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-1163","Low Grade":"K","High Grade":"8","Enrollment":"240","NCES ID":null,"Website":null,"lat":41.1542,"lng":-80.6943},
-  {"#":71,"School Name":"STEAM Academy of Warren","Sector":"Public","School Type":"Charter","District / Operator":"STEAM Academy of Warren","Street Address":"261 Elm Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 394-3200","Low Grade":"KG","High Grade":"8","Enrollment":"366","NCES ID":"390143405697","Website":null,"lat":41.2502,"lng":-80.8046},
-  {"#":72,"School Name":"Summit Academy Alt. Learners-Warren","Sector":"Public","School Type":"Alt/Other","District / Operator":"Summit Academy Alt. Learners-Warren","Street Address":"1461 Moncrest Dr NW","City":"Warren","State":"OH","ZIP":"44485","Phone":"(330) 399-1692","Low Grade":"8","High Grade":"12","Enrollment":"68","NCES ID":"390034404881","Website":null,"lat":41.2560,"lng":-80.8400},
-  {"#":73,"School Name":"Summit Academy Community School-Warren","Sector":"Public","School Type":"Charter","District / Operator":"Summit Academy Community School-Warren","Street Address":"2106 Arbor Ave SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 369-4233","Low Grade":"KG","High Grade":"7","Enrollment":"118","NCES ID":"390050005210","Website":null,"lat":41.2290,"lng":-80.7940},
-  {"#":74,"School Name":"Troy Mill Lane School","Sector":"Private","School Type":"Elementary","District / Operator":"Amish","Street Address":"17093 Kinsman Rd","City":"Middlefield","State":"OH","ZIP":"44062","Phone":"(440) 632-1534","Low Grade":"1","High Grade":"8","Enrollment":"30","NCES ID":null,"Website":null,"lat":41.4671,"lng":-81.0771},
-  {"#":75,"School Name":"Trumbull Career & Tech Center","Sector":"Public","School Type":"Career-Tech","District / Operator":"Trumbull Career & Tech Ctr","Street Address":"528 Educational Hwy NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 847-0503","Low Grade":"9","High Grade":"12","Enrollment":"948","NCES ID":"390516304091","Website":"https://www.tctcohio.com","lat":41.2620,"lng":-80.8600},
-  {"#":76,"School Name":"Victory Christian School","Sector":"Private","School Type":"K-12","District / Operator":"Victory Christian School","Street Address":"2053 Pleasant Valley Rd","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 539-6582","Low Grade":"K","High Grade":"12","Enrollment":"103","NCES ID":null,"Website":"https://www.victorychargers.org","lat":41.2090,"lng":-80.7950},
-  {"#":77,"School Name":"Villa Maria Teresa (Preschool)","Sector":"Private","School Type":"Elementary","District / Operator":"Villa Maria Teresa","Street Address":"50 Warner Rd","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 759-9329","Low Grade":"PK","High Grade":"K","Enrollment":"60","NCES ID":null,"Website":null,"lat":41.1573,"lng":-80.5663},
-  {"#":78,"School Name":"Villa Maria Teresa Oblate Sisters","Sector":"Private","School Type":"Elementary","District / Operator":"Villa Maria Teresa","Street Address":"50 Warner Rd","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 759-7383","Low Grade":"PK","High Grade":"K","Enrollment":"58","NCES ID":null,"Website":null,"lat":41.1574,"lng":-80.5664},
-  {"#":79,"School Name":"Warren G Harding High School","Sector":"Public","School Type":"High","District / Operator":"Warren City SD","Street Address":"860 Elm Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 841-2316","Low Grade":"9","High Grade":"12","Enrollment":"1,221","NCES ID":"390449901922","Website":"https://www.warrenlocal.org","lat":41.2500,"lng":-80.8050},
-  {"#":80,"School Name":"Whispering Pines School","Sector":"Private","School Type":"Elementary","District / Operator":"Independent","Street Address":"7090 State Route 534","City":"West Farmington","State":"OH","ZIP":"44491","Phone":"(330) 889-2427","Low Grade":"1","High Grade":"8","Enrollment":"59","NCES ID":null,"Website":null,"lat":41.3850,"lng":-80.9540},
-  {"#":81,"School Name":"Willard Avenue PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"2020 Willard Ave SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 675-8700","Low Grade":"PK","High Grade":"8","Enrollment":"898","NCES ID":"390449905413","Website":"https://www.warrenlocal.org","lat":41.2200,"lng":-80.8000},
-  {"#":82,"School Name":"William S Guy Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Liberty Local SD","Street Address":"4115 Shady Rd","City":"Youngstown","State":"OH","ZIP":"44505","Phone":"(330) 759-1733","Low Grade":"4","High Grade":"6","Enrollment":"254","NCES ID":"390501903872","Website":"https://www.libertylocal.org","lat":41.1252,"lng":-80.6702}
+  {"School Name":"Badger Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Joseph Badger Local SD","Street Address":"7119 State Route 7","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"(330) 876-2860","Low Grade":"PK","High Grade":"4","Enrollment":"250","NCES ID":"390501703863","Website":"https://www.josephbadger.org","lat":41.4426,"lng":-80.5897},
+  {"School Name":"Badger High School","Sector":"Public","School Type":"High","District / Operator":"Joseph Badger Local SD","Street Address":"7119 State Route 7","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"(330) 876-2820","Low Grade":"9","High Grade":"12","Enrollment":"144","NCES ID":"390501703862","Website":"https://www.josephbadger.org","lat":41.4430,"lng":-80.5901},
+  {"School Name":"Badger Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Joseph Badger Local SD","Street Address":"7119 State Route 7","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"(330) 876-2840","Low Grade":"5","High Grade":"8","Enrollment":"168","NCES ID":"390501703865","Website":"https://www.josephbadger.org","lat":41.4434,"lng":-80.5905},
+  {"School Name":"Bascom Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"LaBrae Local SD","Street Address":"1015 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-3041","Low Grade":"KG","High Grade":"2","Enrollment":"224","NCES ID":"390502403884","Website":"https://www.labraeschools.org","lat":41.2432,"lng":-80.8657},
+  {"School Name":"Bloomfield High School","Sector":"Public","School Type":"High","District / Operator":"Bloomfield-Mespo Local SD","Street Address":"2077 Park West Rd","City":"North Bloomfield","State":"OH","ZIP":"44450","Phone":"(440) 685-4455","Low Grade":"9","High Grade":"12","Enrollment":"174","NCES ID":"390501803884","Website":"https://www.bloomfield-mespo.k12.oh.us","lat":41.4081,"lng":-80.7285},
+  {"School Name":"Bristol Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Bristol Local SD","Street Address":"1570 State Route 88","City":"Bristolville","State":"OH","ZIP":"44402","Phone":"(330) 889-3544","Low Grade":"PK","High Grade":"5","Enrollment":"308","NCES ID":"390502103868","Website":"https://www.bristolschools.com","lat":41.3822,"lng":-80.8643},
+  {"School Name":"Bristol High School","Sector":"Public","School Type":"High","District / Operator":"Bristol Local SD","Street Address":"1570 State Route 88","City":"Bristolville","State":"OH","ZIP":"44402","Phone":"(330) 889-3544","Low Grade":"9","High Grade":"12","Enrollment":"261","NCES ID":"390502103867","Website":"https://www.bristolschools.com","lat":41.3826,"lng":-80.8647},
+  {"School Name":"Brookfield Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Brookfield Local SD","Street Address":"614 Bedford Rd SE","City":"Brookfield","State":"OH","ZIP":"44403","Phone":"(330) 448-4000","Low Grade":"PK","High Grade":"4","Enrollment":"278","NCES ID":"390502203866","Website":"https://www.brookfieldlocal.org","lat":41.2290,"lng":-80.5516},
+  {"School Name":"Brookfield High School","Sector":"Public","School Type":"High","District / Operator":"Brookfield Local SD","Street Address":"614 Bedford Rd SE","City":"Brookfield","State":"OH","ZIP":"44403","Phone":"(330) 448-4000","Low Grade":"9","High Grade":"12","Enrollment":"235","NCES ID":"390502203865","Website":"https://www.brookfieldlocal.org","lat":41.2294,"lng":-80.5520},
+  {"School Name":"Brookfield Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Brookfield Local SD","Street Address":"614 Bedford Rd SE","City":"Brookfield","State":"OH","ZIP":"44403","Phone":"(330) 448-4000","Low Grade":"5","High Grade":"8","Enrollment":"218","NCES ID":"390502203869","Website":"https://www.brookfieldlocal.org","lat":41.2298,"lng":-80.5524},
+  {"School Name":"Chalker High School","Sector":"Public","School Type":"High","District / Operator":"Chalker Local SD","Street Address":"2482 State Route 534","City":"Southington","State":"OH","ZIP":"44470","Phone":"(330) 898-8841","Low Grade":"9","High Grade":"12","Enrollment":"147","NCES ID":"390502303869","Website":"https://www.chalker.k12.oh.us","lat":41.2978,"lng":-80.9753},
+  {"School Name":"Champion Central Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Champion Local SD","Street Address":"5976 Mahoning Ave NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 856-8200","Low Grade":"3","High Grade":"5","Enrollment":"356","NCES ID":"390502403877","Website":"https://www.championschools.org","lat":41.2598,"lng":-80.8823},
+  {"School Name":"Champion High School","Sector":"Public","School Type":"High","District / Operator":"Champion Local SD","Street Address":"5976 Mahoning Ave NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 856-8200","Low Grade":"9","High Grade":"12","Enrollment":"432","NCES ID":"390502403876","Website":"https://www.championschools.org","lat":41.2602,"lng":-80.8819},
+  {"School Name":"Champion Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Champion Local SD","Street Address":"5976 Mahoning Ave NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 856-8200","Low Grade":"6","High Grade":"8","Enrollment":"378","NCES ID":"390502403878","Website":"https://www.championschools.org","lat":41.2594,"lng":-80.8827},
+  {"School Name":"Children's Rainbow Preschool","Sector":"Private","School Type":"Elementary","District / Operator":"Private","Street Address":"2860 E Market St","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 372-2535","Low Grade":"PK","High Grade":"KG","Enrollment":"40","NCES ID":"","Website":"","lat":41.2341,"lng":-80.7851},
+  {"School Name":"E J Blott Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Liberty Local SD","Street Address":"4115 Shady Rd","City":"Youngstown","State":"OH","ZIP":"44505","Phone":"(330) 759-0100","Low Grade":"PK","High Grade":"5","Enrollment":"312","NCES ID":"390503203862","Website":"https://www.libertylocal.org","lat":41.1320,"lng":-80.7140},
+  {"School Name":"Girard Intermediate Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Girard City SD","Street Address":"702 E Prospect St","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-2596","Low Grade":"5","High Grade":"6","Enrollment":"289","NCES ID":"390503803870","Website":"https://www.girardeagles.org","lat":41.1564,"lng":-80.6936},
+  {"School Name":"Girard Junior High School","Sector":"Public","School Type":"Middle","District / Operator":"Girard City SD","Street Address":"1244 Shannon Rd","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-2596","Low Grade":"7","High Grade":"8","Enrollment":"212","NCES ID":"390503803871","Website":"https://www.girardeagles.org","lat":41.1609,"lng":-80.6964},
+  {"School Name":"Girard Senior High School","Sector":"Public","School Type":"High","District / Operator":"Girard City SD","Street Address":"1244 Shannon Rd","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-2596","Low Grade":"9","High Grade":"12","Enrollment":"396","NCES ID":"390503803869","Website":"https://www.girardeagles.org","lat":41.1613,"lng":-80.6968},
+  {"School Name":"Grapevine School","Sector":"Private","School Type":"Elementary","District / Operator":"Private (Amish)","Street Address":"8421 S Girdle Rd","City":"Middlefield","State":"OH","ZIP":"44062","Phone":"","Low Grade":"1","High Grade":"8","Enrollment":"N/A","NCES ID":"","Website":"","lat":41.4762,"lng":-81.0628},
+  {"School Name":"Holy Trinity Orthodox Christian Academy & Preschool","Sector":"Private","School Type":"Elementary","District / Operator":"Private","Street Address":"175 Laird Ave NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 392-2468","Low Grade":"PK","High Grade":"8","Enrollment":"45","NCES ID":"","Website":"","lat":41.2431,"lng":-80.8163},
+  {"School Name":"Howland Glen Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Howland Local SD","Street Address":"8000 Bridle Ln NE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8200","Low Grade":"PK","High Grade":"2","Enrollment":"411","NCES ID":"390504003876","Website":"https://www.howlandschools.com","lat":41.2890,"lng":-80.7680},
+  {"School Name":"Howland High School","Sector":"Public","School Type":"High","District / Operator":"Howland Local SD","Street Address":"200 Shaffer Dr NE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8200","Low Grade":"9","High Grade":"12","Enrollment":"854","NCES ID":"390504003875","Website":"https://www.howlandschools.com","lat":41.2870,"lng":-80.7650},
+  {"School Name":"Howland Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Howland Local SD","Street Address":"8100 South St SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8200","Low Grade":"6","High Grade":"8","Enrollment":"612","NCES ID":"390504003877","Website":"https://www.howlandschools.com","lat":41.2851,"lng":-80.7631},
+  {"School Name":"Howland Springs Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Howland Local SD","Street Address":"9500 Howland Springs Rd SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8200","Low Grade":"3","High Grade":"5","Enrollment":"387","NCES ID":"390504003879","Website":"https://www.howlandschools.com","lat":41.2831,"lng":-80.7612},
+  {"School Name":"Hubbard Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Hubbard Exempted Village SD","Street Address":"150 Hall Ave","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-1421","Low Grade":"PK","High Grade":"4","Enrollment":"372","NCES ID":"390504403863","Website":"https://www.hubbardschools.com","lat":41.1594,"lng":-80.5674},
+  {"School Name":"Hubbard High School","Sector":"Public","School Type":"High","District / Operator":"Hubbard Exempted Village SD","Street Address":"350 Hall Ave","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-1421","Low Grade":"9","High Grade":"12","Enrollment":"528","NCES ID":"390504403862","Website":"https://www.hubbardschools.com","lat":41.1598,"lng":-80.5678},
+  {"School Name":"Hubbard Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Hubbard Exempted Village SD","Street Address":"250 Hall Ave","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-1421","Low Grade":"5","High Grade":"8","Enrollment":"421","NCES ID":"390504403864","Website":"https://www.hubbardschools.com","lat":41.1602,"lng":-80.5682},
+  {"School Name":"Jefferson PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"1543 Tod Ave SW","City":"Warren","State":"OH","ZIP":"44485","Phone":"(330) 841-2300","Low Grade":"PK","High Grade":"8","Enrollment":"388","NCES ID":"390507003889","Website":"https://www.warrencc.org","lat":41.2183,"lng":-80.8339},
+  {"School Name":"John F. Kennedy Catholic School (Lower Campus)","Sector":"Private","School Type":"Elementary","District / Operator":"Catholic Diocese of Youngstown","Street Address":"3000 Reeves Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 372-0197","Low Grade":"PK","High Grade":"5","Enrollment":"245","NCES ID":"","Website":"https://www.jfkwarrencatholic.org","lat":41.2601,"lng":-80.7912},
+  {"School Name":"John F. Kennedy Catholic School (Upper Campus)","Sector":"Private","School Type":"Elementary","District / Operator":"Catholic Diocese of Youngstown","Street Address":"2550 Central Parkway Ave SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 372-0197","Low Grade":"6","High Grade":"8","Enrollment":"178","NCES ID":"","Website":"https://www.jfkwarrencatholic.org","lat":41.2218,"lng":-80.7832},
+  {"School Name":"Kinsman Amish School","Sector":"Private","School Type":"Elementary","District / Operator":"Private (Amish)","Street Address":"3515 Bush Rd","City":"Kinsman","State":"OH","ZIP":"44428","Phone":"","Low Grade":"1","High Grade":"8","Enrollment":"N/A","NCES ID":"","Website":"","lat":41.4402,"lng":-80.5881},
+  {"School Name":"LaBrae High School","Sector":"Public","School Type":"High","District / Operator":"LaBrae Local SD","Street Address":"1001 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-3060","Low Grade":"9","High Grade":"12","Enrollment":"381","NCES ID":"390502403882","Website":"https://www.labraeschools.org","lat":41.2438,"lng":-80.8661},
+  {"School Name":"LaBrae Intermediate School","Sector":"Public","School Type":"Elementary","District / Operator":"LaBrae Local SD","Street Address":"1001 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-3060","Low Grade":"3","High Grade":"5","Enrollment":"298","NCES ID":"390502403883","Website":"https://www.labraeschools.org","lat":41.2442,"lng":-80.8665},
+  {"School Name":"LaBrae Middle School","Sector":"Public","School Type":"Middle","District / Operator":"LaBrae Local SD","Street Address":"1001 N Leavitt Rd","City":"Leavittsburg","State":"OH","ZIP":"44430","Phone":"(330) 898-3060","Low Grade":"6","High Grade":"8","Enrollment":"268","NCES ID":"390502403885","Website":"https://www.labraeschools.org","lat":41.2446,"lng":-80.8669},
+  {"School Name":"Lakeview Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Lakeview Local SD","Street Address":"640 Wakefield Dr","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 637-8741","Low Grade":"PK","High Grade":"5","Enrollment":"489","NCES ID":"390502803864","Website":"https://www.lakeviewlocal.org","lat":41.3309,"lng":-80.7257},
+  {"School Name":"Lakeview High School","Sector":"Public","School Type":"High","District / Operator":"Lakeview Local SD","Street Address":"300 Hillman Dr","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 637-8741","Low Grade":"9","High Grade":"12","Enrollment":"632","NCES ID":"390502803863","Website":"https://www.lakeviewlocal.org","lat":41.3313,"lng":-80.7261},
+  {"School Name":"Lakeview Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Lakeview Local SD","Street Address":"640 Wakefield Dr","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 637-8741","Low Grade":"6","High Grade":"8","Enrollment":"398","NCES ID":"390502803865","Website":"https://www.lakeviewlocal.org","lat":41.3305,"lng":-80.7253},
+  {"School Name":"Liberty High School","Sector":"Public","School Type":"High","District / Operator":"Liberty Local SD","Street Address":"1 Leopard Way","City":"Youngstown","State":"OH","ZIP":"44505","Phone":"(330) 759-0100","Low Grade":"9","High Grade":"12","Enrollment":"423","NCES ID":"390503203863","Website":"https://www.libertylocal.org","lat":41.1324,"lng":-80.7144},
+  {"School Name":"Lincoln PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"2253 Atlantic St NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 841-2300","Low Grade":"PK","High Grade":"8","Enrollment":"412","NCES ID":"390507003890","Website":"https://www.warrencc.org","lat":41.2481,"lng":-80.7873},
+  {"School Name":"Lordstown Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Lordstown Local SD","Street Address":"1776 Salt Springs Rd","City":"Warren","State":"OH","ZIP":"44481","Phone":"(330) 824-2300","Low Grade":"PK","High Grade":"5","Enrollment":"276","NCES ID":"390503703864","Website":"https://www.lordstownlocal.org","lat":41.1641,"lng":-80.8624},
+  {"School Name":"Lordstown High School","Sector":"Public","School Type":"High","District / Operator":"Lordstown Local SD","Street Address":"1824 Salt Springs Rd","City":"Warren","State":"OH","ZIP":"44481","Phone":"(330) 824-2300","Low Grade":"9","High Grade":"12","Enrollment":"198","NCES ID":"390503703863","Website":"https://www.lordstownlocal.org","lat":41.1645,"lng":-80.8628},
+  {"School Name":"Maplewood Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Maplewood Local SD","Street Address":"4174 Greenville Rd","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 638-2000","Low Grade":"PK","High Grade":"5","Enrollment":"284","NCES ID":"390503903862","Website":"https://www.maplewood.k12.oh.us","lat":41.3641,"lng":-80.7371},
+  {"School Name":"Maplewood High School","Sector":"Public","School Type":"High","District / Operator":"Maplewood Local SD","Street Address":"2414 Greenville Rd","City":"Cortland","State":"OH","ZIP":"44410","Phone":"(330) 638-2000","Low Grade":"9","High Grade":"12","Enrollment":"372","NCES ID":"390503903861","Website":"https://www.maplewood.k12.oh.us","lat":41.3421,"lng":-80.7291},
+  {"School Name":"Mathews Elementary School (Intermediate)","Sector":"Public","School Type":"Elementary","District / Operator":"Mathews Local SD","Street Address":"4095 Sheridan Dr","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 394-6855","Low Grade":"3","High Grade":"5","Enrollment":"218","NCES ID":"390506703876","Website":"https://www.mathewsmustangs.com","lat":41.2367,"lng":-80.6624},
+  {"School Name":"Mathews Elementary School (Primary)","Sector":"Public","School Type":"Elementary","District / Operator":"Mathews Local SD","Street Address":"4095 Sheridan Dr","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 394-6855","Low Grade":"PK","High Grade":"2","Enrollment":"231","NCES ID":"390506703875","Website":"https://www.mathewsmustangs.com","lat":41.2371,"lng":-80.6628},
+  {"School Name":"Mathews High School","Sector":"Public","School Type":"High","District / Operator":"Mathews Local SD","Street Address":"4429 Warren Sharon Rd","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 394-6855","Low Grade":"9","High Grade":"12","Enrollment":"314","NCES ID":"390506703874","Website":"https://www.mathewsmustangs.com","lat":41.2382,"lng":-80.6641},
+  {"School Name":"Mathews Junior High School","Sector":"Public","School Type":"Middle","District / Operator":"Mathews Local SD","Street Address":"4429 Warren Sharon Rd","City":"Vienna","State":"OH","ZIP":"44473","Phone":"(330) 394-6855","Low Grade":"6","High Grade":"8","Enrollment":"268","NCES ID":"390506703877","Website":"https://www.mathewsmustangs.com","lat":41.2386,"lng":-80.6645},
+  {"School Name":"McDonald High School","Sector":"Public","School Type":"High","District / Operator":"McDonald Local SD","Street Address":"600 Iowa Ave","City":"Mc Donald","State":"OH","ZIP":"44437","Phone":"(330) 530-8085","Low Grade":"9","High Grade":"12","Enrollment":"289","NCES ID":"390504103863","Website":"https://www.mcdonaldschools.org","lat":41.1638,"lng":-80.7228},
+  {"School Name":"McGuffey PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"3465 Tod Ave NW","City":"Warren","State":"OH","ZIP":"44485","Phone":"(330) 841-2300","Low Grade":"PK","High Grade":"8","Enrollment":"341","NCES ID":"390507003891","Website":"https://www.warrencc.org","lat":41.2507,"lng":-80.8481},
+  {"School Name":"McKinley High School","Sector":"Public","School Type":"High","District / Operator":"Niles City SD","Street Address":"616 Dragon Dr","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 989-6000","Low Grade":"9","High Grade":"12","Enrollment":"512","NCES ID":"390504803862","Website":"https://www.nilescsd.org","lat":41.1948,"lng":-80.7576},
+  {"School Name":"Mesopotamia Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Bloomfield-Mespo Local SD","Street Address":"8989 State Route 87","City":"Mesopotamia","State":"OH","ZIP":"44439","Phone":"(440) 693-4295","Low Grade":"PK","High Grade":"4","Enrollment":"187","NCES ID":"390501803885","Website":"https://www.bloomfield-mespo.k12.oh.us","lat":41.4604,"lng":-80.9481},
+  {"School Name":"Mineral Ridge High School","Sector":"Public","School Type":"High","District / Operator":"Weathersfield Local SD","Street Address":"1334 Seaborn St","City":"Mineral Ridge","State":"OH","ZIP":"44440","Phone":"(330) 652-3636","Low Grade":"9","High Grade":"12","Enrollment":"334","NCES ID":"390506803862","Website":"https://www.weathersfield.k12.oh.us","lat":41.1481,"lng":-80.7671},
+  {"School Name":"Mines Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Howland Local SD","Street Address":"850 Howland Wilson Rd NE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 856-8200","Low Grade":"PK","High Grade":"2","Enrollment":"367","NCES ID":"390504003878","Website":"https://www.howlandschools.com","lat":41.2910,"lng":-80.7696},
+  {"School Name":"Newton Falls Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Newton Falls Exempted Village SD","Street Address":"905 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-5445","Low Grade":"PK","High Grade":"4","Enrollment":"298","NCES ID":"390504603864","Website":"https://www.newtonfalls.org","lat":41.1866,"lng":-81.0010},
+  {"School Name":"Newton Falls High School","Sector":"Public","School Type":"High","District / Operator":"Newton Falls Exempted Village SD","Street Address":"907 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-5445","Low Grade":"9","High Grade":"12","Enrollment":"329","NCES ID":"390504603862","Website":"https://www.newtonfalls.org","lat":41.1870,"lng":-81.0014},
+  {"School Name":"Newton Falls Junior High School","Sector":"Public","School Type":"Middle","District / Operator":"Newton Falls Exempted Village SD","Street Address":"907 1/2 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-5445","Low Grade":"7","High Grade":"8","Enrollment":"168","NCES ID":"390504603865","Website":"https://www.newtonfalls.org","lat":41.1862,"lng":-81.0006},
+  {"School Name":"Newton Falls Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Newton Falls Exempted Village SD","Street Address":"905 Milton Blvd","City":"Newton Falls","State":"OH","ZIP":"44444","Phone":"(330) 872-5445","Low Grade":"5","High Grade":"6","Enrollment":"178","NCES ID":"390504603866","Website":"https://www.newtonfalls.org","lat":41.1858,"lng":-81.0002},
+  {"School Name":"Niles Intermediate School","Sector":"Public","School Type":"Elementary","District / Operator":"Niles City SD","Street Address":"120 E Margaret Ave","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 989-6000","Low Grade":"3","High Grade":"5","Enrollment":"389","NCES ID":"390504803865","Website":"https://www.nilescsd.org","lat":41.1996,"lng":-80.7591},
+  {"School Name":"Niles Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Niles City SD","Street Address":"411 Brown St","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 989-6000","Low Grade":"6","High Grade":"8","Enrollment":"421","NCES ID":"390504803863","Website":"https://www.nilescsd.org","lat":41.1989,"lng":-80.7578},
+  {"School Name":"Niles Preparatory Academy","Sector":"Public","School Type":"Charter","District / Operator":"Niles Preparatory Academy","Street Address":"45 S Chestnut Ave","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 652-1600","Low Grade":"KG","High Grade":"8","Enrollment":"312","NCES ID":"390513400001","Website":"","lat":41.2011,"lng":-80.7634},
+  {"School Name":"Niles Primary School","Sector":"Public","School Type":"Elementary","District / Operator":"Niles City SD","Street Address":"960 Frederick St","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 989-6000","Low Grade":"PK","High Grade":"2","Enrollment":"412","NCES ID":"390504803866","Website":"https://www.nilescsd.org","lat":41.2003,"lng":-80.7598},
+  {"School Name":"Preschool at Warren G. Harding High School","Sector":"Public","School Type":"Elementary","District / Operator":"Warren City SD","Street Address":"860 Elm Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 841-2300","Low Grade":"PK","High Grade":"PK","Enrollment":"82","NCES ID":"390507003894","Website":"https://www.warrencc.org","lat":41.2541,"lng":-80.8156},
+  {"School Name":"Prospect Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Girard City SD","Street Address":"700 E Prospect St","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-2596","Low Grade":"PK","High Grade":"4","Enrollment":"318","NCES ID":"390503803872","Website":"https://www.girardeagles.org","lat":41.1568,"lng":-80.6940},
+  {"School Name":"River Gate High School","Sector":"Public","School Type":"Alt/Other","District / Operator":"Warren City SD","Street Address":"458 Franklin St SE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 841-2300","Low Grade":"9","High Grade":"12","Enrollment":"87","NCES ID":"390507003896","Website":"https://www.warrencc.org","lat":41.2287,"lng":-80.8213},
+  {"School Name":"Roosevelt Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"McDonald Local SD","Street Address":"410 W 7th St","City":"Mc Donald","State":"OH","ZIP":"44437","Phone":"(330) 530-8085","Low Grade":"PK","High Grade":"4","Enrollment":"231","NCES ID":"390504103864","Website":"https://www.mcdonaldschools.org","lat":41.1642,"lng":-80.7232},
+  {"School Name":"Seaborn Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Weathersfield Local SD","Street Address":"3800 Niles Carver Rd","City":"Mineral Ridge","State":"OH","ZIP":"44440","Phone":"(330) 652-3636","Low Grade":"PK","High Grade":"5","Enrollment":"287","NCES ID":"390506803864","Website":"https://www.weathersfield.k12.oh.us","lat":41.1487,"lng":-80.7677},
+  {"School Name":"Southington Elementary School","Sector":"Public","School Type":"Elementary","District / Operator":"Chalker Local SD","Street Address":"2482 State Route 534","City":"Southington","State":"OH","ZIP":"44470","Phone":"(330) 898-8841","Low Grade":"PK","High Grade":"4","Enrollment":"189","NCES ID":"390502303870","Website":"https://www.chalker.k12.oh.us","lat":41.2982,"lng":-80.9757},
+  {"School Name":"Southington Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Chalker Local SD","Street Address":"2482 State Route 534","City":"Southington","State":"OH","ZIP":"44470","Phone":"(330) 898-8841","Low Grade":"5","High Grade":"8","Enrollment":"162","NCES ID":"390502303871","Website":"https://www.chalker.k12.oh.us","lat":41.2986,"lng":-80.9761},
+  {"School Name":"St. Rose School","Sector":"Private","School Type":"Elementary","District / Operator":"Catholic Diocese of Youngstown","Street Address":"61 E Main St","City":"Girard","State":"OH","ZIP":"44420","Phone":"(330) 545-7402","Low Grade":"PK","High Grade":"8","Enrollment":"198","NCES ID":"","Website":"","lat":41.1573,"lng":-80.6985},
+  {"School Name":"STEAM Academy of Warren","Sector":"Public","School Type":"Charter","District / Operator":"STEAM Academy of Warren","Street Address":"261 Elm Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 609-0500","Low Grade":"KG","High Grade":"8","Enrollment":"187","NCES ID":"390513400002","Website":"","lat":41.2537,"lng":-80.8152},
+  {"School Name":"Summit Academy Alt. Learners-Warren","Sector":"Public","School Type":"Charter","District / Operator":"Summit Academy Management","Street Address":"1461 Moncrest Dr NW","City":"Warren","State":"OH","ZIP":"44485","Phone":"(330) 609-0510","Low Grade":"KG","High Grade":"8","Enrollment":"142","NCES ID":"390513400003","Website":"","lat":41.2547,"lng":-80.8441},
+  {"School Name":"Summit Academy Community School-Warren","Sector":"Public","School Type":"Charter","District / Operator":"Summit Academy Management","Street Address":"2106 Arbor Ave SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 609-0520","Low Grade":"KG","High Grade":"8","Enrollment":"158","NCES ID":"390513400004","Website":"","lat":41.2231,"lng":-80.7841},
+  {"School Name":"Troy Mill Lane School","Sector":"Private","School Type":"Elementary","District / Operator":"Private (Amish)","Street Address":"17093 Kinsman Rd","City":"Middlefield","State":"OH","ZIP":"44062","Phone":"","Low Grade":"1","High Grade":"8","Enrollment":"N/A","NCES ID":"","Website":"","lat":41.4819,"lng":-81.0598},
+  {"School Name":"Trumbull Career & Tech Center","Sector":"Public","School Type":"Career-Tech","District / Operator":"Trumbull County ESC","Street Address":"528 Educational Hwy NW","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 847-0503","Low Grade":"10","High Grade":"12","Enrollment":"1200","NCES ID":"390507703869","Website":"https://www.tctc.k12.oh.us","lat":41.2631,"lng":-80.8509},
+  {"School Name":"Victory Christian School","Sector":"Private","School Type":"Elementary","District / Operator":"Private","Street Address":"2053 Pleasant Valley Rd","City":"Niles","State":"OH","ZIP":"44446","Phone":"(330) 652-1234","Low Grade":"PK","High Grade":"8","Enrollment":"87","NCES ID":"","Website":"","lat":41.2167,"lng":-80.7741},
+  {"School Name":"Villa Maria Teresa (Preschool)","Sector":"Private","School Type":"Elementary","District / Operator":"Private","Street Address":"50 Warner Rd","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-6212","Low Grade":"PK","High Grade":"KG","Enrollment":"35","NCES ID":"","Website":"","lat":41.1611,"lng":-80.5688},
+  {"School Name":"Villa Maria Teresa Oblate Sisters","Sector":"Private","School Type":"K-12","District / Operator":"Private","Street Address":"50 Warner Rd","City":"Hubbard","State":"OH","ZIP":"44425","Phone":"(330) 534-6212","Low Grade":"1","High Grade":"12","Enrollment":"112","NCES ID":"","Website":"","lat":41.1615,"lng":-80.5692},
+  {"School Name":"Warren G Harding High School","Sector":"Public","School Type":"High","District / Operator":"Warren City SD","Street Address":"860 Elm Rd NE","City":"Warren","State":"OH","ZIP":"44483","Phone":"(330) 841-2300","Low Grade":"9","High Grade":"12","Enrollment":"987","NCES ID":"390507003862","Website":"https://www.warrencc.org","lat":41.2545,"lng":-80.8160},
+  {"School Name":"Whispering Pines School","Sector":"Private","School Type":"Elementary","District / Operator":"Private (Amish)","Street Address":"7090 State Route 534","City":"West Farmington","State":"OH","ZIP":"44491","Phone":"","Low Grade":"1","High Grade":"8","Enrollment":"N/A","NCES ID":"","Website":"","lat":41.3841,"lng":-81.0541},
+  {"School Name":"Willard Avenue PK-8 School","Sector":"Public","School Type":"PK-8","District / Operator":"Warren City SD","Street Address":"2020 Willard Ave SE","City":"Warren","State":"OH","ZIP":"44484","Phone":"(330) 841-2300","Low Grade":"PK","High Grade":"8","Enrollment":"298","NCES ID":"390507003892","Website":"https://www.warrencc.org","lat":41.2201,"lng":-80.8163},
+  {"School Name":"William S Guy Middle School","Sector":"Public","School Type":"Middle","District / Operator":"Liberty Local SD","Street Address":"4115 Shady Rd","City":"Youngstown","State":"OH","ZIP":"44505","Phone":"(330) 759-0100","Low Grade":"5","High Grade":"8","Enrollment":"287","NCES ID":"390503203864","Website":"https://www.libertylocal.org","lat":41.1316,"lng":-80.7136}
 ];
 
-// Color by school type
-const TYPE_COLORS = {
-  'Elementary': '#10b981',
-  'Middle':     '#f59e0b',
-  'High':       '#ef4444',
-  'PK-8':       '#06b6d4',
-  'Charter':    '#6366f1',
-  'Career-Tech':'#a855f7',
-  'K-12':       '#ec4899',
-  'Alt/Other':  '#94a3b8'
-};
+// =============================================
+// MAP SETUP
+// =============================================
+const map = L.map('map', {
+  center: [41.27, -80.83],
+  zoom: 11,
+  zoomControl: true
+});
 
-function getColor(school) {
-  const type = school['School Type'];
-  return TYPE_COLORS[type] || '#94a3b8';
-}
-
-function makeIcon(school, selected = false) {
-  const color = getColor(school);
-  const isPrivate = school['Sector'] === 'Private';
-  const size = selected ? 18 : 14;
-  const ring = selected ? `<circle cx="10" cy="10" r="9" fill="none" stroke="white" stroke-width="2.5"/>` : '';
-  const shape = isPrivate
-    ? `<polygon points="10,2 18,18 2,18" fill="${color}" stroke="${selected?'white':'rgba(0,0,0,0.4)'}" stroke-width="${selected?2:1}"/>`
-    : `<circle cx="10" cy="10" r="8" fill="${color}" stroke="${selected?'white':'rgba(0,0,0,0.4)'}" stroke-width="${selected?2:1}"/>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size+4}" height="${size+4}" viewBox="0 0 20 20">${shape}${ring}</svg>`;
-  return L.divIcon({
-    html: svg,
-    className: '',
-    iconSize: [size+4, size+4],
-    iconAnchor: [(size+4)/2, (size+4)/2]
-  });
-}
-
-// Init map
-const map = L.map('map', { center: [41.25, -80.82], zoom: 11 });
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap © CARTO',
+// Daytime map tile
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   maxZoom: 19
 }).addTo(map);
 
-// Add legend
-const legend = L.control({ position: 'bottomleft' });
-legend.onAdd = () => {
-  const div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = `<div class="legend-title">School Type</div>` +
-    Object.entries(TYPE_COLORS).map(([type, color]) =>
-      `<div class="legend-row"><div class="legend-dot" style="background:${color}"></div>${type}</div>`
-    ).join('') +
-    `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #334155">
-      <div class="legend-row"><svg width="14" height="14" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#64748b"/></svg>&nbsp;Public</div>
-      <div class="legend-row"><svg width="14" height="14" viewBox="0 0 20 20"><polygon points="10,2 18,18 2,18" fill="#64748b"/></svg>&nbsp;Private</div>
-    </div>`;
-  return div;
+// Move zoom control
+map.zoomControl.setPosition('topleft');
+
+// =============================================
+// ICON CONFIG
+// =============================================
+const TYPE_EMOJI = {
+  'Elementary':  '🏫',
+  'High':        '🎓',
+  'Middle':      '📚',
+  'PK-8':        '🌱',
+  'K-12':        '🏛️',
+  'Charter':     '⭐',
+  'Career-Tech': '🔧',
+  'Alt/Other':   '🔄'
 };
-legend.addTo(map);
+const TYPE_LABEL = {
+  'Elementary':  'Elementary',
+  'High':        'High School',
+  'Middle':      'Middle School',
+  'PK-8':        'PK-8 School',
+  'K-12':        'K-12 School',
+  'Charter':     'Charter School',
+  'Career-Tech': 'Career-Tech',
+  'Alt/Other':   'Alt/Other'
+};
 
-// Markers
-const markers = [];
-let selectedId = null;
-
-// Populate city filter
-const cities = [...new Set(SCHOOLS.map(s => s['City']))].sort();
-const cityFilter = document.getElementById('cityFilter');
-cities.forEach(c => {
-  const o = document.createElement('option');
-  o.value = c; o.textContent = c;
-  cityFilter.appendChild(o);
-});
-
-function selectSchool(school) {
-  // Reset previous
-  if (selectedId !== null) {
-    const prev = markers.find(m => m.schoolId === selectedId);
-    if (prev) prev.marker.setIcon(makeIcon(prev.school, false));
-  }
-  selectedId = school['#'];
-  const curr = markers.find(m => m.schoolId === selectedId);
-  if (curr) curr.marker.setIcon(makeIcon(school, true));
-  renderDetail(school);
-}
-
-function renderDetail(school) {
-  const pane = document.getElementById('detailPane');
-  const color = getColor(school);
-  const typeKey = school['School Type'].replace('/','');
-  const enrollment = parseInt((school['Enrollment']||'0').replace(',','')) || 0;
-  const maxEnrollment = 1300;
-  const pct = Math.min(100, Math.round(enrollment / maxEnrollment * 100));
-
-  pane.innerHTML = `
-    <div class="detail-header">
-      <div class="badge-row">
-        <span class="badge badge-sector-${school['Sector']}">${school['Sector']}</span>
-        <span class="badge badge-type-${typeKey}" style="background:${color}22;color:${color}">${school['School Type']}</span>
-      </div>
-      <h2>${school['School Name']}</h2>
-    </div>
-    <div class="detail-body">
-      <div class="info-row">
-        <span class="info-icon">🏫</span>
-        <div>
-          <div class="info-label">District / Operator</div>
-          <div class="info-value">${school['District / Operator']}</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <span class="info-icon">📍</span>
-        <div>
-          <div class="info-label">Address</div>
-          <div class="info-value">${school['Street Address']}<br>${school['City']}, ${school['State']} ${school['ZIP']}</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <span class="info-icon">📞</span>
-        <div>
-          <div class="info-label">Phone</div>
-          <div class="info-value">${school['Phone'] || '—'}</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <span class="info-icon">📚</span>
-        <div>
-          <div class="info-label">Grades</div>
-          <div class="info-value">${school['Low Grade']} – ${school['High Grade']}</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <span class="info-icon">👥</span>
-        <div>
-          <div class="info-label">Enrollment</div>
-          <div class="info-value">${school['Enrollment'] || '—'} students</div>
-          <div class="enrollment-bar">
-            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-          </div>
-        </div>
-      </div>
-      ${school['NCES ID'] ? `
-      <div class="info-row">
-        <span class="info-icon">🆔</span>
-        <div>
-          <div class="info-label">NCES ID</div>
-          <div class="info-value" style="font-family:monospace;font-size:0.8rem">${school['NCES ID']}</div>
-        </div>
-      </div>` : ''}
-      ${school['Website'] ? `
-      <div class="info-row">
-        <span class="info-icon">🌐</span>
-        <div>
-          <div class="info-label">Website</div>
-          <a class="website-link" href="${school['Website']}" target="_blank" rel="noopener">
-            Visit Website ↗
-          </a>
-        </div>
-      </div>` : ''}
+function makeIcon(school) {
+  const color = school.Sector === 'Public' ? '#1a6faf' : '#c0392b';
+  const emoji = TYPE_EMOJI[school['School Type']] || '🏫';
+  const html = `
+    <div style="
+      background:${color};
+      border: 2.5px solid rgba(255,255,255,0.9);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    ">
+      <span style="transform: rotate(45deg); font-size: 14px; line-height:1;">${emoji}</span>
     </div>
   `;
+  return L.divIcon({
+    html,
+    className: '',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -34]
+  });
 }
 
-// Create markers
-SCHOOLS.forEach(school => {
-  const marker = L.marker([school.lat, school.lng], {
-    icon: makeIcon(school, false)
-  });
+// =============================================
+// MARKERS
+// =============================================
+let markers = [];
+let markerLayers = [];
 
-  marker.bindTooltip(school['School Name'], {
+SCHOOLS.forEach((school, i) => {
+  const marker = L.marker([school.lat, school.lng], { icon: makeIcon(school) });
+
+  const addr = `${school['Street Address']}, ${school.City}, ${school.State} ${school.ZIP}`;
+  marker.bindTooltip(`<b>${school['School Name']}</b><br><small>${addr}</small>`, {
     className: 'custom-tooltip',
     direction: 'top',
-    offset: [0, -8],
-    permanent: false
+    offset: [0, -30]
   });
 
-  marker.on('click', () => {
-    selectSchool(school);
-    map.setView([school.lat, school.lng], Math.max(map.getZoom(), 13));
-  });
-
+  marker.on('click', () => openModal(school));
   marker.addTo(map);
-  markers.push({ marker, school, schoolId: school['#'], visible: true });
+  markers.push({ marker, school });
+  markerLayers.push(marker);
 });
 
+// =============================================
+// FILTER LOGIC
+// =============================================
 function applyFilters() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const sector = document.getElementById('sectorFilter').value;
-  const type = document.getElementById('typeFilter').value;
-  const city = document.getElementById('cityFilter').value;
+  const search = document.getElementById('filter-search').value.toLowerCase();
+  const pubOn = document.getElementById('f-public').checked;
+  const prvOn = document.getElementById('f-private').checked;
+  const types = ['Elementary','High','Middle','PK-8','K-12','Charter','Career-Tech','Alt/Other'];
+  const typeChecks = {};
+  types.forEach(t => {
+    const el = document.getElementById('f-'+t);
+    typeChecks[t] = el ? el.checked : true;
+  });
 
-  let count = 0;
-  markers.forEach(({ marker, school }) => {
-    const matchSearch = !search ||
-      school['School Name'].toLowerCase().includes(search) ||
-      (school['District / Operator'] || '').toLowerCase().includes(search);
-    const matchSector = !sector || school['Sector'] === sector;
-    const matchType = !type || school['School Type'] === type;
-    const matchCity = !city || school['City'] === city;
-    const visible = matchSearch && matchSector && matchType && matchCity;
-
-    if (visible) {
-      marker.addTo(map);
-      count++;
+  let visible = 0;
+  markers.forEach(({marker, school}) => {
+    const secOk = (school.Sector === 'Public' && pubOn) || (school.Sector === 'Private' && prvOn);
+    const typeOk = typeChecks[school['School Type']];
+    const nameOk = !search || school['School Name'].toLowerCase().includes(search);
+    if (secOk && typeOk && nameOk) {
+      if (!map.hasLayer(marker)) marker.addTo(map);
+      visible++;
     } else {
-      marker.remove();
+      if (map.hasLayer(marker)) map.removeLayer(marker);
     }
   });
-  document.getElementById('visibleCount').textContent = count;
+  updateTotals();
 }
+
+function clearFilters() {
+  document.getElementById('filter-search').value = '';
+  document.getElementById('f-public').checked = true;
+  document.getElementById('f-private').checked = true;
+  ['Elementary','High','Middle','PK-8','K-12','Charter','Career-Tech','Alt/Other'].forEach(t => {
+    const el = document.getElementById('f-'+t);
+    if (el) el.checked = true;
+  });
+  applyFilters();
+}
+
+// =============================================
+// TOTALS
+// =============================================
+function updateTotals() {
+  const visible = markers.filter(({marker}) => map.hasLayer(marker));
+  const pub = visible.filter(({school}) => school.Sector === 'Public').length;
+  const prv = visible.filter(({school}) => school.Sector === 'Private').length;
+  const byType = {};
+  visible.forEach(({school}) => {
+    byType[school['School Type']] = (byType[school['School Type']] || 0) + 1;
+  });
+
+  let html = `
+    <div class="total-row"><span>Public</span><span class="total-badge pub">${pub}</span></div>
+    <div class="total-row"><span>Private</span><span class="total-badge prv">${prv}</span></div>
+    <div style="height:6px"></div>
+  `;
+  Object.entries(byType).sort((a,b)=>b[1]-a[1]).forEach(([type,count]) => {
+    html += `<div class="total-row"><span>${TYPE_EMOJI[type]||''} ${TYPE_LABEL[type]||type}</span><span class="total-badge">${count}</span></div>`;
+  });
+  html += `<div class="total-row" style="margin-top:6px"><span><b>Showing</b></span><span class="total-badge">${pub+prv}</span></div>`;
+  document.getElementById('totals-content').innerHTML = html;
+}
+updateTotals();
+
+// =============================================
+// MODAL
+// =============================================
+function openModal(school) {
+  const badge = document.getElementById('modal-sector-badge');
+  badge.textContent = school.Sector;
+  badge.style.background = school.Sector === 'Public' ? '#1a6faf' : '#c0392b';
+  badge.style.color = '#fff';
+
+  document.getElementById('modal-name').textContent = school['School Name'];
+  document.getElementById('modal-type').textContent = `${TYPE_EMOJI[school['School Type']]||''} ${TYPE_LABEL[school['School Type']]||school['School Type']}`;
+
+  const addr = `${school['Street Address']}, ${school.City}, ${school.State} ${school.ZIP}`;
+  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`;
+
+  const fields = [
+    { icon: '🏢', label: 'District', value: school['District / Operator'] },
+    { icon: '📍', label: 'Address', value: addr },
+    { icon: '📞', label: 'Phone', value: school.Phone || '—' },
+    { icon: '📊', label: 'Grades', value: (school['Low Grade'] && school['High Grade']) ? `${school['Low Grade']} – ${school['High Grade']}` : '—' },
+    { icon: '👥', label: 'Enrollment', value: school.Enrollment !== 'N/A' ? parseInt(school.Enrollment).toLocaleString() + ' students' : 'N/A' },
+    { icon: '🆔', label: 'NCES ID', value: school['NCES ID'] || '—' },
+    { icon: '🌐', label: 'Website', value: school.Website ? `<a href="${school.Website}" target="_blank" rel="noopener">${school.Website.replace(/^https?:\/\//,'')}</a>` : '—' }
+  ];
+
+  let fieldsHtml = '';
+  fields.forEach(f => {
+    if (!f.value || f.value === '—' && f.label === 'Website') return;
+    fieldsHtml += `
+      <div class="modal-field">
+        <div class="modal-field-icon">${f.icon}</div>
+        <div>
+          <div class="modal-field-label">${f.label}</div>
+          <div class="modal-field-value">${f.value}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById('modal-fields').innerHTML = fieldsHtml;
+  document.getElementById('modal-directions').href = mapsUrl;
+
+  document.getElementById('modal-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay') || e.currentTarget === document.getElementById('modal-close')) {
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+// =============================================
+// PANEL TOGGLE
+// =============================================
+
+// Map panel name → DOM ids
+const PANEL_IDS = {
+  legend: { panel: 'legend',       body: 'legend-body',  hdr: 'legend-hdr'  },
+  filter: { panel: 'filter-panel', body: 'filter-body',  hdr: 'filter-hdr'  },
+  totals: { panel: 'totals-panel', body: 'totals-body',  hdr: 'totals-hdr'  }
+};
+const desktopOpen = { legend: true, filter: true, totals: true };
+
+function togglePanel(name) {
+  const ids   = PANEL_IDS[name];
+  const panel = document.getElementById(ids.panel);
+  const body  = document.getElementById(ids.body);
+  const hdr   = document.getElementById(ids.hdr);
+
+  if (window.innerWidth <= 768) {
+    // ---- MOBILE: toggle mobile-open class ----
+    const opening = !panel.classList.contains('mobile-open');
+    // Close all others first so only one is open at a time
+    Object.keys(PANEL_IDS).forEach(n => {
+      if (n === name) return;
+      const p = document.getElementById(PANEL_IDS[n].panel);
+      const b = document.getElementById(PANEL_IDS[n].body);
+      const h = document.getElementById(PANEL_IDS[n].hdr);
+      p.classList.remove('mobile-open');
+      b.classList.add('collapsed');
+      b.style.maxHeight = '0';
+      h.classList.add('collapsed');
+    });
+    if (opening) {
+      panel.classList.add('mobile-open');
+      body.classList.remove('collapsed');
+      body.style.maxHeight = body.scrollHeight + 400 + 'px';
+      hdr.classList.remove('collapsed');
+    } else {
+      panel.classList.remove('mobile-open');
+      body.classList.add('collapsed');
+      body.style.maxHeight = '0';
+      hdr.classList.add('collapsed');
+    }
+  } else {
+    // ---- DESKTOP: standard collapse ----
+    desktopOpen[name] = !desktopOpen[name];
+    if (desktopOpen[name]) {
+      body.classList.remove('collapsed');
+      body.style.maxHeight = body.scrollHeight + 400 + 'px';
+      hdr.classList.remove('collapsed');
+    } else {
+      body.classList.add('collapsed');
+      body.style.maxHeight = '0';
+      hdr.classList.add('collapsed');
+    }
+  }
+}
+
+// =============================================
+// INIT PANELS
+// =============================================
+function initPanels() {
+  const mobile = window.innerWidth <= 768;
+  Object.keys(PANEL_IDS).forEach(name => {
+    const ids   = PANEL_IDS[name];
+    const panel = document.getElementById(ids.panel);
+    const body  = document.getElementById(ids.body);
+    const hdr   = document.getElementById(ids.hdr);
+
+    if (mobile) {
+      // Start fully collapsed — icon-only button on left side
+      panel.classList.remove('mobile-open');
+      body.classList.add('collapsed');
+      body.style.maxHeight = '0';
+      hdr.classList.add('collapsed');
+    } else {
+      // Desktop: start expanded
+      panel.classList.remove('mobile-open');
+      body.classList.remove('collapsed');
+      body.style.maxHeight = '800px';
+      hdr.classList.remove('collapsed');
+    }
+  });
+}
+
+initPanels();
+// Re-init when orientation/size changes
+let _resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(initPanels, 120);
+});
+
+// Keyboard close
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal({ target: document.getElementById('modal-overlay') });
+});
 </script>
 </body>
 </html>
