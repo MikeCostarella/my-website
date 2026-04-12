@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ohio Institutions of Higher Learning Map</title>
+<title>Ohio Learning Institutions</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -280,6 +280,10 @@
     background: white; color: #1d4ed8; border-color: #1d4ed8;
   }
   .modal-link.city-link:hover { background: #eff6ff; }
+  .modal-link.maps-link {
+    background: #16a34a; color: white; border-color: #16a34a;
+  }
+  .modal-link.maps-link:hover { background: #15803d; border-color: #15803d; }
   .enroll-bar-wrap { margin-top: 6px; }
   .enroll-bar-bg {
     height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden;
@@ -290,6 +294,92 @@
   .enroll-bar-fill.public  { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
   .enroll-bar-fill.private { background: linear-gradient(90deg, #b45309, #f59e0b); }
   .enroll-note { font-size: 0.67rem; color: #94a3b8; margin-top: 3px; }
+
+  /* ── Mobile collapsible panels ───────────────────────────────────────────── */
+  .panel-toggle-btn {
+    display: none; /* hidden on desktop */
+    position: absolute;
+    z-index: 901;
+    background: #1a3a5c;
+    color: white;
+    border: none;
+    border-radius: 0 6px 6px 0;
+    padding: 8px 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 0.8px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+    line-height: 1;
+    transition: background 0.15s;
+  }
+  .panel-toggle-btn:hover { background: #2b6cb0; }
+
+  #legend-toggle  { bottom: 32px; left: 0; }
+  #filter-toggle  { top: 10px;   left: 0; }
+  #stats-toggle   { top: 10px;   left: 0; } /* repositioned in mobile query */
+
+  @media (max-width: 768px) {
+    .panel-toggle-btn { display: flex; align-items: center; justify-content: center; }
+
+    /* Legend: slides in/out from left at bottom */
+    #legend {
+      transition: transform 0.28s ease, opacity 0.28s ease;
+      transform-origin: left bottom;
+    }
+    #legend.collapsed {
+      transform: translateX(calc(-100% - 2px));
+      opacity: 0;
+      pointer-events: none;
+    }
+    #legend-toggle {
+      left: 0;
+    }
+
+    /* Filter bar: below zoom control (~80px from top) */
+    #filter-bar {
+      top: 80px;
+      left: 0;
+      transform: none;
+      border-radius: 0 8px 8px 0;
+      transition: transform 0.28s ease, opacity 0.28s ease;
+      transform-origin: left top;
+      max-width: calc(100vw - 20px);
+    }
+    #filter-bar.collapsed {
+      transform: translateX(calc(-100% - 2px));
+      opacity: 0;
+      pointer-events: none;
+    }
+    #filter-toggle {
+      top: 80px;
+      left: 0;
+    }
+
+    /* Stats bar: below filter toggle (~150px from top), slides from left */
+    #stats-bar {
+      top: 150px;
+      left: 0;
+      right: auto;
+      border-radius: 0 8px 8px 0;
+      transition: transform 0.28s ease, opacity 0.28s ease;
+      transform-origin: left top;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 70px;
+    }
+    #stats-bar.collapsed {
+      transform: translateX(calc(-100% - 2px));
+      opacity: 0;
+      pointer-events: none;
+    }
+    #stats-toggle {
+      top: 150px;
+      left: 0;
+    }
+  }
 
   /* Tooltip overrides */
   .leaflet-tooltip {
@@ -320,7 +410,7 @@
   <div class="header-left">
     <div class="ohio-flag">🎓</div>
     <div class="title-block">
-      <h1>Ohio Institutions of Higher Learning Map</h1>
+      <h1>Ohio Learning Institutions</h1>
       <div class="subtitle">Interactive Map of Ohio Colleges &amp; Universities · 94 Institutions</div>
     </div>
   </div>
@@ -334,6 +424,9 @@
 <div id="map-wrapper">
   <div id="map"></div>
 
+  <!-- Filter toggle button (mobile only) -->
+  <button class="panel-toggle-btn" id="filter-toggle" onclick="togglePanel('filter')" title="Toggle Filters">▶ Filter</button>
+
   <!-- Filter bar -->
   <div id="filter-bar">
     <span>Filter:</span>
@@ -346,12 +439,18 @@
     <button class="filter-btn" data-filter="Community College">🏙 Community College</button>
   </div>
 
+  <!-- Stats toggle button (mobile only) -->
+  <button class="panel-toggle-btn" id="stats-toggle" onclick="togglePanel('stats')" title="Toggle Totals">▶ Totals</button>
+
   <!-- Stats -->
   <div id="stats-bar">
     <div class="stat-item"><div class="stat-num" id="stat-total">94</div><div class="stat-label">Total</div></div>
     <div class="stat-item"><div class="stat-num" id="stat-pub" style="color:#1d4ed8">45</div><div class="stat-label">Public</div></div>
     <div class="stat-item"><div class="stat-num" id="stat-priv" style="color:#b45309">49</div><div class="stat-label">Private</div></div>
   </div>
+
+  <!-- Legend toggle button (mobile only) -->
+  <button class="panel-toggle-btn" id="legend-toggle" onclick="togglePanel('legend')" title="Toggle Legend">▶ Legend</button>
 
   <!-- Legend -->
   <div id="legend">
@@ -515,9 +614,13 @@ function openModal(inst) {
   const controlCls = inst.control.toLowerCase();
   const typeBadgeCls = inst.type.replace(' ', '');
 
+  const mapsQuery = encodeURIComponent(`${inst.name}, ${inst.address}, ${inst.city}, ${inst.state} ${inst.zip}`);
+  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapsQuery}`;
+
   let linksHtml = '';
   if (inst.website) linksHtml += `<a class="modal-link inst-link" href="${inst.website}" target="_blank">🌐 Institution Website</a>`;
   if (inst.city_website) linksHtml += `<a class="modal-link city-link" href="${inst.city_website}" target="_blank">🏙 City Website</a>`;
+  linksHtml += `<a class="modal-link maps-link" href="${mapsUrl}" target="_blank">📍 Get Directions</a>`;
 
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-grid">
@@ -551,7 +654,7 @@ function openModal(inst) {
         <label>Full Address</label>
         <div class="val">${inst.address}<br>${inst.city}, ${inst.state} ${inst.zip}</div>
       </div>
-      ${linksHtml ? `<div class="modal-field full"><label>Links</label><div class="modal-links">${linksHtml}</div></div>` : ''}
+      <div class="modal-field full"><label>Links</label><div class="modal-links">${linksHtml}</div></div>
     </div>
   `;
 
@@ -569,6 +672,56 @@ document.getElementById('modal-overlay').addEventListener('click', e => {
 
 // Close on Escape
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Mobile collapsible panels ─────────────────────────────────────────────────
+const MOBILE_BP = 768;
+
+function isMobile() { return window.innerWidth <= MOBILE_BP; }
+
+// State: both start collapsed on mobile
+const panelState = { legend: false, filter: false, stats: false }; // false = collapsed
+
+function togglePanel(name) {
+  panelState[name] = !panelState[name];
+  applyPanelState(name);
+}
+
+function applyPanelState(name) {
+  const idMap = { legend: 'legend', filter: 'filter-bar', stats: 'stats-bar' };
+  const labelMap = { legend: 'Legend', filter: 'Filter', stats: 'Totals' };
+  const panel = document.getElementById(idMap[name]);
+  const btn   = document.getElementById(name + '-toggle');
+  const open  = panelState[name];
+  if (open) {
+    panel.classList.remove('collapsed');
+    btn.textContent = '◀ ' + labelMap[name];
+  } else {
+    panel.classList.add('collapsed');
+    btn.textContent = '▶ ' + labelMap[name];
+  }
+}
+
+function initMobilePanels() {
+  if (isMobile()) {
+    panelState.legend = false;
+    panelState.filter = false;
+    panelState.stats  = false;
+    applyPanelState('legend');
+    applyPanelState('filter');
+    applyPanelState('stats');
+  } else {
+    document.getElementById('legend').classList.remove('collapsed');
+    document.getElementById('filter-bar').classList.remove('collapsed');
+    const sb = document.getElementById('stats-bar');
+    sb.classList.remove('collapsed');
+    sb.style.top = '';
+    sb.style.left = '';
+    sb.style.right = '';
+  }
+}
+
+initMobilePanels();
+window.addEventListener('resize', initMobilePanels);
 </script>
 </body>
 </html>
