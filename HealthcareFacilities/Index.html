@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trumbull County Healthcare Facilities Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --ink: #1a1f2e;
+    --ink-soft: #4a5568;
+    --accent: #b8323b;
+    --gold: #c19a4a;
+    --panel: #fbf9f3;
+    --panel-edge: #d4ccba;
+    --shadow: 0 1px 2px rgba(26,31,46,.08), 0 8px 24px rgba(26,31,46,.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: "Source Serif Pro", "Source Serif 4", Georgia, "Times New Roman", serif; background: var(--bg); color: var(--ink); }
+
+  .app {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  header.masthead {
+    background: var(--ink);
+    color: var(--panel);
+    padding: 14px 28px 16px;
+    border-bottom: 3px double var(--gold);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .masthead-left { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+  .mark {
+    font-family: "Playfair Display", "Georgia", serif;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    border: 1px solid var(--gold);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+  h1 {
+    margin: 0;
+    font-family: "Playfair Display", "Didot", "Bodoni 72", Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(18px, 2.2vw, 26px);
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+  }
+  h1 em { color: var(--gold); font-style: italic; font-weight: 500; }
+  .meta {
+    font-family: "Source Sans Pro", "Helvetica Neue", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #a9a193;
+    text-align: right;
+    line-height: 1.6;
+  }
+  .meta strong { color: var(--panel); font-weight: 500; letter-spacing: 0.2em; }
+
+  main {
+    position: relative;
+    overflow: hidden;
+  }
+  #map {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #e8e4db;
+  }
+
+  /* Legend */
+  .legend {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    padding: 14px 16px 12px;
+    box-shadow: var(--shadow);
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    z-index: 500;
+    max-width: 260px;
+    min-width: 220px;
+    font-family: "Source Sans Pro", "Helvetica Neue", sans-serif;
+  }
+  .legend h2 {
+    margin: 0 0 10px;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 1px solid var(--panel-edge);
+    padding-bottom: 8px;
+  }
+  .legend-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--ink-soft);
+    padding: 2px 6px;
+    line-height: 1;
+  }
+  .legend-toggle:hover { color: var(--accent); }
+  .legend.collapsed .legend-item,
+  .legend.collapsed .legend-count { display: none; }
+  .legend.collapsed { padding: 10px 40px 10px 16px; }
+  .legend.collapsed h2 { margin-bottom: 0; border: none; padding-bottom: 0; }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 3px 0;
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.3;
+  }
+  .legend-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(0,0,0,0.25);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .legend-count {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--panel-edge);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .legend-count strong { font-family: "Playfair Display", serif; color: var(--accent); font-size: 14px; }
+
+  /* Custom marker */
+  .fac-marker {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2.5px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .fac-marker:hover {
+    transform: scale(1.35);
+    z-index: 1000 !important;
+  }
+
+  /* Leaflet tooltip style override */
+  .leaflet-tooltip.fac-tooltip {
+    background: var(--ink);
+    color: var(--panel);
+    border: none;
+    border-left: 3px solid var(--gold);
+    border-radius: 2px;
+    padding: 7px 11px;
+    font-family: "Source Sans Pro", "Helvetica Neue", sans-serif;
+    font-size: 12px;
+    line-height: 1.45;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    white-space: nowrap;
+  }
+  .leaflet-tooltip.fac-tooltip::before { border: none !important; }
+  .fac-tooltip .t-id {
+    display: inline-block;
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    font-size: 10px;
+    margin-right: 8px;
+    border-right: 1px solid rgba(193,154,74,0.4);
+    padding-right: 8px;
+  }
+  .fac-tooltip .t-street { font-weight: 600; }
+  .fac-tooltip .t-city { color: #a9a193; font-style: italic; font-size: 11px; display: block; margin-top: 2px; }
+
+  /* Dialog */
+  .dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,31,46,0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: fadein 0.2s ease-out;
+  }
+  .dialog-overlay.open { display: flex; }
+  @keyframes fadein { from {opacity:0;} to {opacity:1;} }
+  @keyframes slidein { from {opacity:0; transform: translateY(14px);} to {opacity:1; transform:translateY(0);} }
+
+  .dialog {
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: slidein 0.25s ease-out;
+    position: relative;
+  }
+  .dialog-header {
+    padding: 22px 52px 18px 26px;
+    border-bottom: 1px solid var(--panel-edge);
+    position: relative;
+    background: linear-gradient(180deg, #fefcf5 0%, var(--panel) 100%);
+  }
+  .dialog-header::after {
+    content: "";
+    position: absolute;
+    bottom: -4px; left: 26px; right: 26px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+  .dialog-kicker {
+    display: inline-block;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: white;
+    padding: 3px 9px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .dialog h2 {
+    margin: 0;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .dialog-id {
+    font-family: "Playfair Display", serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .dialog-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--panel-edge);
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .dialog-close:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .dialog-body { padding: 22px 26px; }
+  .field {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--panel-edge);
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 14px;
+    align-items: baseline;
+  }
+  .field:last-child { border-bottom: none; }
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+  }
+  .field-value { color: var(--ink); line-height: 1.5; }
+  .field-value.empty { color: #a9a193; font-style: italic; }
+  .field-value a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(184,50,59,0.3); }
+  .field-value a:hover { border-bottom-color: var(--accent); }
+
+  .dialog-actions {
+    padding: 16px 26px 22px;
+    border-top: 1px solid var(--panel-edge);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: #faf7ef;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    flex: 1;
+    justify-content: center;
+    min-width: 160px;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--panel);
+    border: 1px solid var(--ink);
+  }
+  .btn-primary:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+  .btn-secondary:hover {
+    background: var(--ink);
+    color: var(--panel);
+  }
+  .btn svg { width: 14px; height: 14px; }
+
+  footer.colophon {
+    background: var(--ink);
+    color: #a9a193;
+    padding: 10px 28px;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-top: 3px double var(--gold);
+  }
+  footer.colophon .cartographer {
+    color: var(--gold);
+  }
+  footer.colophon .cartographer span { color: var(--panel); font-weight: 600; }
+
+  /* Mid-size: tighten legend */
+  @media (max-width: 900px) {
+    .legend {
+      max-height: calc(100vh - 200px);
+      max-width: 220px;
+      min-width: 0;
+      padding: 12px 14px 10px;
+    }
+    .legend h2 { font-size: 12px; }
+    .legend-item { font-size: 11px; }
+  }
+
+  /* Narrow: auto-collapse legend to a compact pill */
+  @media (max-width: 640px) {
+    .legend {
+      top: 8px;
+      right: 8px;
+      max-width: none;
+      width: auto;
+      min-width: 0;
+    }
+    /* Auto-collapse on narrow screens (JS also sets .collapsed class on load) */
+    .legend:not(.user-expanded) .legend-item,
+    .legend:not(.user-expanded) .legend-count { display: none; }
+    .legend:not(.user-expanded) { padding: 8px 36px 8px 14px; }
+    .legend:not(.user-expanded) h2 {
+      margin-bottom: 0;
+      border: none;
+      padding-bottom: 0;
+      font-size: 11px;
+    }
+    .legend.user-expanded {
+      max-width: calc(100% - 16px);
+      max-height: calc(100vh - 160px);
+      overflow-y: auto;
+    }
+    .legend-toggle { top: 6px; right: 8px; }
+    header.masthead { padding: 10px 14px; }
+    .meta { text-align: left; }
+    .field { grid-template-columns: 90px 1fr; font-size: 13px; }
+    footer.colophon { flex-direction: column; gap: 4px; padding: 8px 14px; }
+    .btn { min-width: 0; }
+  }
+
+  /* Very narrow phones */
+  @media (max-width: 400px) {
+    .legend:not(.user-expanded) h2 { font-size: 10px; letter-spacing: 0.1em; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="masthead">
+    <div class="masthead-left">
+      <span class="mark">Est. MMXXVI</span>
+      <h1>Trumbull County <em>Healthcare Facilities</em> Map</h1>
+    </div>
+    <div class="meta">
+      <div>Cartographer &mdash; <strong>Mike Costarella</strong></div>
+      <div>Generated &mdash; <strong id="gen-date">April 17, 2026 at 02:49 AM</strong></div>
+    </div>
+  </header>
+
+  <main>
+    <div id="map"></div>
+    <aside class="legend" id="legend">
+      <h2>Facility Types</h2>
+      <button class="legend-toggle" id="legend-toggle" aria-label="Toggle legend">&minus;</button>
+      <div id="legend-body"></div>
+      <div class="legend-count">Mapped facilities: <strong id="fac-count">0</strong></div>
+    </aside>
+  </main>
+
+  <footer class="colophon">
+    <div class="cartographer">Compiled &amp; designed by <span>Mike Costarella</span></div>
+    <div>Data visualized with Leaflet &middot; Tiles &copy; CARTO &middot; OpenStreetMap contributors</div>
+  </footer>
+</div>
+
+<!-- Dialog -->
+<div class="dialog-overlay" id="dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+  <div class="dialog" id="dialog">
+    <div class="dialog-header">
+      <span class="dialog-kicker" id="dialog-kicker"></span>
+      <h2 id="dialog-title"></h2>
+      <div class="dialog-id" id="dialog-id"></div>
+      <button class="dialog-close" id="dialog-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="dialog-body" id="dialog-body"></div>
+    <div class="dialog-actions">
+      <a class="btn btn-secondary" id="btn-view" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        View on Google Maps
+      </a>
+      <a class="btn btn-primary" id="btn-dir" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        Get Directions
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+<script>
+// ====== EMBEDDED DATA ======
+const FACILITIES = [{"id":1,"name":"Insight Hospital & Medical Center Trumbull (formerly Trumbull Regional Medical Center)","category":"Hospital","address":"1350 East Market Street","city":"Warren","zip":"44482.0","phone":"330-841-9000","notes":"280-bed general medical & surgical hospital; 24/7 ER","lat":41.2443,"lon":-80.7891,"color":"#DC2626"},{"id":2,"name":"Mercy Health - St. Joseph Warren Hospital","category":"Hospital","address":"667 Eastland Avenue SE","city":"Warren","zip":"44484.0","phone":"330-841-4000","notes":"24/7 emergency services","lat":41.22725,"lon":-80.7897,"color":"#DC2626"},{"id":3,"name":"Hillside Rehabilitation Hospital","category":"Rehabilitation Hospital","address":"8747 Squires Lane NE","city":"Warren","zip":"44484.0","phone":"330-841-3700","notes":"Inpatient rehabilitation","lat":41.2468,"lon":-80.7568,"color":"#EA580C"},{"id":4,"name":"Belmont Pines Hospital","category":"Psychiatric Hospital","address":"615 Churchill-Hubbard Road","city":"Youngstown","zip":"44505.0","phone":"330-759-2700","notes":"Serves Trumbull County; 24/7 behavioral health","lat":41.12405,"lon":-80.6597,"color":"#9333EA"},{"id":5,"name":"Mercy Health - Howland Urgent Care","category":"Urgent Care","address":"1296 Tod Place NW","city":"Warren","zip":"44485.0","phone":"330-306-5040","notes":"Walk-in urgent care","lat":41.241,"lon":-80.7851,"color":"#F59E0B"},{"id":6,"name":"Mercy Health - Warren Minor Emergency Services","category":"Urgent Care","address":"1950 Niles Cortland Road NE","city":"Warren","zip":"44484.0","phone":"330-856-4151","notes":"Minor emergency / urgent care","lat":41.2593,"lon":-80.7472,"color":"#F59E0B"},{"id":7,"name":"QUICKmed Urgent Care - Warren","category":"Urgent Care","address":"8098 E Market St #2","city":"Warren","zip":"44484.0","phone":"330-469-6770","notes":"Walk-in urgent care","lat":41.2463,"lon":-80.727,"color":"#F59E0B"},{"id":8,"name":"St. Joseph Urgent Care","category":"Urgent Care","address":"1950 Niles Cortland Rd NE","city":"Warren","zip":"44484.0","phone":"330-856-4151","notes":"Part of Mercy Health system","lat":41.2593,"lon":-80.7472,"color":"#F59E0B"},{"id":9,"name":"TMMG Urgent Care (Trumbull-Mahoning Medical Group)","category":"Urgent Care","address":"1825 Niles Cortland Rd NE","city":"Warren","zip":"44484.0","phone":"330-856-4700","notes":"Open to public; sports physicals available","lat":41.257,"lon":-80.748,"color":"#F59E0B"},{"id":10,"name":"CVS MinuteClinic - Niles","category":"Walk-in Clinic","address":"1331 Youngstown-Warren Road","city":"Niles","zip":"44446.0","phone":"866-389-2727","notes":"Inside CVS Pharmacy","lat":41.1925,"lon":-80.7628,"color":"#FBBF24"},{"id":11,"name":"One Health Ohio - Lloyd McCoy Health Center","category":"Community Health Center","address":"1977 Niles Road SE","city":"Warren","zip":"44484.0","phone":"330-393-6446","notes":"Primary care, pediatrics, OB/GYN, dental, SUD treatment","lat":41.2217,"lon":-80.7658,"color":"#0EA5E9"},{"id":12,"name":"Access Health Mahoning Valley","category":"Community Health Center","address":"258 E Market Street, Third Floor","city":"Warren","zip":"44481.0","phone":"330-373-0703","notes":"Free/low-cost community clinic","lat":41.2368,"lon":-80.8194,"color":"#0EA5E9"},{"id":13,"name":"Mercy Health Youngstown Cancer Center - St. Joseph Hospital","category":"Cancer Center","address":"667 Eastland Avenue","city":"Warren","zip":"44484.0","phone":"330-841-4177","notes":"Oncology services","lat":41.22725,"lon":-80.7897,"color":"#BE185D"},{"id":14,"name":"St. Joseph Cancer Center","category":"Cancer Center","address":"667 Eastland Avenue SE","city":"Warren","zip":"44484.0","phone":"330-841-4177","notes":"Comprehensive cancer care","lat":41.22725,"lon":-80.7897,"color":"#BE185D"},{"id":15,"name":"Louis Stokes VA Medical Center - Warren CBOC","category":"VA Outpatient Clinic","address":"1460 Tod Avenue NW","city":"Warren","zip":"44485.0","phone":"330-392-0311","notes":"Community-based outpatient clinic for veterans","lat":41.2482,"lon":-80.8365,"color":"#1E40AF"},{"id":16,"name":"Mercy Health Home Health Services","category":"Home Health","address":"979 Tibbets-Wick Road","city":"Girard","zip":"44420.0","phone":"330-480-3776","notes":"Home nursing, PT, respiratory therapy","lat":41.1687,"lon":-80.7122,"color":"#14B8A6"},{"id":17,"name":"Acute Care Home Nursing Services","category":"Home Health / Nursing","address":"2921 Youngstown Road SE","city":"Warren","zip":"44484.0","phone":"","notes":"In-home care services","lat":41.2287,"lon":-80.7745,"color":"#14B8A6"},{"id":18,"name":"Autumn Hills Care Center","category":"Nursing Home / Skilled Nursing","address":"2565 Niles Vienna Road","city":"Niles","zip":"44446.0","phone":"330-652-5959","notes":"Up to 136 residents; skilled nursing","lat":41.2017,"lon":-80.7298,"color":"#059669"},{"id":19,"name":"Manor at Autumn Hills","category":"Nursing Home","address":"2567 Niles-Vienna Road","city":"Niles","zip":"44446.0","phone":"330-652-5959","notes":"Up to 95 residents; assisted living & memory care","lat":41.202,"lon":-80.7296,"color":"#059669"},{"id":20,"name":"Signature Healthcare of Warren","category":"Nursing Home / Skilled Nursing","address":"2473 North Road NE","city":"Warren","zip":"44483.0","phone":"330-372-2251","notes":"Up to 150 residents","lat":41.2784,"lon":-80.8144,"color":"#059669"},{"id":21,"name":"O'Brien Memorial Health Care Center","category":"Nursing Home / Skilled Nursing","address":"563 Brookfield Avenue SE","city":"Masury","zip":"44438.0","phone":"330-448-1561","notes":"Up to 99 residents; memory care","lat":41.2241,"lon":-80.5402,"color":"#059669"},{"id":22,"name":"Ohio Living Lake Vista","category":"Nursing Home / Skilled Nursing","address":"303 North Mecca Street","city":"Cortland","zip":"44410.0","phone":"330-638-2420","notes":"Up to 57 residents","lat":41.3287,"lon":-80.8731,"color":"#059669"},{"id":23,"name":"Concord Care Center of Cortland","category":"Nursing Home / Skilled Nursing","address":"4250 Sodom Hutchings Road","city":"Cortland","zip":"44410.0","phone":"330-637-9030","notes":"Up to 50 residents","lat":41.3542,"lon":-80.8318,"color":"#059669"},{"id":24,"name":"Shepherd of the Valley - Niles","category":"Nursing Home / Skilled Nursing","address":"1500 McKinley Avenue","city":"Niles","zip":"44446.0","phone":"330-544-2088","notes":"Oncology & rehab care","lat":41.1856,"lon":-80.7644,"color":"#059669"},{"id":25,"name":"Community Skilled Health Care","category":"Nursing Home / Skilled Nursing","address":"","city":"Warren","zip":"","phone":"","notes":"Medicare-licensed skilled nursing","lat":41.237,"lon":-80.818,"color":"#059669"},{"id":26,"name":"Gillette Nursing Home, Inc.","category":"Nursing Home","address":"3310 Elm Road NE","city":"Warren","zip":"44483.0","phone":"330-372-2311","notes":"Skilled nursing facility","lat":41.2705,"lon":-80.811,"color":"#059669"},{"id":27,"name":"Laurie Ann Nursing Home","category":"Nursing Home","address":"2200 Milton Boulevard","city":"Newton Falls","zip":"44444.0","phone":"330-872-5821","notes":"Skilled nursing","lat":41.1872,"lon":-80.9732,"color":"#059669"},{"id":28,"name":"Cedarcreek Health & Rehab","category":"Nursing Home / Rehab","address":"4121 Tod Avenue NW","city":"Warren","zip":"44485.0","phone":"330-898-3606","notes":"Nursing & rehabilitation","lat":41.2634,"lon":-80.8249,"color":"#10B981"},{"id":29,"name":"Campus Health & Rehab","category":"Nursing Home / Rehab","address":"196 Colonial Drive","city":"Youngstown","zip":"44505.0","phone":"","notes":"Serves Trumbull area","lat":41.1213,"lon":-80.6489,"color":"#10B981"},{"id":30,"name":"Shepherd of the Valley - Howland","category":"Assisted Living / Memory Care","address":"4100 North River Road","city":"Warren","zip":"44484.0","phone":"330-856-4900","notes":"Up to 100 residents","lat":41.2564,"lon":-80.7329,"color":"#65A30D"},{"id":31,"name":"Shepherd of the Valley Lutheran Retirement - Liberty","category":"Assisted Living","address":"","city":"Liberty Township","zip":"","phone":"","notes":"96 assisted living apartments","lat":41.1683,"lon":-80.6642,"color":"#84CC16"},{"id":32,"name":"Grace Woods Senior Living","category":"Assisted Living / Memory Care","address":"730 Youngstown-Warren Road","city":"Niles","zip":"44446.0","phone":"330-505-1400","notes":"78 units; 24/7 staff","lat":41.1833,"lon":-80.7585,"color":"#65A30D"},{"id":33,"name":"Champion Estates Assisted Living","category":"Assisted Living","address":"1 Windsor Place","city":"Warren","zip":"44483.0","phone":"330-847-0774","notes":"Up to 65 residents","lat":41.2475,"lon":-80.8565,"color":"#84CC16"},{"id":34,"name":"Clearview Lantern Suites","category":"Assisted Living","address":"596 Champion Avenue West","city":"Warren","zip":"44483.0","phone":"330-847-1012","notes":"Up to 73 residents","lat":41.247,"lon":-80.854,"color":"#84CC16"},{"id":35,"name":"Liberty Arms Assisted Living Facility","category":"Assisted Living","address":"1353 Churchill Hubbard Road","city":"Youngstown","zip":"44505.0","phone":"330-759-8400","notes":"Up to 87 residents; serves Trumbull","lat":41.1347,"lon":-80.6653,"color":"#84CC16"},{"id":36,"name":"Allan-Dell","category":"Assisted Living","address":"2200 Milton Boulevard","city":"Newton Falls","zip":"44444.0","phone":"330-872-7676","notes":"Up to 36 residents","lat":41.1868,"lon":-80.9736,"color":"#84CC16"},{"id":37,"name":"Armstrong Memory Care Assisted Living","category":"Memory Care","address":"","city":"Warren","zip":"44483.0","phone":"","notes":"Up to 44 residents","lat":41.239,"lon":-80.815,"color":"#4D7C0F"},{"id":38,"name":"Vista Center at The Ridge Residential Care","category":"Assisted Living / Memory Care","address":"3379 Main Street","city":"Mineral Ridge","zip":"44440.0","phone":"330-544-9595","notes":"Memory care & assisted living","lat":41.1395,"lon":-80.7681,"color":"#65A30D"},{"id":39,"name":"Lake Vista of Cortland","category":"Assisted Living","address":"303 North Mecca Street","city":"Cortland","zip":"44410.0","phone":"330-638-2420","notes":"Part of Ohio Living campus","lat":41.3285,"lon":-80.8729,"color":"#84CC16"},{"id":40,"name":"Alta Behavioral Healthcare","category":"Behavioral Health","address":"8790 E. Market St., Suite #100","city":"Warren","zip":"44484.0","phone":"330-736-0073","notes":"Outpatient behavioral health","lat":41.2469,"lon":-80.7254,"color":"#7C3AED"},{"id":41,"name":"Catholic Charities Regional Agency","category":"Mental Health / Counseling","address":"175 Laird Avenue, Third Floor","city":"Warren","zip":"44483.0","phone":"330-393-4050","notes":"Counseling services","lat":41.2396,"lon":-80.8218,"color":"#A78BFA"},{"id":42,"name":"Coleman Professional Services","category":"Mental Health","address":"103 W. Market Street","city":"Warren","zip":"44481.0","phone":"330-394-8831","notes":"Outpatient mental health","lat":41.2362,"lon":-80.821,"color":"#8B5CF6"},{"id":43,"name":"Coleman Access Center","category":"Crisis / Mental Health","address":"103 W. Market Street","city":"Warren","zip":"44481.0","phone":"330-392-1100","notes":"24/7 crisis services","lat":41.2362,"lon":-80.821,"color":"#5B21B6"},{"id":44,"name":"Compass Family & Community Services","category":"Mental Health / Social Services","address":"320 High Street NE","city":"Warren","zip":"44481.0","phone":"330-394-9090","notes":"Outpatient MH & SUD","lat":41.2382,"lon":-80.8176,"color":"#A78BFA"},{"id":45,"name":"Compass Family & Community Services - Riverbend Center","category":"Residential Mental Health","address":"3120 West Market Street","city":"Warren","zip":"44485.0","phone":"330-898-6992","notes":"Residential treatment, by referral","lat":41.2408,"lon":-80.8502,"color":"#7C3AED"},{"id":46,"name":"Valley Counseling Services - Adult Services","category":"Mental Health","address":"150 E. Market Street","city":"Warren","zip":"44481.0","phone":"330-399-6451","notes":"Adult outpatient MH","lat":41.2369,"lon":-80.8189,"color":"#8B5CF6"},{"id":47,"name":"Valley Counseling Services - Children's Office","category":"Mental Health","address":"318 Mahoning Avenue NW","city":"Warren","zip":"44483.0","phone":"330-395-9563","notes":"Child & adolescent services","lat":41.2413,"lon":-80.8274,"color":"#8B5CF6"},{"id":48,"name":"Travco Behavioral Health","category":"Behavioral Health / SUD","address":"2671 Youngstown Rd. SE","city":"Warren","zip":"44484.0","phone":"330-822-6545","notes":"Behavioral health services","lat":41.2285,"lon":-80.774,"color":"#6D28D9"},{"id":49,"name":"Thrive Counseling","category":"Counseling","address":"1705 Woodland St. NE","city":"Warren","zip":"44483.0","phone":"330-469-6777","notes":"Outpatient counseling","lat":41.2437,"lon":-80.8089,"color":"#A78BFA"},{"id":50,"name":"Greentree Counseling Center Inc.","category":"Mental Health","address":"430 Franklin Street SE","city":"Warren","zip":"44483.0","phone":"330-394-5074","notes":"Outpatient counseling","lat":41.2358,"lon":-80.8142,"color":"#8B5CF6"},{"id":51,"name":"Meridian Healthcare - Howland Office","category":"Behavioral Health / SUD","address":"1950 NE Niles Cortland Road","city":"Warren","zip":"44484.0","phone":"330-797-0070","notes":"Outpatient MH and SUD services","lat":41.2593,"lon":-80.7472,"color":"#6D28D9"},{"id":52,"name":"PsyCare - Cortland","category":"Mental Health","address":"378 North High Street","city":"Cortland","zip":"44410.0","phone":"330-638-4000","notes":"Outpatient mental health","lat":41.3295,"lon":-80.8735,"color":"#8B5CF6"},{"id":53,"name":"Trumbull County Mental Health & Recovery Board","category":"Government / Admin","address":"4076 Youngstown Rd. SE","city":"Warren","zip":"44484.0","phone":"330-675-2765","notes":"County MH/addiction oversight","lat":41.229,"lon":-80.7751,"color":"#525252"},{"id":54,"name":"Trumbull County Combined Health District","category":"Public Health Dept.","address":"176 Chestnut Ave. NE","city":"Warren","zip":"44483.0","phone":"330-675-2489","notes":"County health department","lat":41.2432,"lon":-80.8167,"color":"#3F3F46"}];
+const LEGEND = [{"category":"Hospital","color":"#DC2626"},{"category":"Rehabilitation Hospital","color":"#EA580C"},{"category":"Psychiatric Hospital","color":"#9333EA"},{"category":"Urgent Care","color":"#F59E0B"},{"category":"Walk-in Clinic","color":"#FBBF24"},{"category":"Community Health Center","color":"#0EA5E9"},{"category":"Cancer Center","color":"#BE185D"},{"category":"VA Outpatient Clinic","color":"#1E40AF"},{"category":"Home Health","color":"#14B8A6"},{"category":"Home Health / Nursing","color":"#14B8A6"},{"category":"Nursing Home / Skilled Nursing","color":"#059669"},{"category":"Nursing Home","color":"#059669"},{"category":"Nursing Home / Rehab","color":"#10B981"},{"category":"Assisted Living / Memory Care","color":"#65A30D"},{"category":"Assisted Living","color":"#84CC16"},{"category":"Memory Care","color":"#4D7C0F"},{"category":"Behavioral Health","color":"#7C3AED"},{"category":"Mental Health / Counseling","color":"#A78BFA"},{"category":"Mental Health","color":"#8B5CF6"},{"category":"Crisis / Mental Health","color":"#5B21B6"},{"category":"Mental Health / Social Services","color":"#A78BFA"},{"category":"Residential Mental Health","color":"#7C3AED"},{"category":"Behavioral Health / SUD","color":"#6D28D9"},{"category":"Counseling","color":"#A78BFA"},{"category":"Government / Admin","color":"#525252"},{"category":"Public Health Dept.","color":"#3F3F46"}];
+
+// ====== MAP INIT ======
+const map = L.map('map', {
+  center: [41.245, -80.790],
+  zoom: 11,
+  zoomControl: true,
+  preferCanvas: true,
+});
+
+// Daytime map: CARTO Voyager (clean, light, readable)
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19,
+}).addTo(map);
+
+// ====== MARKERS ======
+function createIcon(color) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="fac-marker" style="background:${color};"></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+}
+
+const markers = [];
+let mappedCount = 0;
+
+FACILITIES.forEach(f => {
+  if (f.lat == null || f.lon == null) return;
+  mappedCount++;
+  const m = L.marker([f.lat, f.lon], { icon: createIcon(f.color) }).addTo(map);
+
+  const streetText = f.address || f.city;
+  const tipHtml = `<span class="t-id">ID ${String(f.id).padStart(3,'0')}</span>
+    <span class="t-street">${escapeHtml(streetText)}</span>
+    <span class="t-city">${escapeHtml(f.city)}${f.zip ? ' &middot; ' + escapeHtml(f.zip) : ''}</span>`;
+
+  m.bindTooltip(tipHtml, {
+    direction: 'top',
+    offset: [0, -10],
+    className: 'fac-tooltip',
+    opacity: 1,
+  });
+
+  m.on('click', () => openDialog(f));
+  markers.push(m);
+});
+
+document.getElementById('fac-count').textContent = mappedCount;
+
+// Fit bounds
+if (markers.length) {
+  const group = L.featureGroup(markers);
+  map.fitBounds(group.getBounds(), { padding: [40, 40] });
+}
+
+// ====== LEGEND ======
+const legendBody = document.getElementById('legend-body');
+LEGEND.forEach(l => {
+  const div = document.createElement('div');
+  div.className = 'legend-item';
+  div.innerHTML = `<span class="legend-dot" style="background:${l.color};"></span><span>${escapeHtml(l.category)}</span>`;
+  legendBody.appendChild(div);
+});
+
+// Legend: responsive collapse behavior.
+// On wide screens: .collapsed class drives open/closed (user toggle).
+// On narrow screens (<=640px, via CSS): collapsed by default; .user-expanded opens it.
+const legendEl = document.getElementById('legend');
+const legendToggle = document.getElementById('legend-toggle');
+const narrowMQ = window.matchMedia('(max-width: 640px)');
+
+function isLegendOpen() {
+  if (narrowMQ.matches) return legendEl.classList.contains('user-expanded');
+  return !legendEl.classList.contains('collapsed');
+}
+
+function setLegendToggleGlyph() {
+  legendToggle.textContent = isLegendOpen() ? '\u2212' : '+';
+  legendToggle.setAttribute('aria-expanded', isLegendOpen() ? 'true' : 'false');
+}
+
+legendToggle.addEventListener('click', () => {
+  if (narrowMQ.matches) {
+    legendEl.classList.toggle('user-expanded');
+  } else {
+    legendEl.classList.toggle('collapsed');
+  }
+  setLegendToggleGlyph();
+});
+
+// When crossing the breakpoint, reset user-expanded state & re-sync glyph
+narrowMQ.addEventListener('change', () => {
+  legendEl.classList.remove('user-expanded');
+  legendEl.classList.remove('collapsed');
+  setLegendToggleGlyph();
+});
+
+setLegendToggleGlyph();
+
+// ====== DIALOG ======
+const overlay = document.getElementById('dialog-overlay');
+const dTitle = document.getElementById('dialog-title');
+const dKicker = document.getElementById('dialog-kicker');
+const dId = document.getElementById('dialog-id');
+const dBody = document.getElementById('dialog-body');
+const btnView = document.getElementById('btn-view');
+const btnDir = document.getElementById('btn-dir');
+
+function openDialog(f) {
+  dTitle.textContent = f.name;
+  dKicker.textContent = f.category;
+  dKicker.style.background = f.color;
+  dId.textContent = 'Resource ID \u00B7 ' + String(f.id).padStart(3, '0');
+
+  const fullAddress = [f.address, f.city, 'OH', f.zip].filter(Boolean).join(', ');
+  const phoneLink = f.phone ? `<a href="tel:${f.phone.replace(/[^0-9+]/g,'')}">${escapeHtml(f.phone)}</a>` : '';
+
+  const fields = [
+    { label: 'Resource ID', value: String(f.id).padStart(3, '0') },
+    { label: 'Facility', value: escapeHtml(f.name) },
+    { label: 'Category', value: escapeHtml(f.category) },
+    { label: 'Address', value: escapeHtml(f.address) },
+    { label: 'City', value: escapeHtml(f.city) },
+    { label: 'Zip', value: escapeHtml(f.zip) },
+    { label: 'Phone', value: phoneLink, raw: true },
+    { label: 'Notes', value: escapeHtml(f.notes) },
+    { label: 'Coordinates', value: (f.lat.toFixed(5) + ', ' + f.lon.toFixed(5)) },
+  ];
+
+  dBody.innerHTML = fields.map(fd => {
+    const isEmpty = !fd.value || fd.value === '';
+    const content = isEmpty ? '<span class="field-value empty">&mdash;</span>'
+                            : '<span class="field-value">' + fd.value + '</span>';
+    return `<div class="field"><span class="field-label">${fd.label}</span>${content}</div>`;
+  }).join('');
+
+  // Google Maps links
+  const q = encodeURIComponent(f.name + ', ' + fullAddress);
+  const coordStr = f.lat + ',' + f.lon;
+  btnView.href = `https://www.google.com/maps/search/?api=1&query=${q}&query_place_id=${coordStr}`;
+  // Use coordinates for precision on "view"
+  btnView.href = `https://www.google.com/maps/?q=${coordStr}(${q})`;
+  btnDir.href = `https://www.google.com/maps/dir/?api=1&destination=${coordStr}&destination_place_id=${q}`;
+
+  overlay.classList.add('open');
+}
+
+function closeDialog() { overlay.classList.remove('open'); }
+
+document.getElementById('dialog-close').addEventListener('click', closeDialog);
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closeDialog(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDialog(); });
+
+// ====== UTIL ======
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+</script>
+</body>
+</html>
