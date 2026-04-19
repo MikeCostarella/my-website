@@ -263,28 +263,31 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* "You are here" location marker */
+  /* "You are here" fireman marker */
   .user-location-icon { background: transparent; border: none; }
   .user-loc-dot {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #1a73e8;
-    border: 3px solid white;
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.4), 0 1px 4px rgba(0,0,0,0.4);
+    width: 44px;
+    height: 54px;
     position: relative;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.45));
   }
+  .user-loc-dot svg { width: 100%; height: 100%; display: block; position: relative; z-index: 2; }
   .user-loc-dot::before {
     content: '';
     position: absolute;
-    inset: -10px;
+    left: 50%;
+    bottom: -4px;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background: rgba(26,115,232,0.25);
+    background: rgba(26,115,232,0.3);
     animation: userPulse 2s ease-out infinite;
+    z-index: 1;
   }
   @keyframes userPulse {
-    0% { transform: scale(0.5); opacity: 0.9; }
-    100% { transform: scale(1.6); opacity: 0; }
+    0% { transform: translateX(-50%) scale(0.5); opacity: 0.9; }
+    100% { transform: translateX(-50%) scale(1.8); opacity: 0; }
   }
 
   /* Mobile responsive */
@@ -615,17 +618,48 @@
     map.fitBounds(COUNTY_BOUNDS, { padding: [20, 20] });
   }
 
-  // Add a "my location" pulse marker when we get a fix
+  // Add a "fireman" marker showing the user's location
   let userMarker = null;
   function showUserLocation(lat, lng, accuracy) {
     if (userMarker) map.removeLayer(userMarker);
+    const firemanSvg = `<svg viewBox="0 0 44 54" xmlns="http://www.w3.org/2000/svg">
+      <!-- Fire helmet front shield (red) -->
+      <path d="M10 18 Q10 8 22 6 Q34 8 34 18 L34 20 L10 20 Z" fill="#dc2626" stroke="#1a1a1a" stroke-width="1"/>
+      <!-- Helmet shield emblem -->
+      <path d="M19 10 L25 10 L26 15 L22 17 L18 15 Z" fill="#fbbf24" stroke="#1a1a1a" stroke-width="0.6"/>
+      <!-- Helmet brim -->
+      <ellipse cx="22" cy="20" rx="15" ry="2.5" fill="#991b1b" stroke="#1a1a1a" stroke-width="1"/>
+      <!-- Rear brim peak -->
+      <path d="M7 20 Q8 23 11 23 L33 23 Q36 23 37 20 Z" fill="#991b1b" stroke="#1a1a1a" stroke-width="1"/>
+      <!-- Face -->
+      <ellipse cx="22" cy="27" rx="6" ry="5" fill="#fbd3a7" stroke="#1a1a1a" stroke-width="0.8"/>
+      <!-- Eyes -->
+      <circle cx="19.5" cy="26.5" r="0.7" fill="#1a1a1a"/>
+      <circle cx="24.5" cy="26.5" r="0.7" fill="#1a1a1a"/>
+      <!-- Mustache / mouth hint -->
+      <path d="M20 29 Q22 30 24 29" stroke="#1a1a1a" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+      <!-- Neck -->
+      <rect x="20" y="31" width="4" height="2" fill="#fbd3a7" stroke="#1a1a1a" stroke-width="0.6"/>
+      <!-- Turnout coat body (yellow/tan with reflective stripes) -->
+      <path d="M10 34 Q10 33 12 32.5 L17 32 L22 33 L27 32 L32 32.5 Q34 33 34 34 L34 50 L10 50 Z" fill="#d4a017" stroke="#1a1a1a" stroke-width="1"/>
+      <!-- Reflective silver stripe across chest -->
+      <rect x="10" y="39" width="24" height="2.2" fill="#e5e7eb" stroke="#1a1a1a" stroke-width="0.4"/>
+      <rect x="10" y="41.5" width="24" height="1" fill="#facc15"/>
+      <!-- Coat center seam -->
+      <line x1="22" y1="33" x2="22" y2="50" stroke="#1a1a1a" stroke-width="0.6"/>
+      <!-- Coat buttons -->
+      <circle cx="22" cy="36" r="0.7" fill="#1a1a1a"/>
+      <circle cx="22" cy="46" r="0.7" fill="#1a1a1a"/>
+    </svg>`;
     const icon = L.divIcon({
       className: 'user-location-icon',
-      html: '<div class="user-loc-dot"></div>',
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
+      html: '<div class="user-loc-dot">' + firemanSvg + '</div>',
+      iconSize: [44, 54],
+      iconAnchor: [22, 52],
+      popupAnchor: [0, -48]
     });
-    userMarker = L.marker([lat, lng], { icon: icon, interactive: false, keyboard: false, zIndexOffset: -1000 }).addTo(map);
+    userMarker = L.marker([lat, lng], { icon: icon, zIndexOffset: 1000, title: 'Your location' }).addTo(map);
+    userMarker.bindTooltip('You are here', { className: 'hydrant-tooltip', direction: 'top', offset: [0, -48] });
   }
 
   // Defer marker build so loading overlay can paint first
