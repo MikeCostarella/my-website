@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\HealthcareFacilities"
+    "\\HealthcareFacilities",
+    "\\Hydrants"
   ],
-  "SelectedNode": "\\HealthcareFacilities\\Index.html",
+  "SelectedNode": "\\Hydrants",
   "PreviewInSolutionExplorer": false
 }
