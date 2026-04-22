@@ -1238,14 +1238,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
   const statusTextEl = document.getElementById('status-text');
 
   // ---------- Canvas overlay ----------
+  // Canvas sits in the map's container (not a transformed pane) so it stays
+  // fixed to the viewport. We redraw its contents on every map move/zoom.
   const pointCanvas = document.createElement('canvas');
   pointCanvas.style.position = 'absolute';
   pointCanvas.style.left = '0';
   pointCanvas.style.top = '0';
   pointCanvas.style.pointerEvents = 'none';
-  pointCanvas.style.willChange = 'transform';
+  pointCanvas.style.zIndex = '400'; // above tiles, below UI
   const ctx = pointCanvas.getContext('2d', { alpha: true });
-  map.getPanes().overlayPane.appendChild(pointCanvas);
+  map.getContainer().appendChild(pointCanvas);
 
   // ---------- State ----------
   // Precomputed cluster pyramid:
@@ -1339,8 +1341,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       pointCanvas.style.width = size.x + 'px';
       pointCanvas.style.height = size.y + 'px';
     }
-    const topLeft = map.containerPointToLayerPoint([0, 0]);
-    L.DomUtil.setPosition(pointCanvas, topLeft);
+    // Canvas is fixed at (0,0) of the container — no translation needed.
   }
 
   // ---------- Draw ----------
@@ -1380,23 +1381,32 @@ svg.leaflet-image-layer.leaflet-interactive path {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, size.x, size.y);
 
-    const zoom = Math.round(map.getZoom());
+    // `zoomLevel` is the integer cluster tier to use; `actualZoom` is the
+    // fractional zoom Leaflet is currently rendering (may differ during zoom anim).
+    const actualZoom = map.getZoom();
+    const zoomLevel = Math.round(actualZoom);
     lastDrawItems = [];
 
-    // Map's pixel origin at current zoom
-    const origin = map.getPixelOrigin();
-    const ox = origin.x, oy = origin.y;
-    const scale = Math.pow(2, zoom); // for going from lat/lon directly
+    // Derive the (ox, oy) that maps our precomputed projectLatLon() outputs
+    // to container pixels at the CURRENT map state (including live pan/zoom).
+    // We anchor to a known point — Trumbull County center — computing both
+    // its mercator pixel (via our inline math) and its container pixel (via Leaflet).
+    // The delta between them is the origin offset we need.
+    const anchorLat = 41.3171, anchorLon = -80.7607;
+    const [anchorPx, anchorPy] = projectLatLon(anchorLat, anchorLon, actualZoom);
+    const anchorContainer = map.latLngToContainerPoint([anchorLat, anchorLon]);
+    const ox = anchorPx - anchorContainer.x;
+    const oy = anchorPy - anchorContainer.y;
 
-    if (zoom < UNCLUSTERED_ZOOM && clustersByZoom[zoom]) {
-      drawClusters(zoom, ox, oy, size);
+    if (zoomLevel < UNCLUSTERED_ZOOM && clustersByZoom[zoomLevel]) {
+      drawClusters(zoomLevel, actualZoom, ox, oy, size);
     } else {
-      drawIndividualPoints(zoom, ox, oy, size);
+      drawIndividualPoints(actualZoom, ox, oy, size);
     }
   }
 
-  function drawClusters(zoom, ox, oy, size) {
-    const layer = clustersByZoom[zoom];
+  function drawClusters(zoomLevel, actualZoom, ox, oy, size) {
+    const layer = clustersByZoom[zoomLevel];
     if (!layer) return;
     const n = layer.lats.length;
     const r = 16; // icon radius base
@@ -1418,7 +1428,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     if (usePrecomputed) {
       // Standard path — use precomputed clusters directly
       for (let i = 0; i < n; i++) {
-        const [px, py] = projectLatLon(layer.lats[i], layer.lons[i], zoom);
+        const [px, py] = projectLatLon(layer.lats[i], layer.lons[i], actualZoom);
         const x = px - ox;
         const y = py - oy;
         if (x < viewLeft || x > viewRight || y < viewTop || y > viewBottom) continue;
@@ -1451,7 +1461,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       }
     } else {
       // Filters active — recompute on the fly from individual points at this zoom's cell grid
-      drawDynamicClusters(zoom, ox, oy, size);
+      drawDynamicClusters(actualZoom, ox, oy, size);
     }
   }
 

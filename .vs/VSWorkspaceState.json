@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\HealthcareFacilities",
-    "\\Hydrants"
+    "\\Governments\\Ohio\\Trumbull"
   ],
-  "SelectedNode": "\\Hydrants",
+  "SelectedNode": "\\AddressPoints",
   "PreviewInSolutionExplorer": false
 }
