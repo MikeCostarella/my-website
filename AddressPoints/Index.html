@@ -769,10 +769,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   #sidebar {
     position: absolute;
-    top: 152px; /* below header + zoom control */
+    top: 196px; /* below header + zoom control + locate button */
     left: 16px;
     width: 300px;
-    max-height: calc(100vh - 168px);
+    max-height: calc(100vh - 212px);
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
@@ -873,7 +873,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .filter-row.disabled .icon-dot { opacity: 0.35; }
   #sidebar-toggle {
     position: absolute;
-    top: 152px;
+    top: 196px;
     left: 16px;
     z-index: 901;
     width: 44px;
@@ -1092,6 +1092,49 @@ svg.leaflet-image-layer.leaflet-interactive path {
     font-weight: 500;
   }
   .modal-section-title:first-child { margin-top: 4px; }
+
+  /* LOCATE BUTTON (Leaflet control) */
+  .locate-control { background: var(--panel); }
+  .locate-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .locate-btn:hover { background: var(--ink); color: var(--panel); }
+  .locate-btn svg { display: block; }
+
+  /* USER LOCATION MARKER (blue pulsing dot) */
+  .user-location-marker { background: transparent !important; border: none !important; }
+  .user-location-marker .ulm-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    background: #4285f4;
+    border: 2.5px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(66,133,244,0.5), 0 1px 4px rgba(0,0,0,0.4);
+    z-index: 2;
+  }
+  .user-location-marker .ulm-pulse {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    background: rgba(66,133,244,0.4);
+    border-radius: 50%;
+    animation: ulm-pulse 2s ease-out infinite;
+    z-index: 1;
+  }
+  @keyframes ulm-pulse {
+    0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+  }
   @media (max-width: 640px) {
     #header { padding: 11px 14px 9px; }
     #header h1 { font-size: 17px; }
@@ -1100,15 +1143,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
     #map { top: 64px; }
     #status { top: 74px; right: 10px; }
     #sidebar {
-      top: 140px;
+      top: 184px;
       left: 12px;
       width: calc(100vw - 74px); /* leaves room for zoom control */
       max-width: 300px;
-      max-height: calc(100vh - 156px);
+      max-height: calc(100vh - 200px);
     }
     /* Collapses to the left (same as desktop) */
     #sidebar.collapsed { transform: translateX(calc(-100% - 20px)); }
-    #sidebar-toggle { top: 140px; left: 12px; }
+    #sidebar-toggle { top: 184px; left: 12px; }
     .modal-head h3 { font-size: 21px; }
     .modal-head { padding: 18px 20px 14px; }
     .modal-body { padding: 14px 20px 18px; }
@@ -1236,6 +1279,104 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   const statusEl = document.getElementById('status');
   const statusTextEl = document.getElementById('status-text');
+
+  // ---------- User location ----------
+  // Trumbull County bounding box (with small buffer)
+  const COUNTY_BOUNDS = L.latLngBounds([41.10, -81.05], [41.53, -80.48]);
+  let userMarker = null;
+  let userAccuracyCircle = null;
+
+  function placeUserMarker(lat, lon, accuracy) {
+    if (userMarker) map.removeLayer(userMarker);
+    if (userAccuracyCircle) map.removeLayer(userAccuracyCircle);
+
+    if (accuracy && accuracy > 20) {
+      userAccuracyCircle = L.circle([lat, lon], {
+        radius: accuracy,
+        color: '#4285f4',
+        fillColor: '#4285f4',
+        fillOpacity: 0.12,
+        weight: 1,
+        interactive: false,
+      }).addTo(map);
+    }
+
+    // Blue dot, similar to Google Maps "you are here"
+    const icon = L.divIcon({
+      className: 'user-location-marker',
+      html: '<div class="ulm-pulse"></div><div class="ulm-dot"></div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+    });
+    userMarker = L.marker([lat, lon], { icon, interactive: false, keyboard: false, zIndexOffset: 1000 }).addTo(map);
+  }
+
+  function goToUserLocation(opts) {
+    opts = opts || {};
+    if (!navigator.geolocation) {
+      if (opts.manual) alert('Geolocation is not supported by your browser.');
+      return;
+    }
+    if (opts.manual) {
+      statusEl.classList.add('visible');
+      statusTextEl.textContent = 'Getting your location…';
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const acc = pos.coords.accuracy || 0;
+        placeUserMarker(lat, lon, acc);
+
+        if (COUNTY_BOUNDS.contains([lat, lon])) {
+          // User is in Trumbull County — zoom in close
+          map.setView([lat, lon], 16, { animate: !opts.initial });
+        } else {
+          // User is outside — just show their location as a marker but keep county view
+          if (opts.manual) {
+            // On manual click, pan there anyway
+            map.setView([lat, lon], 14, { animate: true });
+          }
+          // For initial load, leave the county fit in place (already set)
+        }
+
+        if (opts.manual) {
+          statusEl.classList.remove('visible');
+        }
+      },
+      (err) => {
+        if (opts.manual) {
+          statusTextEl.textContent = 'Location ' + (err.code === 1 ? 'permission denied' : 'unavailable');
+          setTimeout(() => { statusEl.classList.remove('visible'); }, 2000);
+        }
+        console.warn('Geolocation error:', err.message);
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+    );
+  }
+
+  // Try to locate on initial load (silently — no alert if denied)
+  goToUserLocation({ initial: true });
+
+  // Locate button
+  const LocateControl = L.Control.extend({
+    options: { position: 'topleft' },
+    onAdd: function() {
+      const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control locate-control');
+      const btn = L.DomUtil.create('a', 'locate-btn', container);
+      btn.href = '#';
+      btn.title = 'Show my location';
+      btn.setAttribute('role', 'button');
+      btn.setAttribute('aria-label', 'Show my location');
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path></svg>';
+      L.DomEvent.on(btn, 'click', (e) => {
+        L.DomEvent.stop(e);
+        goToUserLocation({ manual: true });
+      });
+      return container;
+    }
+  });
+  map.addControl(new LocateControl());
 
   // ---------- Canvas overlay ----------
   // Canvas sits in the map's container (not a transformed pane) so it stays
