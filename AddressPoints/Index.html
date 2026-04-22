@@ -1093,6 +1093,50 @@ svg.leaflet-image-layer.leaflet-interactive path {
   }
   .modal-section-title:first-child { margin-top: 4px; }
 
+  /* GOOGLE MAPS LINK BUTTONS in the modal */
+  .map-links {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 6px;
+    flex-wrap: wrap;
+  }
+  .map-link-btn {
+    flex: 1;
+    min-width: 140px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .map-link-btn:hover {
+    background: #f8f4eb;
+    border-color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .map-link-btn.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .map-link-btn.primary:hover {
+    background: #9c3509;
+    border-color: #9c3509;
+  }
+  .map-link-btn svg { flex-shrink: 0; }
+
   /* LOCATE BUTTON (Leaflet control) */
   .locate-control { background: var(--panel); }
   .locate-btn {
@@ -1285,6 +1329,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   const COUNTY_BOUNDS = L.latLngBounds([41.10, -81.05], [41.53, -80.48]);
   let userMarker = null;
   let userAccuracyCircle = null;
+  let userLocation = null; // { lat, lon } — last known location, used for directions
 
   function placeUserMarker(lat, lon, accuracy) {
     if (userMarker) map.removeLayer(userMarker);
@@ -1326,11 +1371,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
         const acc = pos.coords.accuracy || 0;
+        userLocation = { lat, lon };
         placeUserMarker(lat, lon, acc);
 
         if (COUNTY_BOUNDS.contains([lat, lon])) {
-          // User is in Trumbull County — zoom in close
-          map.setView([lat, lon], 16, { animate: !opts.initial });
+          // User is in Trumbull County — zoom in close enough that nearby
+          // address points are individually selectable (zoom 18 gives ~14 px icons).
+          map.setView([lat, lon], 18, { animate: !opts.initial });
         } else {
           // User is outside — just show their location as a marker but keep county view
           if (opts.manual) {
@@ -1919,21 +1966,67 @@ svg.leaflet-image-layer.leaflet-interactive path {
            (v ? escapeHtml(v) : '—') + '</div></div>';
   }
 
+  // Build the Google Maps links block (View + Directions)
+  function mapLinksHtml(lat, lon, address) {
+    const coordStr = lat.toFixed(6) + ',' + lon.toFixed(6);
+    // Prefer the human-readable address in the search query if available;
+    // coordinates are passed separately to anchor the pin precisely.
+    const query = address
+      ? encodeURIComponent(address + ' Trumbull County OH')
+      : encodeURIComponent(coordStr);
+    const viewUrl = 'https://www.google.com/maps/search/?api=1&query=' + query +
+      '&query_place_id=&center=' + encodeURIComponent(coordStr);
+    // Google Maps search by coords shows a pin at the exact coords
+    const viewUrlCoords = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(coordStr);
+
+    let dirButton = '';
+    if (userLocation) {
+      const origin = encodeURIComponent(userLocation.lat.toFixed(6) + ',' + userLocation.lon.toFixed(6));
+      const dest = encodeURIComponent(coordStr);
+      const dirUrl = 'https://www.google.com/maps/dir/?api=1&origin=' + origin + '&destination=' + dest + '&travelmode=driving';
+      dirButton =
+        '<a class="map-link-btn primary" href="' + dirUrl + '" target="_blank" rel="noopener noreferrer" title="Get directions from your location">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>' +
+          '<span>Directions</span>' +
+        '</a>';
+    } else {
+      dirButton =
+        '<button class="map-link-btn primary" type="button" title="Requires your location" onclick="this.blur()" data-needs-location="1">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>' +
+          '<span>Directions</span>' +
+        '</button>';
+    }
+
+    return '<div class="map-links">' +
+      '<a class="map-link-btn" href="' + viewUrlCoords + '" target="_blank" rel="noopener noreferrer" title="Open in Google Maps">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+        '<span>View on Google Maps</span>' +
+      '</a>' +
+      dirButton +
+    '</div>';
+  }
+
   function openModal(i) {
+    currentModalIdx = i;
     const def = STRUC_TYPES[pointStypes[i]] || STRUC_TYPES[0];
     modalPill.style.background = def.color;
     modalPillIcon.textContent = def.letter;
     modalPillText.textContent = def.name;
 
+    const lat = pointLats[i];
+    const lon = pointLons[i];
+
     if (!details) {
       modalTitle.textContent = 'Loading details…';
       modalSubtitle.textContent = def.desc;
-      modalBody.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--muted);font-family:var(--serif);font-style:italic">Address details are still loading — please try again in a moment.</div>' +
+      modalBody.innerHTML = mapLinksHtml(lat, lon, null) +
+        '<div style="text-align:center;padding:20px 20px 12px;color:var(--muted);font-family:var(--serif);font-style:italic">Address details are still loading — please try again in a moment.</div>' +
         '<div class="modal-section-title">Coordinates</div><div class="field-grid">' +
-        field('Latitude', pointLats[i].toFixed(6) + '°') +
-        field('Longitude', pointLons[i].toFixed(6) + '°') +
+        field('Latitude', lat.toFixed(6) + '°') +
+        field('Longitude', lon.toFixed(6) + '°') +
         '</div>';
       modalBackdrop.classList.add('open');
+      attachLocationHandlers();
       return;
     }
 
@@ -1948,6 +2041,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       : '';
 
     modalBody.innerHTML =
+      mapLinksHtml(lat, lon, details.ls[i]) +
       '<div class="modal-section-title">Location</div><div class="field-grid">' +
         field('Municipality', details.muL[details.mu[i]]) +
         field('ZIP Code', details.ziL[details.zi[i]]) +
@@ -1956,8 +2050,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
         landmarkHtml +
       '</div>' +
       '<div class="modal-section-title">Coordinates</div><div class="field-grid">' +
-        field('Latitude', pointLats[i].toFixed(6) + '°') +
-        field('Longitude', pointLons[i].toFixed(6) + '°') +
+        field('Latitude', lat.toFixed(6) + '°') +
+        field('Longitude', lon.toFixed(6) + '°') +
       '</div>' +
       '<div class="modal-section-title">Emergency Services</div><div class="field-grid">' +
         field('Police', details.plL[details.pl[i]]) +
@@ -1971,6 +2065,35 @@ svg.leaflet-image-layer.leaflet-interactive path {
       '</div>';
 
     modalBackdrop.classList.add('open');
+    attachLocationHandlers();
+  }
+
+  // If the Directions button needs location (user hasn't granted yet), clicking
+  // it triggers a location request. If successful, re-open the modal so the
+  // link is now live.
+  let currentModalIdx = -1;
+  function attachLocationHandlers() {
+    const btn = modalBody.querySelector('[data-needs-location]');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
+      btn.innerHTML = '<span style="opacity:0.7">Requesting location…</span>';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          placeUserMarker(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy || 0);
+          // Re-render the modal to show the live link
+          if (currentModalIdx >= 0) openModal(currentModalIdx);
+        },
+        (err) => {
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg><span>Location ' + (err.code === 1 ? 'denied' : 'unavailable') + '</span>';
+        },
+        { timeout: 8000 }
+      );
+    });
   }
 
   function closeModal() { modalBackdrop.classList.remove('open'); }
