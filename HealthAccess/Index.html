@@ -94,12 +94,37 @@
     color: var(--gold-soft);
     font-weight: 500;
   }
-  header .count {
+  header .meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    line-height: 1.35;
+  }
+  header .meta .credit {
+    font-size: 0.78rem;
+    color: var(--gold-soft);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  header .meta .credit strong {
+    color: #FFFFFF;
+    font-weight: 600;
+  }
+  header .meta .updated {
+    font-size: 0.72rem;
+    color: var(--gold-soft);
+    font-weight: 400;
+    opacity: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+  header .meta .count {
     font-size: 0.85rem;
     color: var(--gold-soft);
     font-weight: 400;
+    margin-top: 2px;
   }
-  header .count strong {
+  header .meta .count strong {
     color: #FFFFFF;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
@@ -458,6 +483,45 @@
   }
   .leaflet-tooltip.boundary-tooltip::before { display: none; }
 
+  /* Permanent labels rendered inside township and municipality polygons.
+     The container has its anchor at (0,0) on the centroid lat/lng, so we
+     translate(-50%, -50%) to center the text on that point. The text is
+     drawn with a soft white halo (text-shadow) so it remains readable
+     against any underlying tile color. */
+  .boundary-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    line-height: 1.1;
+    /* The white halo: multiple text-shadows simulate a glow that's
+       visible on both light gray basemap and through municipality fill. */
+    text-shadow:
+       0  1px 0 rgba(255,255,255,0.95),
+       0 -1px 0 rgba(255,255,255,0.95),
+       1px 0 0 rgba(255,255,255,0.95),
+      -1px 0 0 rgba(255,255,255,0.95),
+       1px 1px 1.5px rgba(255,255,255,0.85),
+      -1px -1px 1.5px rgba(255,255,255,0.85),
+       1px -1px 1.5px rgba(255,255,255,0.85),
+      -1px 1px 1.5px rgba(255,255,255,0.85);
+  }
+  /* Townships — subordinate styling: italic, gray, smaller */
+  .township-label {
+    font: italic 600 0.78rem 'Inter', sans-serif;
+    color: #5A5347;
+    letter-spacing: 0.02em;
+  }
+  /* Municipalities — primary styling: navy, slightly larger, uppercase */
+  .muni-label {
+    font: 700 0.85rem 'Inter', sans-serif;
+    color: var(--navy-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
   /* ============ Modal ============ */
   .modal-backdrop {
     position: fixed;
@@ -675,7 +739,9 @@
       padding: 12px 16px 10px;
     }
     header h1 { font-size: 1.25rem; }
-    header .sub, header .count { display: none; }
+    header .sub, header .meta .count { display: none; }
+    header .meta .credit { font-size: 0.7rem; }
+    header .meta .updated { font-size: 0.66rem; }
 
     .main {
       grid-template-columns: 1fr;
@@ -726,7 +792,11 @@
       <div class="sub">Trumbull County Combined Health District</div>
       <h1>Access to Care</h1>
     </div>
-    <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
+    <div class="meta">
+      <div class="credit">Created by <strong>Costarella Innovations, LLC</strong></div>
+      <div class="updated">Updated April 28, 2026 at 8:56 AM EDT</div>
+      <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
+    </div>
   </header>
 
   <div class="main" id="main">
@@ -995,6 +1065,57 @@ if (leafletAvailable) {
   townshipPane.style.zIndex = 350;  // below markers (default 600), above tiles (200)
   const munipane = map.createPane('munis');
   munipane.style.zIndex = 360;
+  const labelPane = map.createPane('boundaryLabels');
+  labelPane.style.zIndex = 370;     // above boundaries, still below markers
+  labelPane.style.pointerEvents = 'none';  // labels never intercept clicks
+
+  /* Track all boundary labels so we can show/hide based on zoom */
+  const boundaryLabels = [];
+
+  /* Helper: add a permanent name label at the center of a boundary feature.
+     `kind` is 'township' or 'muni' — used to pick the CSS class. */
+  function addBoundaryLabel(layer, displayName, kind) {
+    /* getBounds().getCenter() works for both single polygons and multi-polygons.
+       It's the bounding-box center, not the geometric centroid — fast and good
+       enough for these mostly-rectangular shapes. */
+    let center;
+    try {
+      center = layer.getBounds().getCenter();
+    } catch (e) {
+      return;  /* skip features without geometry */
+    }
+    const labelClass = kind === 'township' ? 'boundary-label township-label' : 'boundary-label muni-label';
+    const labelMarker = L.marker(center, {
+      pane: 'boundaryLabels',
+      interactive: false,
+      icon: L.divIcon({
+        className: '',
+        html: `<div class="${labelClass}">${displayName}</div>`,
+        iconSize: null,  /* let CSS size the label */
+        iconAnchor: [0, 0]
+      })
+    });
+    boundaryLabels.push(labelMarker);
+    labelMarker.addTo(map);
+  }
+
+  /* Show labels only at zoom 11 and above; below that, the county view
+     would be cluttered. Townships start showing at zoom 11; municipalities
+     get a slightly lower threshold (10) since their names are typically
+     more important to residents orienting themselves. */
+  function updateBoundaryLabels() {
+    const z = map.getZoom();
+    boundaryLabels.forEach(m => {
+      const el = m.getElement();
+      if (!el) return;
+      const labelEl = el.querySelector('.boundary-label');
+      if (!labelEl) return;
+      const isTownship = labelEl.classList.contains('township-label');
+      const threshold = isTownship ? 11 : 10;
+      labelEl.style.display = (z >= threshold) ? '' : 'none';
+    });
+  }
+  map.on('zoomend', updateBoundaryLabels);
 
   /* Townships — soft gray dashed outline */
   fetch(`${BOUNDARY_BASE}/109${boundaryQuery}`)
@@ -1015,11 +1136,13 @@ if (leafletAvailable) {
           const name = feature.properties && feature.properties.NAME;
           if (name) {
             const pretty = name.replace(/\s+TOWNSHIP\s*$/i, '').replace(/\s+/g, ' ').trim();
+            const display = `${pretty} Twp.`;
             layer.bindTooltip(`${pretty} Township`, {
               sticky: true,
               className: 'boundary-tooltip',
               direction: 'center'
             });
+            addBoundaryLabel(layer, display, 'township');
           }
           /* Boundaries should not block marker clicks */
           layer.on('add', () => {
@@ -1027,6 +1150,7 @@ if (leafletAvailable) {
           });
         }
       }).addTo(map);
+      updateBoundaryLabels();
     })
     .catch(() => { /* silent — boundaries are nice-to-have, not required */ });
 
@@ -1047,20 +1171,28 @@ if (leafletAvailable) {
         onEachFeature: (feature, layer) => {
           const name = feature.properties && feature.properties.NAME;
           if (name) {
-            const pretty = name
+            /* For the inline label, drop the (City)/(Village) suffix to keep it short.
+               The hover tooltip keeps the full designation. */
+            const tooltipName = name
               .replace(/\s+CITY\s*$/i, ' (City)')
               .replace(/\s+VILLAGE\s*$/i, ' (Village)');
-            layer.bindTooltip(pretty, {
+            const labelName = name
+              .replace(/\s+CITY\s*$/i, '')
+              .replace(/\s+VILLAGE\s*$/i, '')
+              .trim();
+            layer.bindTooltip(tooltipName, {
               sticky: true,
               className: 'boundary-tooltip',
               direction: 'center'
             });
+            addBoundaryLabel(layer, labelName, 'muni');
           }
           layer.on('add', () => {
             if (layer._path) layer._path.style.pointerEvents = 'none';
           });
         }
       }).addTo(map);
+      updateBoundaryLabels();
     })
     .catch(() => { /* silent fallback */ });
 } else {
