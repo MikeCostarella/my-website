@@ -162,6 +162,26 @@
     transform: translateX(-100%);
     visibility: hidden;
   }
+  /* Mobile-only close button at the top-right of the drawer.
+     Hidden on desktop (legend is part of grid layout, not a drawer). */
+  .legend-close {
+    display: none;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--bg);
+    border-radius: 4px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    z-index: 10;
+    place-items: center;
+    transition: background-color 0.15s, color 0.15s;
+  }
+  .legend-close:hover { background: var(--navy); color: white; }
+  .legend-close svg { width: 20px; height: 20px; display: block; }
   .legend-inner {
     padding: 22px 22px 28px;
   }
@@ -784,6 +804,11 @@
       transform: translateX(0);
       visibility: visible;
     }
+    /* Show the close button only on mobile, where the legend is a drawer */
+    .legend-close { display: grid; }
+    /* Make room at the top of the inner content so the close button doesn't
+       overlap the "Facility Key" heading */
+    .legend-inner { padding-right: 60px; }
     .toolbar { left: 8px; right: 8px; top: 8px; }
     .toolbar-bar { padding: 6px 6px 6px 12px; }
     .filter-toggle { padding: 0 10px; }
@@ -814,7 +839,7 @@
     </div>
     <div class="meta">
       <div class="credit">Created by <strong>Costarella Innovations, LLC</strong></div>
-      <div class="updated">Updated April 28, 2026 at 12:00 PM EDT</div>
+      <div class="updated">Updated April 28, 2026 at 12:11 PM EDT</div>
       <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
     </div>
   </header>
@@ -822,6 +847,9 @@
   <div class="main" id="main">
 
     <aside class="legend" id="legend" aria-label="Facility type filter">
+      <button class="legend-close" id="legend-close" aria-label="Close facility key">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       <div class="legend-inner">
         <h2>Facility Key</h2>
         <div class="legend-sub">Click a type to toggle</div>
@@ -1384,6 +1412,15 @@ document.getElementById('filter-toggle').addEventListener('click', () => {
 
 document.getElementById('legend-toggle').addEventListener('click', () => {
   document.getElementById('main').classList.toggle('legend-collapsed');
+  if (map) setTimeout(() => map.invalidateSize(), 350);
+});
+
+/* Mobile-only close button inside the legend drawer. Hidden on desktop
+   (display: none in CSS), so this listener is harmless there. Always
+   collapses the legend (never toggles), since this button only exists
+   to dismiss an open drawer. */
+document.getElementById('legend-close').addEventListener('click', () => {
+  document.getElementById('main').classList.add('legend-collapsed');
   if (map) setTimeout(() => map.invalidateSize(), 350);
 });
 
