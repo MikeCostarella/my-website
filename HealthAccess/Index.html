@@ -760,12 +760,15 @@
     header .meta .credit { font-size: 0.7rem; }
     header .meta .updated { font-size: 0.66rem; }
 
-    .main {
+    /* On mobile, .main is always a single-column grid regardless of
+       legend state. The legend is positioned absolutely (removed from
+       flow), so the grid only contains .map-wrap. We need this rule
+       to override the desktop "0 1fr" rule on .main.legend-collapsed,
+       which would otherwise place the map in a 0-width column. */
+    .main,
+    .main.legend-collapsed {
       grid-template-columns: 1fr;
       grid-template-rows: 1fr;
-    }
-    .main:not(.legend-collapsed) {
-      grid-template-columns: 1fr;
     }
     aside.legend {
       position: absolute;
@@ -811,7 +814,7 @@
     </div>
     <div class="meta">
       <div class="credit">Created by <strong>Costarella Innovations, LLC</strong></div>
-      <div class="updated">Updated April 28, 2026 at 11:47 AM EDT</div>
+      <div class="updated">Updated April 28, 2026 at 12:00 PM EDT</div>
       <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
     </div>
   </header>
