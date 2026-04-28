@@ -64,7 +64,14 @@
   .app {
     display: grid;
     grid-template-rows: auto 1fr;
+    /* 100vh fallback for older browsers; 100dvh is the "dynamic viewport
+       height" unit that correctly accounts for mobile browser URL bars
+       expanding and collapsing. Without dvh, iOS Safari can render the
+       map area as zero pixels tall. */
     height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
   }
 
@@ -136,6 +143,10 @@
     grid-template-columns: 280px 1fr;
     overflow: hidden;
     position: relative;
+    /* Defensive: ensure the grid row gets a real height even when the
+       parent's 1fr resolution lags (iOS Safari URL bar transitions). */
+    min-height: 0;
+    height: 100%;
   }
   .main.legend-collapsed { grid-template-columns: 0 1fr; }
 
@@ -248,6 +259,12 @@
   .map-wrap {
     position: relative;
     overflow: hidden;
+    /* Defensive: even if the grid cell is 0 pixels (iOS Safari quirk
+       during URL bar transitions), force a minimum height so Leaflet
+       has somewhere to render. The invalidateSize() call after load
+       fixes the size once the grid resolves correctly. */
+    min-height: 200px;
+    height: 100%;
   }
   #map {
     position: absolute;
@@ -794,7 +811,7 @@
     </div>
     <div class="meta">
       <div class="credit">Created by <strong>Costarella Innovations, LLC</strong></div>
-      <div class="updated">Updated April 28, 2026 at 8:56 AM EDT</div>
+      <div class="updated">Updated April 28, 2026 at 11:47 AM EDT</div>
       <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
     </div>
   </header>
@@ -1622,6 +1639,38 @@ function escapeAttr(s) { return escapeHtml(s); }
 buildLegend();
 buildFilters();
 applyFilters();
+
+/* iOS Safari fix: when the URL bar collapses or the orientation changes,
+   the map container's height changes, but Leaflet doesn't auto-detect
+   parent resizes. Invalidate the map size in three situations:
+     1. Shortly after initial load (URL bar may collapse 0.5s in)
+     2. On window resize (covers desktop too, no harm)
+     3. On orientation change (mobile rotation) */
+function refreshMapSize() {
+  if (map && typeof map.invalidateSize === 'function') {
+    map.invalidateSize({ animate: false });
+  }
+}
+
+if (map) {
+  /* One-shot delayed call after page settles. 100ms catches most layout
+     transitions; the second call at 600ms catches the iOS URL bar
+     collapse animation, which finishes around 400-500ms. */
+  setTimeout(refreshMapSize, 100);
+  setTimeout(refreshMapSize, 600);
+
+  window.addEventListener('resize', refreshMapSize);
+  window.addEventListener('orientationchange', () => {
+    /* Wait for the rotation animation to finish before measuring */
+    setTimeout(refreshMapSize, 250);
+  });
+
+  /* When the page becomes visible again (e.g., user switches back to
+     this tab on iOS Safari), the layout may have changed. Refresh. */
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshMapSize();
+  });
+}
 </script>
 </body>
 </html>
