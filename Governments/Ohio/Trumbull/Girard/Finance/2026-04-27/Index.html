@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City of Girard — Q1 2026 Finance Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --ink: #0e2438;
+    --ink-2: #1f3a52;
+    --ink-soft: #4a5e74;
+    --paper: #f5f0e6;
+    --paper-2: #ebe4d4;
+    --paper-3: #e0d7c2;
+    --rule: #c8bda6;
+    --rule-soft: #d8cfb9;
+    --teal: #1a6e6e;
+    --teal-soft: #d6e4e0;
+    --amber: #c47a2c;
+    --amber-soft: #f3e3c8;
+    --brick: #983221;
+    --brick-soft: #efd5cd;
+    --gold: #b48a3c;
+    --shadow: 0 1px 0 rgba(14, 36, 56, 0.04), 0 8px 24px -12px rgba(14, 36, 56, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter Tight', -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(14, 36, 56, 0.04) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+
+  .num, td.num, th.num { font-variant-numeric: tabular-nums; }
+
+  /* ── Masthead ──────────────────────────────────────── */
+  .masthead {
+    border-bottom: 3px double var(--ink);
+    padding: 32px 48px 24px;
+    background: var(--paper);
+    position: relative;
+  }
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+  .masthead-top span { font-weight: 500; }
+  .masthead-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 144;
+  }
+  .masthead-title .ampersand {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--gold);
+    font-variation-settings: 'opsz' 144;
+  }
+  .masthead-sub {
+    margin-top: 10px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-2);
+    font-weight: 400;
+  }
+  .masthead-meta {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .masthead-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Tab Navigation ────────────────────────────────── */
+  .tabs {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 48px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 4px 16px -8px rgba(14, 36, 56, 0.4);
+  }
+  .tabs-inner {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-inner::-webkit-scrollbar { display: none; }
+  .tab {
+    background: none;
+    border: none;
+    color: rgba(245, 240, 230, 0.65);
+    padding: 14px 22px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    position: relative;
+  }
+  .tab:hover { color: var(--paper); }
+  .tab.active {
+    color: var(--paper);
+    border-bottom-color: var(--gold);
+  }
+  .tab-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    margin-right: 8px;
+    color: var(--gold);
+  }
+
+  /* ── Main content ─────────────────────────────────── */
+  main {
+    padding: 32px 48px 64px;
+    max-width: 1600px;
+  }
+
+  .panel {
+    display: none;
+  }
+  .panel.active { display: block; animation: fade 0.3s ease; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ── Section headers ─────────────────────────────── */
+  .section-head {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+  .section-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .section-desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    font-size: 15px;
+    max-width: 720px;
+  }
+
+  /* ── KPI grid (Overview) ──────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .kpi {
+    background: var(--paper);
+    padding: 20px 22px;
+    position: relative;
+  }
+  .kpi-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .kpi-sub {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-sub.pos { color: var(--teal); font-weight: 500; }
+  .kpi-sub.neg { color: var(--brick); font-weight: 500; }
+
+  /* ── Two-column layout ────────────────────────────── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 1100px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    box-shadow: var(--shadow);
+    padding: 22px 24px;
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .card-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--ink);
+  }
+  .card-meta {
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 320px;
+  }
+  .chart-wrap.tall { height: 380px; }
+  .chart-wrap.short { height: 220px; }
+
+  /* ── Tables ───────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead tr {
+    border-bottom: 2px solid var(--ink);
+  }
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    background: var(--paper-2);
+    white-space: nowrap;
+    position: sticky;
+    top: 50px;
+    cursor: pointer;
+    user-select: none;
+  }
+  th.sortable::after {
+    content: ' ↕';
+    color: var(--ink-soft);
+    font-size: 10px;
+    opacity: 0.4;
+  }
+  th.sort-asc::after { content: ' ↑'; opacity: 1; color: var(--gold); }
+  th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
+  th.num { text-align: right; }
+  th.center { text-align: center; }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--rule-soft);
+    color: var(--ink-2);
+    vertical-align: middle;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr { transition: background 0.1s; }
+  tbody tr:hover { background: var(--paper-2); }
+  tbody tr.clickable { cursor: pointer; }
+  tbody tr.clickable:hover { background: var(--teal-soft); }
+
+  .fund-pill {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .pos { color: var(--teal); font-weight: 500; }
+  .neg { color: var(--brick); font-weight: 500; }
+  .muted { color: var(--ink-soft); }
+  .zero { color: var(--rule); }
+
+  /* ── Filter bar ───────────────────────────────────── */
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+  }
+  .filter-bar input[type="text"],
+  .filter-bar select {
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    min-width: 180px;
+    border-radius: 0;
+  }
+  .filter-bar input[type="text"]:focus,
+  .filter-bar select:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 2px var(--paper-3);
+  }
+  .filter-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .filter-stats {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .filter-stats strong { color: var(--ink); font-weight: 700; }
+  .clear-btn {
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 8px 14px;
+    color: var(--ink-soft);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .clear-btn:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ── Budget bar ───────────────────────────────────── */
+  .bar-wrap {
+    position: relative;
+    height: 18px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule-soft);
+    width: 140px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--teal);
+    transition: width 0.3s;
+  }
+  .bar-fill.warning { background: var(--amber); }
+  .bar-fill.over { background: var(--brick); }
+  .bar-target {
+    position: absolute;
+    top: 0;
+    left: 25%;
+    width: 1px;
+    height: 100%;
+    background: var(--ink);
+    z-index: 2;
+  }
+  .bar-pct {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink);
+    z-index: 3;
+  }
+
+  /* ── Drill-down modal ─────────────────────────────── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14, 36, 56, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 32px;
+  }
+  .modal-overlay.active { display: flex; animation: fade 0.2s; }
+  .modal {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    box-shadow: 0 24px 64px -16px rgba(14, 36, 56, 0.5);
+    max-width: 1100px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-head {
+    padding: 20px 28px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: var(--paper-2);
+  }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .modal-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .close-btn {
+    background: none;
+    border: 1px solid var(--ink-soft);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    color: var(--ink);
+    font-size: 18px;
+    line-height: 1;
+    transition: all 0.15s;
+  }
+  .close-btn:hover { background: var(--ink); color: var(--paper); }
+  .modal-body {
+    padding: 24px 28px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .modal-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 24px;
+  }
+  .modal-stat {
+    background: var(--paper);
+    padding: 14px 16px;
+  }
+  .modal-stat-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .modal-stat-value {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Misc ─────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--rule);
+  }
+
+  .empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+  }
+
+  footer {
+    border-top: 3px double var(--ink);
+    margin: 64px 0 0;
+    padding: 24px 48px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  footer strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Responsive ───────────────────────────────────── */
+  @media (max-width: 768px) {
+    .masthead, main, footer, .tabs { padding-left: 20px; padding-right: 20px; }
+    .modal-stats { grid-template-columns: repeat(2, 1fr); }
+    th { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-top">
+    <span>City of Girard, Ohio · Office of the Auditor</span>
+    <span id="report-period">First Quarter 2026</span>
+  </div>
+  <h1 class="masthead-title">Quarterly Finance <span class="ampersand">&amp;</span> Cash Position Report</h1>
+  <p class="masthead-sub">A comprehensive accounting of municipal funds, expenditures, and revenue.</p>
+  <div class="masthead-meta">
+    <span>Reporting period <strong id="period-label">—</strong></span>
+    <span>Source data through <strong id="as-of-label">—</strong></span>
+    <span><strong id="fund-count-meta">—</strong> active funds</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button class="tab active" data-panel="overview"><span class="tab-num">01</span>Overview</button>
+    <button class="tab" data-panel="funds"><span class="tab-num">02</span>Funds</button>
+    <button class="tab" data-panel="expenses"><span class="tab-num">03</span>Expenses</button>
+    <button class="tab" data-panel="checks"><span class="tab-num">04</span>Checks</button>
+    <button class="tab" data-panel="revenue"><span class="tab-num">05</span>Revenue</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ── PANEL: OVERVIEW ────────────────────────────── -->
+  <section class="panel active" id="panel-overview">
+    <div class="section-head">
+      <div class="section-eyebrow">Section One</div>
+      <h2 class="section-title">Quarter at a Glance</h2>
+      <p class="section-desc">Headline figures across all 55 active funds for the period ending March 31, 2026. Click any card or chart bar to drill into detail.</p>
+    </div>
+
+    <div class="kpi-grid" id="kpi-grid"></div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Top 10 Funds by YTD Expenses</div>
+          </div>
+          <div class="card-meta">Click a bar to drill down</div>
+        </div>
+        <div class="chart-wrap tall"><canvas id="chart-top-funds"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Revenue vs. Expenses · YTD</div>
+          </div>
+          <div class="card-meta">Top 8 funds by activity</div>
+        </div>
+        <div class="chart-wrap tall"><canvas id="chart-rev-exp"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Budget Utilization Distribution</div>
+          </div>
+          <div class="card-meta">Q1 target: 25%</div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-budget-dist"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--teal)"></span>Under target (&lt; 25%)</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--amber)"></span>Near target (25–50%)</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--brick)"></span>Over pace (&gt; 50%)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Income Tax Trend · Q1</div>
+          </div>
+          <div class="card-meta">Monthly gross collection</div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-income-trend"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PANEL: FUNDS ───────────────────────────────── -->
+  <section class="panel" id="panel-funds">
+    <div class="section-head">
+      <div class="section-eyebrow">Section Two</div>
+      <h2 class="section-title">Cash Position by Fund</h2>
+      <p class="section-desc">All 55 active funds with beginning balance, year-to-date revenue and expenses, and unexpended balance. Click a row to see account-level detail.</p>
+    </div>
+
+    <div class="filter-bar">
+      <span class="filter-label">Search</span>
+      <input type="text" id="fund-search" placeholder="Fund name or number…">
+      <span class="filter-label">Activity</span>
+      <select id="fund-activity">
+        <option value="all">All funds</option>
+        <option value="active">Active (revenue or expenses)</option>
+        <option value="dormant">Dormant (no Q1 activity)</option>
+        <option value="negative">Net negative cash flow</option>
+      </select>
+      <button class="clear-btn" id="fund-clear">Clear</button>
+      <span class="filter-stats">Showing <strong id="fund-count">0</strong> of <strong id="fund-total">0</strong> funds</span>
+    </div>
+
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table id="funds-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="fund">Fund</th>
+            <th class="sortable" data-sort="desc">Description</th>
+            <th class="num sortable" data-sort="beg_balance">Beg. Balance</th>
+            <th class="num sortable" data-sort="rev_ytd">YTD Revenue</th>
+            <th class="num sortable" data-sort="exp_ytd">YTD Expenses</th>
+            <th class="num sortable" data-sort="net">Net Change</th>
+            <th class="num sortable" data-sort="unexpended">Unexpended</th>
+          </tr>
+        </thead>
+        <tbody id="funds-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── PANEL: EXPENSES ────────────────────────────── -->
+  <section class="panel" id="panel-expenses">
+    <div class="section-head">
+      <div class="section-eyebrow">Section Three</div>
+      <h2 class="section-title">Account-Level Expenses</h2>
+      <p class="section-desc">148 active expenditure accounts with budget, year-to-date spend, encumbrance, and percent used. Q1 target pace is 25% — accounts above that line are running ahead of schedule.</p>
+    </div>
+
+    <div class="filter-bar">
+      <span class="filter-label">Search</span>
+      <input type="text" id="exp-search" placeholder="Account, description, dept…">
+      <span class="filter-label">Fund</span>
+      <select id="exp-fund"><option value="all">All funds</option></select>
+      <span class="filter-label">Department</span>
+      <select id="exp-dept"><option value="all">All departments</option></select>
+      <span class="filter-label">Category</span>
+      <select id="exp-category"><option value="all">All categories</option></select>
+      <button class="clear-btn" id="exp-clear">Clear</button>
+      <span class="filter-stats">Showing <strong id="exp-count">0</strong> of <strong id="exp-total">0</strong> · Budget <strong id="exp-budget-sum">$0</strong> · YTD <strong id="exp-ytd-sum">$0</strong></span>
+    </div>
+
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table id="exp-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="fund">Fund</th>
+            <th class="sortable" data-sort="dept">Department</th>
+            <th class="sortable" data-sort="account">Account</th>
+            <th class="sortable" data-sort="desc">Description</th>
+            <th class="num sortable" data-sort="budget">Budget</th>
+            <th class="num sortable" data-sort="ytd">YTD</th>
+            <th class="num sortable" data-sort="encumbrance">Encum.</th>
+            <th class="num sortable" data-sort="pct_used">% Used</th>
+          </tr>
+        </thead>
+        <tbody id="exp-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── PANEL: CHECKS ──────────────────────────────── -->
+  <section class="panel" id="panel-checks">
+    <div class="section-head">
+      <div class="section-eyebrow">Section Four</div>
+      <h2 class="section-title">Outstanding Checks · March 2026</h2>
+      <p class="section-desc">Every check, ACH, and EFT issued from the Farmers Bank account between March 1 and March 31, 2026.</p>
+    </div>
+
+    <div class="filter-bar">
+      <span class="filter-label">Search</span>
+      <input type="text" id="chk-search" placeholder="Vendor or check #…">
+      <span class="filter-label">Type</span>
+      <select id="chk-type">
+        <option value="all">All types</option>
+        <option value="Check">Check</option>
+        <option value="ACH">ACH</option>
+        <option value="EFT">EFT</option>
+      </select>
+      <span class="filter-label">Min. amount</span>
+      <select id="chk-min">
+        <option value="0">Any</option>
+        <option value="1000">$1,000+</option>
+        <option value="5000">$5,000+</option>
+        <option value="10000">$10,000+</option>
+        <option value="50000">$50,000+</option>
+      </select>
+      <button class="clear-btn" id="chk-clear">Clear</button>
+      <span class="filter-stats">Showing <strong id="chk-count">0</strong> · Total <strong id="chk-sum">$0</strong></span>
+    </div>
+
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table id="chk-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="check_no">Check #</th>
+            <th class="sortable" data-sort="date">Date</th>
+            <th class="sortable" data-sort="vendor">Vendor</th>
+            <th class="sortable" data-sort="type">Type</th>
+            <th class="num sortable" data-sort="amount">Amount</th>
+            <th class="num sortable" data-sort="void">Void</th>
+          </tr>
+        </thead>
+        <tbody id="chk-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── PANEL: REVENUE ─────────────────────────────── -->
+  <section class="panel" id="panel-revenue">
+    <div class="section-head">
+      <div class="section-eyebrow">Section Five</div>
+      <h2 class="section-title">Income Tax &amp; Special Revenue</h2>
+      <p class="section-desc">Income tax flows through RITA, traffic camera enforcement allocations, and municipal court filing fees.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">2026 Income Tax Recap</div>
+          <div class="card-meta">Monthly · January – March</div>
+        </div>
+        <table id="recap-table">
+          <thead>
+            <tr><th>Category</th><th class="num">Jan</th><th class="num">Feb</th><th class="num">Mar</th><th class="num">YTD</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">RITA Distributions</div>
+          <div class="card-meta">Gross, retainer, net</div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-rita"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Traffic Camera Revenue Allocation</div>
+          <div class="card-meta">Per Ord. 8224-19</div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-traffic"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Court Filing Fees ($20 / ticket)</div>
+          <div class="card-meta">Tickets filed &amp; fees</div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-court"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>City of Girard, Ohio</strong> · Q1 2026 Finance Report ·
+  Reorganized from PDF dated 4/22/2026 ·
+  Subtotals computed from source line items — figures may differ slightly from PDF rounding.
+</footer>
+
+<!-- ── Drill-down modal ─────────────────────────────── -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-eyebrow" id="modal-eyebrow">Fund Detail</div>
+        <div class="modal-title" id="modal-title">—</div>
+      </div>
+      <button class="close-btn" id="modal-close" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const DATA = {"summary":{"period":"Q1 2026","period_label":"January 1 \u2013 March 31, 2026","as_of":"April 22, 2026","kpis":{"beg_balance":6883902.95,"rev_ytd":4562920.16,"exp_ytd":4812707.94,"unexpended":6634105.17,"net_change":-249787.78,"fund_count":55,"budget_total":20477742.99,"budget_used":4459908.19,"budget_pct":21.78,"encumbrance":2904326.76,"check_count":186,"check_total":787357.96,"check_void":9428,"largest_check":153722.56,"income_tax_gross_q1":1131487.42,"income_tax_net_q1":1096656.9,"income_tax_general_q1":997984.78,"traffic_cam_q1":82887.03,"court_fees_q1":33520}},"funds":[{"fund":"100","desc":"GENERAL FUND","beg_balance":2404020.53,"rev_mtd":455138.61,"rev_ytd":1454607.82,"exp_mtd":477260.31,"exp_ytd":1594588.06,"unexpended":2264040.29},{"fund":"110","desc":"COURT GENERAL","beg_balance":218384.38,"rev_mtd":17125.33,"rev_ytd":45037.75,"exp_mtd":27710.13,"exp_ytd":43923.46,"unexpended":219498.67},{"fund":"201","desc":"STREET CONSTRUCTION FUND - SPECIAL PROJECTS","beg_balance":163906.46,"rev_mtd":51035.3,"rev_ytd":159109.14,"exp_mtd":62174.66,"exp_ytd":236484.81,"unexpended":86530.79},{"fund":"202","desc":"STATE HIGHWAY IMPROVEMENT FUND","beg_balance":80393.88,"rev_mtd":3691.06,"rev_ytd":11155.83,"exp_mtd":22920.45,"exp_ytd":51548.26,"unexpended":40001.45},{"fund":"203","desc":"STREET PERMISSIVE TAX FUND","beg_balance":140929.74,"rev_mtd":10462.5,"rev_ytd":33146.65,"exp_mtd":3097.67,"exp_ytd":30840.53,"unexpended":143235.86},{"fund":"204","desc":"GARBAGE FUND","beg_balance":-19248.95,"rev_mtd":13245.67,"rev_ytd":43873.09,"exp_mtd":2.63,"exp_ytd":2.63,"unexpended":24621.51},{"fund":"206","desc":"SPECIAL RESTAURANT LICENSE FUND","beg_balance":0,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":0},{"fund":"207","desc":"WEED CUTTING FUND","beg_balance":13470.84,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":13470.84},{"fund":"208","desc":"CONDEMNED HOMES FUND","beg_balance":12678.13,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":12678.13},{"fund":"209","desc":"AMBULANCE HOSPITALIZATION FUND","beg_balance":240479.03,"rev_mtd":3542.05,"rev_ytd":229241.46,"exp_mtd":59008.94,"exp_ytd":373823.92,"unexpended":95896.57},{"fund":"210","desc":"ELDERLY BUS FARE FUND","beg_balance":3614,"rev_mtd":50,"rev_ytd":774,"exp_mtd":242.16,"exp_ytd":-452.36,"unexpended":4840.36},{"fund":"211","desc":"LAW ENFORCEMENT DRUG FUND","beg_balance":374.87,"rev_mtd":158.89,"rev_ytd":705.9,"exp_mtd":0,"exp_ytd":0,"unexpended":1080.77},{"fund":"212","desc":"WELLMAN THEATER FUND","beg_balance":42047.22,"rev_mtd":661.46,"rev_ytd":2486.61,"exp_mtd":5779.38,"exp_ytd":6128.88,"unexpended":38404.95},{"fund":"214","desc":"RECREATION FUND","beg_balance":175614.07,"rev_mtd":18464.49,"rev_ytd":61507.16,"exp_mtd":18705.64,"exp_ytd":51240.32,"unexpended":185880.91},{"fund":"216","desc":"RENTAL INSPECTION FUND","beg_balance":9725.16,"rev_mtd":3150,"rev_ytd":33275,"exp_mtd":2818.77,"exp_ytd":8363.51,"unexpended":34636.65},{"fund":"218","desc":"ONE OHIO OPIOID","beg_balance":117076.44,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":117076.44},{"fund":"220","desc":"AMBULANCE SERVICE FUND","beg_balance":245293.51,"rev_mtd":41953.97,"rev_ytd":77571.03,"exp_mtd":18454.61,"exp_ytd":57295.07,"unexpended":265569.47},{"fund":"225","desc":"C & DD DISPOSAL","beg_balance":12029.35,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":12029.35},{"fund":"230","desc":"COMMUNITY BLOCK GRANT FUND","beg_balance":0,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":0},{"fund":"235","desc":"CHIP/CHIS FUND","beg_balance":75788.55,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":75788.55},{"fund":"236","desc":"EPA GRANT","beg_balance":5,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":5},{"fund":"237","desc":"DEA","beg_balance":9293.28,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":9293.28},{"fund":"240","desc":"PHOTO ENFORCEMENT","beg_balance":610.74,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":610.74},{"fund":"250","desc":"AMERICAN RESCUE PLAN ACT FUND","beg_balance":95193.25,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":95193.25},{"fund":"300","desc":"FIRE LEVY FUND","beg_balance":88887.77,"rev_mtd":29.56,"rev_ytd":29.56,"exp_mtd":18328.73,"exp_ytd":73343.14,"unexpended":15574.19},{"fund":"310","desc":"SENIOR LEVY FUND","beg_balance":3500.66,"rev_mtd":17.74,"rev_ytd":17.74,"exp_mtd":2.53,"exp_ytd":2.53,"unexpended":3515.87},{"fund":"350","desc":"GENERAL BOND FUND","beg_balance":81.28,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":81.28},{"fund":"400","desc":"OWDA DEBT SERVICE","beg_balance":260141.81,"rev_mtd":0,"rev_ytd":124753.16,"exp_mtd":384803.07,"exp_ytd":384803.07,"unexpended":81.9},{"fund":"550","desc":"F.E.M.A./EMERGENCY ASSISTANCE FUND","beg_balance":3322.55,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":3322.55},{"fund":"601","desc":"WATER REVENUE FUND","beg_balance":458704.88,"rev_mtd":762594.02,"rev_ytd":1578580.03,"exp_mtd":1154421.93,"exp_ytd":1154421.93,"unexpended":882862.98},{"fund":"607","desc":"WATER DEPOSITS FUND","beg_balance":317042.95,"rev_mtd":4300,"rev_ytd":13475,"exp_mtd":2619.35,"exp_ytd":8044.35,"unexpended":322473.6},{"fund":"610","desc":"FEMA CAPITAL PROJECTS","beg_balance":0,"rev_mtd":26337.2,"rev_ytd":26337.2,"exp_mtd":0,"exp_ytd":0,"unexpended":26337.2},{"fund":"620","desc":"SEWER RENTAL FUND","beg_balance":645623.54,"rev_mtd":209470.6,"rev_ytd":580603.13,"exp_mtd":180301.37,"exp_ytd":538437.51,"unexpended":687789.16},{"fund":"622","desc":"SEWER RENTAL EQUIPMENT REPLACE","beg_balance":17676.75,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":17676.75},{"fund":"640","desc":"CEMETERY FUND","beg_balance":105474.39,"rev_mtd":4102.97,"rev_ytd":9602.97,"exp_mtd":819.44,"exp_ytd":2638.92,"unexpended":112438.44},{"fund":"646","desc":"PERPETUAL CARE PRINCIPAL & INT","beg_balance":47821.89,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":47821.89},{"fund":"680","desc":"CEMETERY T C TOMKO REESE FUND","beg_balance":554.81,"rev_mtd":0,"rev_ytd":60,"exp_mtd":5,"exp_ytd":15,"unexpended":599.81},{"fund":"681","desc":"CEMETERY T C KING SEKLAR FUND","beg_balance":0,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":0},{"fund":"683","desc":"CEMETERY T C MAUSOLEUM FUND","beg_balance":378.08,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":378.08},{"fund":"800","desc":"FIRE PENSION FUND","beg_balance":23188.69,"rev_mtd":4.44,"rev_ytd":4.44,"exp_mtd":0.62,"exp_ytd":0.62,"unexpended":23192.51},{"fund":"825","desc":"POLICE PENSION FUND","beg_balance":12006.9,"rev_mtd":4.44,"rev_ytd":4.44,"exp_mtd":0.62,"exp_ytd":0.62,"unexpended":12010.72},{"fund":"860","desc":"MUNICIPAL PROBATION SERVICES F","beg_balance":77723.8,"rev_mtd":6505.12,"rev_ytd":20201.12,"exp_mtd":38115.69,"exp_ytd":41799.19,"unexpended":56125.73},{"fund":"870","desc":"AGENCY REIMBURSEMENT FUND","beg_balance":170441.33,"rev_mtd":0,"rev_ytd":1130,"exp_mtd":28524.27,"exp_ytd":29654.27,"unexpended":141917.06},{"fund":"875","desc":"UNCLAIMED FUNDS","beg_balance":0,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":0},{"fund":"880","desc":"STATE HIGHWAY PATROL FUND","beg_balance":17634.12,"rev_mtd":1295.18,"rev_ytd":3568.78,"exp_mtd":1096.6,"exp_ytd":2314.23,"unexpended":18888.67},{"fund":"885","desc":"AMBULANCE SERVICE CAPITAL PROJECT FUND","beg_balance":0,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":0},{"fund":"900","desc":"CAPITAL IMPROVEMENT FUND","beg_balance":111105.74,"rev_mtd":4409.71,"rev_ytd":16577.41,"exp_mtd":8200.98,"exp_ytd":43255.73,"unexpended":84427.42},{"fund":"910","desc":"LAKES DAM FUND","beg_balance":786.83,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":786.83},{"fund":"925","desc":"CAPITAL IMPROVEMENT SAFETY FUND","beg_balance":96402.4,"rev_mtd":1102.43,"rev_ytd":5058.83,"exp_mtd":12108.63,"exp_ytd":35796.9,"unexpended":65664.33},{"fund":"950","desc":"TRAILER PARK FUND","beg_balance":299.03,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":299.03},{"fund":"975","desc":"COURT COMPUTER FUND A","beg_balance":154126.51,"rev_mtd":2868,"rev_ytd":7391,"exp_mtd":967.89,"exp_ytd":2903.67,"unexpended":158613.84},{"fund":"976","desc":"CLERK OF COURT COMPUTER FUND B","beg_balance":5,"rev_mtd":0,"rev_ytd":0,"exp_mtd":0,"exp_ytd":0,"unexpended":5},{"fund":"985","desc":"INDIGENT DRIVERS ALCOHOL TREAT","beg_balance":154491.28,"rev_mtd":8024.6,"rev_ytd":21476.5,"exp_mtd":13059.03,"exp_ytd":40779.17,"unexpended":135188.61},{"fund":"989","desc":"INDIGENT DRIVERS INTERLOCK & ALCOHOL MONITORING FUND","beg_balance":67650.48,"rev_mtd":737.26,"rev_ytd":1457.41,"exp_mtd":0,"exp_ytd":710,"unexpended":68397.89},{"fund":"990","desc":"ALCOHOL ENFORCEMENT & EDUCATION","beg_balance":7150,"rev_mtd":50,"rev_ytd":100,"exp_mtd":0,"exp_ytd":0,"unexpended":7250}],"expenses":[{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52100","desc":"POLICE OVERTIME","budget":140000,"mtd":11557.94,"ytd":31556.13,"unexpended":108443.87,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52101","desc":"RADIO OPERATOR OVERTIME","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52102","desc":"POLICE HOLIDAY PAY","budget":35000,"mtd":552.44,"ytd":8239.03,"unexpended":26760.97,"encumbrance":0,"pct_used":0.24},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52103","desc":"RADIO OPERATOR HOLIDAY","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52110","desc":"POLICE SALARIES","budget":1170000,"mtd":79186.56,"ytd":239826.47,"unexpended":930173.53,"encumbrance":0,"pct_used":0.2},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52111","desc":"POLICE SEVERANCE PAY","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52112","desc":"POLICE RADIO OPERATOR","budget":246000,"mtd":20066.4,"ytd":57601.49,"unexpended":188398.51,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52120","desc":"POLICE HOSPITALIZATION","budget":200000,"mtd":0,"ytd":24481.67,"unexpended":175518.33,"encumbrance":0,"pct_used":0.12},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52122","desc":"POLICE WORKERS COMP","budget":45000,"mtd":3598.73,"ytd":16197.46,"unexpended":28802.54,"encumbrance":0,"pct_used":0.36},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52123","desc":"POLICE MEDICARE TAX","budget":25000,"mtd":1602.37,"ytd":4853.3,"unexpended":20146.7,"encumbrance":0,"pct_used":0.19},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52136","desc":"POLICE UNIFORM ALLOWANCE","budget":28000,"mtd":1827.36,"ytd":7246.13,"unexpended":20753.87,"encumbrance":0,"pct_used":0.26},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52188","desc":"RADIO OPERATOR PENSION","budget":15000,"mtd":403.2,"ytd":932.4,"unexpended":14067.6,"encumbrance":0,"pct_used":0.06},{"fund":"100","dept":"POLICE DEPT","category":"Personal Services","account":"100-1010-52189","desc":"POLICE DISABILITY & PENSION","budget":265000,"mtd":19816.65,"ytd":50464.74,"unexpended":214545.26,"encumbrance":0,"pct_used":0.19},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52422","desc":"POLICE LEGAL FEES","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52423","desc":"POLICE CAR WASHES","budget":3000,"mtd":287,"ytd":630,"unexpended":2370,"encumbrance":0,"pct_used":0.21},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52424","desc":"POLICE GASOLINE","budget":58000,"mtd":3539.06,"ytd":10932.7,"unexpended":47067.3,"encumbrance":0,"pct_used":0.19},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52425","desc":"POLICE INSURANCE","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52426","desc":"POLICE OPERATION & MAI","budget":150000,"mtd":19939.58,"ytd":32199.58,"unexpended":117800.07,"encumbrance":0,"pct_used":0.21},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52428","desc":"POLICE RADIO COMMUNICATIONS","budget":20000,"mtd":1672.31,"ytd":3953.91,"unexpended":16046.09,"encumbrance":0,"pct_used":0.2},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52429","desc":"POLICE SUPPLIES & MISCELLANEOUS","budget":5000,"mtd":0,"ytd":146.98,"unexpended":4853.02,"encumbrance":0,"pct_used":0.03},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52430","desc":"POLICE TELEPHONE","budget":15000,"mtd":1599.74,"ytd":3149.78,"unexpended":11860.22,"encumbrance":0,"pct_used":0.21},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52434","desc":"POLICE VEHICLE REPAIR","budget":50000,"mtd":4102.24,"ytd":11923.71,"unexpended":38076.29,"encumbrance":0,"pct_used":0.24},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52435","desc":"POLICE COPY MACHINE","budget":0,"mtd":0,"ytd":-70.25,"unexpended":70.25,"encumbrance":0,"pct_used":null},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52445","desc":"POLICE CAMERA FEES","budget":70000,"mtd":3525,"ytd":9000.5,"unexpended":60999.5,"encumbrance":0,"pct_used":0.13},{"fund":"100","dept":"POLICE DEPT","category":"Supplies & Materials","account":"100-1010-52450","desc":"POLICE TECHNOLOGY OPER","budget":40000,"mtd":0,"ytd":19767.58,"unexpended":20232.42,"encumbrance":0,"pct_used":0.49},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52100","desc":"FIRE OVERTIME","budget":120000,"mtd":10694.74,"ytd":33566.39,"unexpended":86433.61,"encumbrance":0,"pct_used":0.28},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52102","desc":"FIRE HOLIDAY PAY","budget":30000,"mtd":0,"ytd":12415.47,"unexpended":17584.53,"encumbrance":0,"pct_used":0.41},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52110","desc":"FIRE SALARIES","budget":935000,"mtd":68895.32,"ytd":245128.34,"unexpended":689871.66,"encumbrance":0,"pct_used":0.26},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52111","desc":"FIRE SEVERANCE PAY","budget":42500,"mtd":0,"ytd":0,"unexpended":42500,"encumbrance":0,"pct_used":0},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52120","desc":"FIRE HOSPITALIZATION","budget":160000,"mtd":6030.32,"ytd":14551.33,"unexpended":145448.67,"encumbrance":0,"pct_used":0.09},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52122","desc":"FIRE WORKERS COMP","budget":20000,"mtd":46.56,"ytd":5925.57,"unexpended":14074.43,"encumbrance":0,"pct_used":0.3},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52123","desc":"FIRE MEDICARE TAX","budget":12000,"mtd":163.98,"ytd":4154.42,"unexpended":7845.58,"encumbrance":0,"pct_used":0.35},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52136","desc":"FIRE UNIFORM ALLOWANCE","budget":15000,"mtd":1065.98,"ytd":3861.27,"unexpended":11138.73,"encumbrance":0,"pct_used":0.26},{"fund":"100","dept":"FIRE DEPT","category":"Personal Services","account":"100-1020-52189","desc":"FIRE DISABILITY & PENSION","budget":120000,"mtd":0,"ytd":31014.42,"unexpended":88985.58,"encumbrance":0,"pct_used":0.26},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52424","desc":"FIRE GASOLINE","budget":18000,"mtd":1457.26,"ytd":4477.57,"unexpended":13522.43,"encumbrance":0,"pct_used":0.25},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52425","desc":"FIRE INSURANCE","budget":1000,"mtd":0,"ytd":0,"unexpended":1000,"encumbrance":0,"pct_used":0},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52426","desc":"FIRE OPERATION & MAINT","budget":20000,"mtd":543.27,"ytd":1210.45,"unexpended":18789.55,"encumbrance":0,"pct_used":0.06},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52429","desc":"FIRE SUPPLIES & MISCELLANEOUS","budget":12000,"mtd":688.82,"ytd":1857.95,"unexpended":10142.05,"encumbrance":0,"pct_used":0.15},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52430","desc":"FIRE TELEPHONE","budget":3500,"mtd":0,"ytd":1210.45,"unexpended":2289.55,"encumbrance":0,"pct_used":0.35},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52431","desc":"FIRE DOMINION EAST OHIO","budget":7600,"mtd":2432.51,"ytd":4463.4,"unexpended":3136.6,"encumbrance":0,"pct_used":0.59},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52434","desc":"FIRE VEHICLE REPAIR","budget":40000,"mtd":0,"ytd":4463.4,"unexpended":35536.6,"encumbrance":0,"pct_used":0.11},{"fund":"100","dept":"FIRE DEPT","category":"Supplies & Materials","account":"100-1020-52450","desc":"FIRE TECHNOLOGY OPER","budget":10000,"mtd":0,"ytd":3560.9,"unexpended":6439.1,"encumbrance":0,"pct_used":0.36},{"fund":"100","dept":"STREET LIGHTING","category":"Contractual Services","account":"100-1030-52350","desc":"STREET LIGHTING","budget":30000,"mtd":8156.88,"ytd":9399.01,"unexpended":20600.99,"encumbrance":600.99,"pct_used":0.31},{"fund":"100","dept":"ELDERLY BUS DRIVER","category":"Personal Services","account":"100-6011-52110","desc":"ELDERLY BUS DRIVER SALARY","budget":30000,"mtd":2157.97,"ytd":6467.15,"unexpended":23532.85,"encumbrance":0,"pct_used":0.22},{"fund":"100","dept":"ELDERLY BUS DRIVER","category":"Personal Services","account":"100-6011-52123","desc":"ELDERLY BUS MEDICARE T","budget":600,"mtd":30.91,"ytd":92.63,"unexpended":507.37,"encumbrance":0,"pct_used":0.15},{"fund":"100","dept":"ELDERLY BUS DRIVER","category":"Personal Services","account":"100-6011-52189","desc":"ELDERLY BUS PENSION","budget":4200,"mtd":302.64,"ytd":754.97,"unexpended":3445.03,"encumbrance":0,"pct_used":0.18},{"fund":"100","dept":"ELDERLY BUS DRIVER","category":"Supplies & Materials","account":"100-6011-52426","desc":"ELDERLY VAN OPERATION","budget":5000,"mtd":0,"ytd":2146.84,"unexpended":2853.16,"encumbrance":0,"pct_used":0.43},{"fund":"100","dept":"MUNICIPAL COURT","category":"Personal Services","account":"100-7012-52110","desc":"MUNICIPAL COURT JUDGE","budget":45450,"mtd":4600.32,"ytd":13506.24,"unexpended":31943.76,"encumbrance":0,"pct_used":0.3},{"fund":"100","dept":"MUNICIPAL COURT","category":"Personal Services","account":"100-7012-52118","desc":"MUNICIPAL COURT EMPLOYEE","budget":575768.6,"mtd":42725.44,"ytd":130408.68,"unexpended":445359.92,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"MUNICIPAL COURT","category":"Personal Services","account":"100-7012-52120","desc":"MUNICIPAL COURT HOSPITALIZATION","budget":250000,"mtd":0,"ytd":25397.27,"unexpended":224602.73,"encumbrance":0,"pct_used":0.1},{"fund":"100","dept":"MUNICIPAL COURT","category":"Personal Services","account":"100-7012-52189","desc":"MUNICIPAL COURT PENSION","budget":87012.57,"mtd":6619.12,"ytd":16615.62,"unexpended":70396.95,"encumbrance":0,"pct_used":0.19},{"fund":"100","dept":"MAYOR","category":"Personal Services","account":"100-7013-52110","desc":"MAYOR SALARY","budget":21000,"mtd":1588.38,"ytd":4765.14,"unexpended":16234.86,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"AUDITOR & CLERKS","category":"Personal Services","account":"100-7014-52110","desc":"AUDITOR SALARY","budget":20000,"mtd":1413.99,"ytd":4241.97,"unexpended":15758.03,"encumbrance":0,"pct_used":0.21},{"fund":"100","dept":"AUDITOR & CLERKS","category":"Personal Services","account":"100-7014-52112","desc":"AUDITOR CLERKS SALARIES","budget":60000,"mtd":3814.72,"ytd":11825.91,"unexpended":48174.09,"encumbrance":0,"pct_used":0.2},{"fund":"100","dept":"AUDITOR & CLERKS","category":"Personal Services","account":"100-7014-52189","desc":"AUDITOR PENSION","budget":14000,"mtd":719.96,"ytd":1851.59,"unexpended":12148.41,"encumbrance":0,"pct_used":0.13},{"fund":"100","dept":"TREASURER","category":"Personal Services","account":"100-7015-52110","desc":"TREASURER SALARY","budget":2000,"mtd":74.97,"ytd":230.43,"unexpended":1769.57,"encumbrance":0,"pct_used":0.12},{"fund":"100","dept":"LEGAL DEPARTMENT","category":"Personal Services","account":"100-7016-52110","desc":"LAW DIRECTOR SALARY","budget":14900,"mtd":1229.28,"ytd":3417.69,"unexpended":11482.31,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"LEGAL DEPARTMENT","category":"Personal Services","account":"100-7016-52114","desc":"LEGAL PROSECUTOR CLERK","budget":51300,"mtd":3944.8,"ytd":11834.4,"unexpended":39465.6,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"LEGAL DEPARTMENT","category":"Personal Services","account":"100-7016-52115","desc":"LEGAL PROSECUTOR SALARY","budget":45000,"mtd":2923.08,"ytd":7615.4,"unexpended":37384.6,"encumbrance":0,"pct_used":0.17},{"fund":"100","dept":"LEGAL DEPARTMENT","category":"Personal Services","account":"100-7016-52120","desc":"LEGAL HOSPITALIZATION","budget":35000,"mtd":0,"ytd":2247.05,"unexpended":32752.95,"encumbrance":0,"pct_used":0.06},{"fund":"100","dept":"LEGAL DEPARTMENT","category":"Personal Services","account":"100-7016-52189","desc":"LEGAL PENSION","budget":16500,"mtd":1125.2,"ytd":2613.65,"unexpended":13886.35,"encumbrance":0,"pct_used":0.16},{"fund":"100","dept":"SERVICE","category":"Personal Services","account":"100-7017-52110","desc":"SERVICE DIRECTOR SALARY","budget":26750,"mtd":1480.82,"ytd":4440.96,"unexpended":22309.04,"encumbrance":0,"pct_used":0.17},{"fund":"100","dept":"LEGISLATIVE","category":"Personal Services","account":"100-7018-52110","desc":"LEGISLATIVE SALARIES","budget":72000,"mtd":5976.17,"ytd":17928.51,"unexpended":54071.49,"encumbrance":0,"pct_used":0.25},{"fund":"100","dept":"LEGISLATIVE","category":"Personal Services","account":"100-7018-52112","desc":"LEGISLATIVE CLERK SALARY","budget":9660,"mtd":689.54,"ytd":2068.62,"unexpended":7591.38,"encumbrance":0,"pct_used":0.21},{"fund":"100","dept":"CITY HALL","category":"Personal Services","account":"100-7021-52110","desc":"CITY HALL EMPLOYEE WAGES","budget":170000,"mtd":12197.03,"ytd":38801.44,"unexpended":131198.56,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"CITY HALL","category":"Supplies & Materials","account":"100-7021-52426","desc":"CITY HALL OPERATION & M","budget":130000,"mtd":7334.05,"ytd":31160.92,"unexpended":98839.08,"encumbrance":38563.39,"pct_used":0.24},{"fund":"100","dept":"CITY HALL","category":"Supplies & Materials","account":"100-7021-52431","desc":"CITY HALL DOMINION EAST","budget":8000,"mtd":1010.16,"ytd":3628.98,"unexpended":4371.02,"encumbrance":10605,"pct_used":0.45},{"fund":"100","dept":"ENGINEER","category":"Personal Services","account":"100-7022-52110","desc":"ENGINEER SALARY","budget":5800,"mtd":468,"ytd":1314,"unexpended":4486,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"INCOME TAX","category":"Personal Services","account":"100-7090-52110","desc":"INCOME TAX SUPERVISION","budget":7300,"mtd":553.84,"ytd":1661.52,"unexpended":5638.48,"encumbrance":0,"pct_used":0.23},{"fund":"100","dept":"INCOME TAX","category":"Other Uses","account":"100-7090-52759","desc":"INCOME TAX TRANSFERS","budget":145000,"mtd":10463.05,"ytd":34830.52,"unexpended":110169.48,"encumbrance":0,"pct_used":0.24},{"fund":"100","dept":"INCOME TAX","category":"Other Uses","account":"100-7090-52787","desc":"OTHER USES TRANSFERS","budget":300000,"mtd":29760.43,"ytd":98672.13,"unexpended":201327.87,"encumbrance":0,"pct_used":0.33},{"fund":"110","dept":"MUNICIPAL COURT","category":"Supplies & Materials","account":"110-7012-52478","desc":"COURT GENERAL SPECIAL","budget":200000,"mtd":27710.13,"ytd":43923.46,"unexpended":156076.54,"encumbrance":0,"pct_used":0.22},{"fund":"201","dept":"STREET DEPT","category":"Personal Services","account":"201-6024-52100","desc":"STREET OVERTIME","budget":30000,"mtd":954.79,"ytd":13131.79,"unexpended":16868.21,"encumbrance":0,"pct_used":0.44},{"fund":"201","dept":"STREET DEPT","category":"Personal Services","account":"201-6024-52110","desc":"STREET SALARIES","budget":51000,"mtd":3565.52,"ytd":10425.06,"unexpended":40574.94,"encumbrance":0,"pct_used":0.2},{"fund":"201","dept":"STREET DEPT","category":"Personal Services","account":"201-6024-52113","desc":"STREET HOURLY SALARIES","budget":564000,"mtd":41651.75,"ytd":127624.03,"unexpended":436375.97,"encumbrance":0,"pct_used":0.23},{"fund":"201","dept":"STREET DEPT","category":"Personal Services","account":"201-6024-52120","desc":"STREET HOSPITALIZATION","budget":140000,"mtd":0,"ytd":15388.25,"unexpended":124611.75,"encumbrance":0,"pct_used":0.11},{"fund":"201","dept":"STREET DEPT","category":"Personal Services","account":"201-6024-52122","desc":"STREET WORKERS COMP","budget":10000,"mtd":1000,"ytd":3200,"unexpended":6800,"encumbrance":0,"pct_used":0.32},{"fund":"201","dept":"STREET DEPT","category":"Personal Services","account":"201-6024-52123","desc":"STREET MEDICARE TAX","budget":9355,"mtd":663.68,"ytd":2174.61,"unexpended":7180.39,"encumbrance":0,"pct_used":0.23},{"fund":"201","dept":"STREET DEPT","category":"Personal Services","account":"201-6024-52189","desc":"STREET PENSION","budget":90300,"mtd":6746.39,"ytd":17950.51,"unexpended":72349.49,"encumbrance":0,"pct_used":0.2},{"fund":"201","dept":"STREET DEPT","category":"Supplies & Materials","account":"201-6024-52424","desc":"STREET GASOLINE","budget":15000,"mtd":1953.21,"ytd":6485.64,"unexpended":8514.36,"encumbrance":0,"pct_used":0.43},{"fund":"201","dept":"STREET DEPT","category":"Supplies & Materials","account":"201-6024-52426","desc":"STREET OPERATION & MAI","budget":150000,"mtd":735.48,"ytd":4909.01,"unexpended":145090.99,"encumbrance":0,"pct_used":0.03},{"fund":"201","dept":"STREET DEPT","category":"Supplies & Materials","account":"201-6024-52432","desc":"STREET VEHICLE REPAIRS","budget":95000,"mtd":626.31,"ytd":17346.11,"unexpended":77653.89,"encumbrance":0,"pct_used":0.18},{"fund":"201","dept":"STREET DEPT","category":"Supplies & Materials","account":"201-6024-52434","desc":"STREET STATE EXAMINER","budget":60000,"mtd":2086.6,"ytd":10998.75,"unexpended":49001.25,"encumbrance":1851.84,"pct_used":0.18},{"fund":"201","dept":"STREET DEPT","category":"Supplies & Materials","account":"201-6024-52460","desc":"STREET SALT & SLAG","budget":40000,"mtd":0,"ytd":25482.45,"unexpended":14517.55,"encumbrance":0,"pct_used":0.64},{"fund":"201","dept":"STREET DEPT","category":"Supplies & Materials","account":"201-6024-52478","desc":"STREET SPECIAL PROJECT","budget":10000,"mtd":0,"ytd":9201.25,"unexpended":798.75,"encumbrance":0,"pct_used":0.92},{"fund":"202","dept":"STATE HIGHWAY","category":"Personal Services","account":"202-6041-52110","desc":"STATE HIGHWAY SALARIES","budget":85000,"mtd":0,"ytd":0,"unexpended":85000,"encumbrance":0,"pct_used":0},{"fund":"202","dept":"STATE HIGHWAY","category":"Personal Services","account":"202-6041-52120","desc":"STATE HIGHWAY HOSPITALIZATION","budget":0,"mtd":1953.21,"ytd":6485.64,"unexpended":-6485.64,"encumbrance":0,"pct_used":null},{"fund":"202","dept":"STATE HIGHWAY","category":"Supplies & Materials","account":"202-6041-52426","desc":"STATE HWY SALT & SLAG","budget":45000,"mtd":22920.45,"ytd":51548.26,"unexpended":-6548.26,"encumbrance":0,"pct_used":1.15},{"fund":"203","dept":"STREET PERMISSIVE","category":"Contractual Services","account":"203-6040-52350","desc":"STREET PERMISSIVE TRANSFER","budget":30000,"mtd":1331.67,"ytd":8146.68,"unexpended":21853.32,"encumbrance":21853.32,"pct_used":0.27},{"fund":"203","dept":"STREET PERMISSIVE","category":"Supplies & Materials","account":"203-6040-52426","desc":"STREET PERMISSIVE O & M","budget":185000,"mtd":1766,"ytd":22693.85,"unexpended":162306.15,"encumbrance":0,"pct_used":0.12},{"fund":"209","dept":"AMBULANCE HOSP.","category":"Contractual Services","account":"209-7043-52371","desc":"AMBULANCE HOSPITALIZATION","budget":1400000,"mtd":3460.09,"ytd":163542.48,"unexpended":1236457.52,"encumbrance":12714.33,"pct_used":0.12},{"fund":"209","dept":"AMBULANCE HOSP.","category":"Contractual Services","account":"209-7043-52375","desc":"HOSPITALIZATION MONTHLY","budget":590000,"mtd":55548.85,"ytd":210281.44,"unexpended":379718.56,"encumbrance":443799.71,"pct_used":0.36},{"fund":"209","dept":"AMBULANCE HOSP.","category":"Contractual Services","account":"209-7043-52379","desc":"MONTHLY CONSULTING/P","budget":106100,"mtd":0,"ytd":0,"unexpended":106100,"encumbrance":0,"pct_used":0},{"fund":"214","dept":"RECREATION","category":"Personal Services","account":"214-3030-52110","desc":"RECREATION SALARIES","budget":167000,"mtd":9210.44,"ytd":26596.32,"unexpended":140403.68,"encumbrance":0,"pct_used":0.16},{"fund":"214","dept":"RECREATION","category":"Personal Services","account":"214-3030-52120","desc":"RECREATION HOSPITALIZATION","budget":15000,"mtd":0,"ytd":0,"unexpended":15000,"encumbrance":0,"pct_used":0},{"fund":"214","dept":"RECREATION","category":"Supplies & Materials","account":"214-3030-52426","desc":"RECREATION OPERATION","budget":150000,"mtd":5949.28,"ytd":13687.07,"unexpended":136312.93,"encumbrance":24364.91,"pct_used":0.09},{"fund":"214","dept":"RECREATION","category":"Supplies & Materials","account":"214-3030-52432","desc":"RECREATION OHIO EDISON","budget":18000,"mtd":1529.87,"ytd":5242.54,"unexpended":12757.46,"encumbrance":11757.46,"pct_used":0.29},{"fund":"214","dept":"RECREATION","category":"Capital Outlay","account":"214-3030-52575","desc":"RECREATION CAPITAL IMPROVEMENT","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"216","dept":"RENTAL INSPECTION","category":"Personal Services","account":"216-2040-52110","desc":"RENTAL INSPECTION SALARY","budget":28000,"mtd":2130.72,"ytd":6414.25,"unexpended":21585.75,"encumbrance":0,"pct_used":0.23},{"fund":"218","dept":"ONE OHIO OPIOID","category":"Other Uses","account":"218-7048-52745","desc":"COMM. DISTRESS GRANT PR","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"220","dept":"AMBULANCE SERVICE","category":"Personal Services","account":"220-7046-52110","desc":"AMBULANCE PART-TIME S","budget":260000,"mtd":15004,"ytd":40880,"unexpended":219120,"encumbrance":0,"pct_used":0.16},{"fund":"220","dept":"AMBULANCE SERVICE","category":"Personal Services","account":"220-7046-52111","desc":"AMBULANCE SOCIAL SECU","budget":16120,"mtd":944.18,"ytd":2588.01,"unexpended":13531.99,"encumbrance":0,"pct_used":0.16},{"fund":"220","dept":"AMBULANCE SERVICE","category":"Personal Services","account":"220-7046-52123","desc":"MEDICARE TAX","budget":3770,"mtd":217.54,"ytd":592.71,"unexpended":3177.29,"encumbrance":0,"pct_used":0.16},{"fund":"220","dept":"AMBULANCE SERVICE","category":"Travel & Transportation","account":"220-7046-52234","desc":"AMBULANCE CLOTHING ALL","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"250","dept":"MISC","category":"Supplies & Materials","account":"250-0059-52426","desc":"ARP EXPENSES","budget":92350,"mtd":0,"ytd":0,"unexpended":92350,"encumbrance":126948.25,"pct_used":0},{"fund":"300","dept":"FIRE DEPT","category":"Personal Services","account":"300-1020-52110","desc":"FIRE LEVY SALARIES","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"300","dept":"FIRE DEPT","category":"Personal Services","account":"300-1020-52120","desc":"FIRE LEVY HOSPITALIZATION","budget":225000,"mtd":0,"ytd":55014.41,"unexpended":169985.59,"encumbrance":0,"pct_used":0.24},{"fund":"300","dept":"FIRE DEPT","category":"Personal Services","account":"300-1020-52189","desc":"FIRE LEVY DISABILITY & PE","budget":375000,"mtd":18324.52,"ytd":73338.93,"unexpended":301661.07,"encumbrance":0,"pct_used":0.2},{"fund":"310","dept":"SENIOR SERVICES LEVY","category":"Contractual Services","account":"310-3025-52342","desc":"SENIOR SERVICES LEVY C","budget":3500,"mtd":2.53,"ytd":2.53,"unexpended":3497.47,"encumbrance":0,"pct_used":0.0},{"fund":"310","dept":"SENIOR SERVICES LEVY","category":"Supplies & Materials","account":"310-3025-52426","desc":"SENIOR SERVICES LEVY O","budget":205000,"mtd":0,"ytd":0,"unexpended":205000,"encumbrance":0,"pct_used":0},{"fund":"350","dept":"MISC","category":"Spec. Assess. Bond","account":"350-0099-50040","desc":"GENERAL BOND PRINCIPAL","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"350","dept":"MISC","category":"Spec. Assess. Bond","account":"350-0099-50045","desc":"GENERAL BOND INTEREST","budget":0,"mtd":0,"ytd":0,"unexpended":0,"encumbrance":0,"pct_used":null},{"fund":"400","dept":"OWDA DEBT","category":"Other Uses","account":"400-0055-52750","desc":"OWDA WATER DEBT SERVICE","budget":30000,"mtd":0,"ytd":0,"unexpended":30000,"encumbrance":0,"pct_used":0},{"fund":"400","dept":"OWDA DEBT","category":"Other Uses","account":"400-0055-52751","desc":"OWDA SEWER DEBT SERVICE","budget":769607,"mtd":0,"ytd":384803.07,"unexpended":384803.93,"encumbrance":0,"pct_used":0.5},{"fund":"601","dept":"WATER DEPT","category":"Personal Services","account":"601-5060-52100","desc":"WATER OVERTIME","budget":45000,"mtd":4474.22,"ytd":20442.93,"unexpended":24557.07,"encumbrance":0,"pct_used":0.45},{"fund":"601","dept":"WATER DEPT","category":"Personal Services","account":"601-5060-52110","desc":"WATER SALARIES","budget":140000,"mtd":10476.29,"ytd":30908.03,"unexpended":109091.97,"encumbrance":0,"pct_used":0.22},{"fund":"601","dept":"WATER DEPT","category":"Personal Services","account":"601-5060-52113","desc":"WATER HOURLY WAGES","budget":370000,"mtd":26271.47,"ytd":78867.29,"unexpended":291132.71,"encumbrance":0,"pct_used":0.21},{"fund":"601","dept":"WATER DEPT","category":"Personal Services","account":"601-5060-52120","desc":"WATER HOSPITALIZATION","budget":250000,"mtd":0,"ytd":16651.31,"unexpended":233348.69,"encumbrance":0,"pct_used":0.07},{"fund":"601","dept":"WATER DEPT","category":"Personal Services","account":"601-5060-52122","desc":"WATER WORKERS COMP","budget":15000,"mtd":0,"ytd":2471.54,"unexpended":12528.46,"encumbrance":0,"pct_used":0.16},{"fund":"601","dept":"WATER DEPT","category":"Personal Services","account":"601-5060-52123","desc":"WATER MEDICARE TAX","budget":8700,"mtd":592.71,"ytd":1873.14,"unexpended":6826.86,"encumbrance":0,"pct_used":0.22},{"fund":"601","dept":"WATER DEPT","category":"Personal Services","account":"601-5060-52189","desc":"WATER PENSION","budget":88000,"mtd":6047.52,"ytd":15275.23,"unexpended":72724.77,"encumbrance":0,"pct_used":0.17},{"fund":"601","dept":"WATER DEPT","category":"Contractual Services","account":"601-5060-52286","desc":"WATER PURCHASES","budget":3500000,"mtd":288330.21,"ytd":847389.6,"unexpended":2652610.4,"encumbrance":2152610.4,"pct_used":0.24},{"fund":"601","dept":"WATER DEPT","category":"Supplies & Materials","account":"601-5060-52460","desc":"WATER METERS","budget":15000,"mtd":6640,"ytd":8360,"unexpended":6640,"encumbrance":0,"pct_used":0.56},{"fund":"601","dept":"WATER DEPT","category":"Capital Outlay","account":"601-5060-52575","desc":"WATER CAPITAL IMPROVEMENTS","budget":30000,"mtd":0,"ytd":0,"unexpended":30000,"encumbrance":0,"pct_used":0},{"fund":"601","dept":"WATER DEPT","category":"Other Uses","account":"601-5060-52742","desc":"WATER OWDA LOAN REPAYMENT","budget":28700,"mtd":0,"ytd":0,"unexpended":28700,"encumbrance":0,"pct_used":0},{"fund":"620","dept":"SEWER RENTAL","category":"Personal Services","account":"620-5051-52100","desc":"SEWER RENTAL OVERTIME","budget":25000,"mtd":3814.81,"ytd":14618.35,"unexpended":10381.65,"encumbrance":0,"pct_used":0.58},{"fund":"620","dept":"SEWER RENTAL","category":"Personal Services","account":"620-5051-52110","desc":"SEWER RENTAL SALARIES","budget":140000,"mtd":10517.8,"ytd":31024.37,"unexpended":108975.63,"encumbrance":0,"pct_used":0.22},{"fund":"620","dept":"SEWER RENTAL","category":"Personal Services","account":"620-5051-52113","desc":"SEWER RENTAL HOURLY","budget":755000,"mtd":56674.64,"ytd":204400.62,"unexpended":550599.38,"encumbrance":0,"pct_used":0.27},{"fund":"620","dept":"SEWER RENTAL","category":"Personal Services","account":"620-5051-52120","desc":"SEWER RENTAL HOSPITALIZATION","budget":215000,"mtd":0,"ytd":24976.46,"unexpended":190023.54,"encumbrance":0,"pct_used":0.12},{"fund":"620","dept":"SEWER RENTAL","category":"Personal Services","account":"620-5051-52189","desc":"SEWER RENTAL PENSION","budget":135800,"mtd":10135.91,"ytd":25565.82,"unexpended":110234.18,"encumbrance":0,"pct_used":0.19},{"fund":"620","dept":"SEWER RENTAL","category":"Supplies & Materials","account":"620-5051-52426","desc":"SEWER RENTAL OPERATIONS","budget":375000,"mtd":68377.11,"ytd":124042.07,"unexpended":250957.93,"encumbrance":49482.16,"pct_used":0.33},{"fund":"620","dept":"SEWER RENTAL","category":"Debt Services","account":"620-5051-52679","desc":"SEWER RENTAL OWDA LO","budget":520099.82,"mtd":0,"ytd":0,"unexpended":520099.82,"encumbrance":0,"pct_used":0},{"fund":"640","dept":"CEMETERY","category":"Personal Services","account":"640-2080-52100","desc":"CEMETERY OVERTIME","budget":4000,"mtd":157.86,"ytd":449.34,"unexpended":3550.66,"encumbrance":0,"pct_used":0.11},{"fund":"640","dept":"CEMETERY","category":"Public Health Services","account":"640-2080-52426","desc":"CEMETERY OPERATION &","budget":45000,"mtd":29.64,"ytd":29.64,"unexpended":44970.36,"encumbrance":800,"pct_used":0.0},{"fund":"825","dept":"POLICE PENSION","category":"Pensions","account":"825-0098-52809","desc":"POLICE PENSION","budget":50000,"mtd":0.62,"ytd":0.62,"unexpended":49999.38,"encumbrance":0,"pct_used":0.0},{"fund":"850","dept":"INCOME TAX","category":"Personal Services","account":"850-7090-52110","desc":"INCOME TAX SUPERVISION","budget":0,"mtd":38115.69,"ytd":41799.19,"unexpended":-41799.19,"encumbrance":0,"pct_used":null},{"fund":"860","dept":"MUNICIPAL COURT","category":"Supplies & Materials","account":"860-0098-52440","desc":"MUNICIPAL COURT PROBATION","budget":190000,"mtd":38115.69,"ytd":41799.19,"unexpended":148200.81,"encumbrance":0,"pct_used":0.22},{"fund":"870","dept":"MISC","category":"Supplies & Materials","account":"870-0098-52440","desc":"AGENCY REIMBURSEMENT","budget":200000,"mtd":28524.27,"ytd":29654.27,"unexpended":170345.73,"encumbrance":0,"pct_used":0.15},{"fund":"880","dept":"MISC","category":"Other Uses","account":"880-7092-52792","desc":"SHP LAW LIBRARY REIMB","budget":35000,"mtd":1096.6,"ytd":2314.23,"unexpended":32685.77,"encumbrance":0,"pct_used":0.07},{"fund":"900","dept":"CAP. IMP. MISC.","category":"Supplies & Materials","account":"900-0096-52440","desc":"CAP IMP SPECIAL PROJECTS","budget":165000,"mtd":6700.98,"ytd":39425.73,"unexpended":125574.27,"encumbrance":8375,"pct_used":0.24},{"fund":"900","dept":"CAP. IMP. MISC.","category":"Supplies & Materials","account":"900-0096-52443","desc":"CAP IMP CAMERA FEES","budget":28000,"mtd":1500,"ytd":3830,"unexpended":24170,"encumbrance":0,"pct_used":0.14},{"fund":"925","dept":"POLICE DEPT","category":"Personal Services","account":"925-1010-52100","desc":"CAPITAL IMPROVEMENT POL","budget":2500,"mtd":373.67,"ytd":1057.59,"unexpended":1442.41,"encumbrance":0,"pct_used":0.42},{"fund":"925","dept":"POLICE DEPT","category":"Personal Services","account":"925-1010-52110","desc":"CAP IMP POLICE SALARIES","budget":150000,"mtd":9346.55,"ytd":28558.49,"unexpended":121441.51,"encumbrance":0,"pct_used":0.19},{"fund":"925","dept":"POLICE DEPT","category":"Supplies & Materials","account":"925-1010-52189","desc":"CAPITAL IMPROVEMENT","budget":23000,"mtd":1873.65,"ytd":4797.31,"unexpended":18202.69,"encumbrance":0,"pct_used":0.21},{"fund":"975","dept":"MUNICIPAL COURT","category":"Supplies & Materials","account":"975-7012-52467","desc":"COURT COMPUTER FUND","budget":110000,"mtd":967.89,"ytd":2903.67,"unexpended":107096.33,"encumbrance":0,"pct_used":0.03},{"fund":"985","dept":"MUNICIPAL COURT","category":"Special Uses","account":"985-7012-51613","desc":"INDIGENT DRIVERS ALCOH","budget":200000,"mtd":13059.03,"ytd":40779.17,"unexpended":159220.83,"encumbrance":0,"pct_used":0.2},{"fund":"989","dept":"MUNICIPAL COURT","category":"Special Uses","account":"989-7012-41614","desc":"INDIGENT DRIVERS & ALC","budget":25000,"mtd":0,"ytd":710,"unexpended":24290,"encumbrance":0,"pct_used":0.03},{"fund":"990","dept":"MUNICIPAL COURT","category":"Special Uses","account":"990-7012-51614","desc":"ENFORCEMENT & EDUCATION","budget":1000,"mtd":0,"ytd":0,"unexpended":1000,"encumbrance":0,"pct_used":0}],"checks":[{"check_no":"138","date":"3/17/2026","vendor_code":"AA0258","vendor":"AULTRA ADMINISTRATIVE GROUP","type":"ACH","status":"Outstanding","void":0,"amount":532.08},{"check_no":"139","date":"3/25/2026","vendor_code":"AA0258","vendor":"AULTRA ADMINISTRATIVE GROUP","type":"ACH","status":"Outstanding","void":0,"amount":1556.2},{"check_no":"140","date":"3/25/2026","vendor_code":"M22599","vendor":"MUTUAL HEALTH SERVICES - MONTHLY","type":"ACH","status":"Outstanding","void":0,"amount":47475.06},{"check_no":"235","date":"3/06/2026","vendor_code":"MEDICARE","vendor":"MEDICARE - CITY'S PORTION","type":"EFT","status":"Outstanding","void":0,"amount":3333.32},{"check_no":"236","date":"3/06/2026","vendor_code":"PAY714","vendor":"SOCIAL SECURITY CITY PORTION","type":"EFT","status":"Outstanding","void":0,"amount":472.12},{"check_no":"237","date":"3/11/2026","vendor_code":"P01400","vendor":"OHIO POLICE & FIRE PENSION FUND","type":"EFT","status":"Outstanding","void":0,"amount":37063.26},{"check_no":"238","date":"3/20/2026","vendor_code":"MEDICARE","vendor":"MEDICARE - CITY'S PORTION","type":"EFT","status":"Outstanding","void":0,"amount":3463.33},{"check_no":"239","date":"3/20/2026","vendor_code":"PAY714","vendor":"SOCIAL SECURITY CITY'S PORTION","type":"EFT","status":"Outstanding","void":0,"amount":472.06},{"check_no":"82175","date":"3/05/2026","vendor_code":"A00840","vendor":"A & M TOWING & ROAD SERVICE, INC.","type":"Check","status":"Outstanding","void":0,"amount":945.55},{"check_no":"82176","date":"3/05/2026","vendor_code":"A00250","vendor":"ADVANCED MARKING & PRINTING","type":"Check","status":"Outstanding","void":0,"amount":61},{"check_no":"82177","date":"3/05/2026","vendor_code":"A00501","vendor":"AMERICAN FEDERATION OF MUSICIANS","type":"Check","status":"Outstanding","void":0,"amount":3200},{"check_no":"82178","date":"3/05/2026","vendor_code":"AR0147","vendor":"ARO EFFECT MARKETING","type":"Check","status":"Outstanding","void":0,"amount":1250},{"check_no":"82179","date":"3/05/2026","vendor_code":"T02556","vendor":"BARBARA TOLNAR","type":"Check","status":"Outstanding","void":0,"amount":605.76},{"check_no":"82180","date":"3/05/2026","vendor_code":"C00410","vendor":"CARDINAL ENVIRONMENTAL LABORATORY","type":"Check","status":"Outstanding","void":0,"amount":689.5},{"check_no":"82181","date":"3/05/2026","vendor_code":"T00175","vendor":"CHARTER COMMUNICATIONS","type":"Check","status":"Outstanding","void":0,"amount":779.97},{"check_no":"82182","date":"3/05/2026","vendor_code":"C02300","vendor":"COLE CREATIVE DESIGN","type":"Check","status":"Outstanding","void":0,"amount":411},{"check_no":"82183","date":"3/05/2026","vendor_code":"CS0122","vendor":"CRETELLA SERVICES LLC","type":"Check","status":"Outstanding","void":0,"amount":921.71},{"check_no":"82184","date":"3/05/2026","vendor_code":"EF0753","vendor":"ELAN FINANCIAL SERVICES","type":"Check","status":"Outstanding","void":0,"amount":549.27},{"check_no":"82185","date":"3/05/2026","vendor_code":"F00100","vendor":"FALLSWAY EQUIPMENT CO. INC.","type":"Check","status":"Outstanding","void":0,"amount":576.8},{"check_no":"82186","date":"3/05/2026","vendor_code":"G00020","vendor":"GALLS, INC.","type":"Check","status":"Outstanding","void":0,"amount":162.98},{"check_no":"82187","date":"3/05/2026","vendor_code":"S01530","vendor":"GIRARD AUTO BATH","type":"Check","status":"Outstanding","void":0,"amount":287},{"check_no":"82188","date":"3/05/2026","vendor_code":"G74369","vendor":"GIRARD ZONING DEPT","type":"Check","status":"Outstanding","void":0,"amount":225},{"check_no":"82189","date":"3/05/2026","vendor_code":"G01230","vendor":"GRAINGER","type":"Check","status":"Outstanding","void":0,"amount":183.18},{"check_no":"82190","date":"3/05/2026","vendor_code":"H00455","vendor":"HANDYMAN OF NILES","type":"Check","status":"Outstanding","void":0,"amount":1108.06},{"check_no":"82191","date":"3/05/2026","vendor_code":"H00647","vendor":"HARRIS, CHELSEA","type":"Check","status":"Outstanding","void":0,"amount":280},{"check_no":"82192","date":"3/05/2026","vendor_code":"H00487","vendor":"HKG ENTERPRISE, LLC","type":"Check","status":"Outstanding","void":0,"amount":436},{"check_no":"82193","date":"3/05/2026","vendor_code":"N00080","vendor":"HOMETOWN AUTO PARTS, LLC","type":"Check","status":"Outstanding","void":0,"amount":804.39},{"check_no":"82194","date":"3/05/2026","vendor_code":"I45236","vendor":"IPITOMY COMMUNICATIONS LLC","type":"Check","status":"Outstanding","void":0,"amount":1048.61},{"check_no":"82195","date":"3/05/2026","vendor_code":"P00800","vendor":"J.C. PENNEY CREDIT SERVICES","type":"Check","status":"Outstanding","void":0,"amount":678.04},{"check_no":"82196","date":"3/05/2026","vendor_code":"J00140","vendor":"J.P. TECHNICAL SERVICES","type":"Check","status":"Outstanding","void":0,"amount":700},{"check_no":"82197","date":"3/05/2026","vendor_code":"M02580","vendor":"JACKLYN MASSURI","type":"Check","status":"Outstanding","void":0,"amount":69.66},{"check_no":"82198","date":"3/05/2026","vendor_code":"N65479","vendor":"JOHNNY K'S POWERSPORTS","type":"Check","status":"Outstanding","void":0,"amount":5554.38},{"check_no":"82199","date":"3/05/2026","vendor_code":"J00605","vendor":"JULIE COGGINS","type":"Check","status":"Outstanding","void":0,"amount":66.84},{"check_no":"82200","date":"3/05/2026","vendor_code":"KP4453","vendor":"KEVIN POWELL","type":"Check","status":"Outstanding","void":0,"amount":189.23},{"check_no":"82201","date":"3/05/2026","vendor_code":"KC0147","vendor":"KO CONSULTING, LLC","type":"Check","status":"Outstanding","void":0,"amount":4000},{"check_no":"82202","date":"3/05/2026","vendor_code":"L00217","vendor":"LEAF","type":"Check","status":"Outstanding","void":0,"amount":363},{"check_no":"82203","date":"3/05/2026","vendor_code":"L00725","vendor":"LOWE'S","type":"Check","status":"Outstanding","void":0,"amount":190.7},{"check_no":"82204","date":"3/05/2026","vendor_code":"Z00405","vendor":"MARK ZUPPO","type":"Check","status":"Outstanding","void":0,"amount":303.76},{"check_no":"82205","date":"3/05/2026","vendor_code":"M52998","vendor":"MES SERVICE COMPANY LLC","type":"Check","status":"Outstanding","void":0,"amount":1765},{"check_no":"82206","date":"3/05/2026","vendor_code":"C07075","vendor":"M/S CONSULTANTS, INC","type":"Check","status":"Outstanding","void":0,"amount":112.07},{"check_no":"82207","date":"3/05/2026","vendor_code":"M56289","vendor":"MICHAEL CARDIERO","type":"Check","status":"Outstanding","void":0,"amount":976.03},{"check_no":"82208","date":"3/05/2026","vendor_code":"N00560","vendor":"NECO","type":"Check","status":"Outstanding","void":0,"amount":6640},{"check_no":"82209","date":"3/05/2026","vendor_code":"N00805","vendor":"NIAGARA SCIENTIFIC","type":"Check","status":"Outstanding","void":0,"amount":260},{"check_no":"82210","date":"3/05/2026","vendor_code":"O00106","vendor":"OASIS SANITARY, LLC.","type":"Check","status":"Outstanding","void":0,"amount":173},{"check_no":"82211","date":"3/05/2026","vendor_code":"O00199","vendor":"OHIO AFSCME CARE PLAN","type":"Check","status":"Outstanding","void":0,"amount":17.5},{"check_no":"82212","date":"3/05/2026","vendor_code":"O01100","vendor":"OHIO EDISON COMPANY","type":"Check","status":"Outstanding","void":0,"amount":1253.67},{"check_no":"82213","date":"3/05/2026","vendor_code":"O01550","vendor":"OHIO PEACE OFFICER TRAINING ACADEMY","type":"Check","status":"Outstanding","void":0,"amount":425},{"check_no":"82214","date":"3/05/2026","vendor_code":"O01600","vendor":"OPERATOR TRAINING COMMITTEE OF O","type":"Check","status":"Outstanding","void":0,"amount":340},{"check_no":"82215","date":"3/05/2026","vendor_code":"P00569","vendor":"PELTON ENVIRONMENTAL PRODUCTS","type":"Check","status":"Outstanding","void":0,"amount":2554.52},{"check_no":"82216","date":"3/05/2026","vendor_code":"P01500","vendor":"POWER TOOL & SUPPLY CO., INC.","type":"Check","status":"Outstanding","void":0,"amount":229},{"check_no":"82217","date":"3/05/2026","vendor_code":"R00550","vendor":"RED DIAMOND UNIFORM, INC.","type":"Check","status":"Outstanding","void":0,"amount":729.33},{"check_no":"82218","date":"3/05/2026","vendor_code":"A00040","vendor":"REPUBLIC SERVICES","type":"Check","status":"Outstanding","void":0,"amount":89.8},{"check_no":"82219","date":"3/05/2026","vendor_code":"S02134","vendor":"SCOTT STRAIN","type":"Check","status":"Outstanding","void":0,"amount":163.13},{"check_no":"82220","date":"3/05/2026","vendor_code":"S50065","vendor":"SHIELD AUTO GLASS","type":"Check","status":"Outstanding","void":0,"amount":498},{"check_no":"82221","date":"3/05/2026","vendor_code":"P00147","vendor":"TAYLOR PEARSON","type":"Check","status":"Outstanding","void":0,"amount":64.68},{"check_no":"82222","date":"3/05/2026","vendor_code":"H00605","vendor":"THE HARTFORD","type":"Check","status":"Outstanding","void":0,"amount":6349.04},{"check_no":"82223","date":"3/05/2026","vendor_code":"T96321","vendor":"T-MOBILE","type":"Check","status":"Outstanding","void":0,"amount":1329.03},{"check_no":"82224","date":"3/05/2026","vendor_code":"TC0147","vendor":"TOWN CENTER ASSOCIATES LLC","type":"Check","status":"Outstanding","void":0,"amount":2687.5},{"check_no":"82225","date":"3/05/2026","vendor_code":"OHIO450","vendor":"TREASURER OF STATE OF OHIO","type":"Check","status":"Outstanding","void":0,"amount":5800},{"check_no":"82226","date":"3/05/2026","vendor_code":"T01050","vendor":"TRI-COUNTY ASPHALT & MATERIALS, IN","type":"Check","status":"Outstanding","void":0,"amount":417.3},{"check_no":"82227","date":"3/05/2026","vendor_code":"T00784","vendor":"TROJAN TECHNOLOGIES","type":"Check","status":"Outstanding","void":0,"amount":14165.66},{"check_no":"82228","date":"3/05/2026","vendor_code":"T01500","vendor":"TRUM. COUNTY LAW LIBRARY ASSOC","type":"Check","status":"Outstanding","void":0,"amount":1096.6},{"check_no":"82229","date":"3/05/2026","vendor_code":"T01514","vendor":"TRUMBULL COUNTY ENGINEER","type":"Check","status":"Outstanding","void":0,"amount":22920.45},{"check_no":"82230","date":"3/05/2026","vendor_code":"T01525","vendor":"TRUMBULL SOIL & WATER CONSERVATION","type":"Check","status":"Outstanding","void":0,"amount":4033.26},{"check_no":"82231","date":"3/05/2026","vendor_code":"U06625","vendor":"US SAFETY GEAR","type":"Check","status":"Outstanding","void":0,"amount":1164.15},{"check_no":"82232","date":"3/05/2026","vendor_code":"V00095","vendor":"VANCE OUTDOORS, INC.","type":"Check","status":"Outstanding","void":0,"amount":549.27},{"check_no":"82233","date":"3/05/2026","vendor_code":"W00060","vendor":"W.J. SERVICE CO.","type":"Check","status":"Outstanding","void":0,"amount":829.09},{"check_no":"82234","date":"3/05/2026","vendor_code":"Y00300","vendor":"YOUNGSTOWN WATER DEPARTMENT","type":"Check","status":"Outstanding","void":0,"amount":84.2},{"check_no":"82235","date":"3/05/2026","vendor_code":"Y00301","vendor":"YOUNGSTOWN/WARREN REGIONAL CHA","type":"Check","status":"Outstanding","void":0,"amount":270},{"check_no":"82236","date":"3/06/2026","vendor_code":"W08775","vendor":"WALMART","type":"Check","status":"Outstanding","void":0,"amount":268.1},{"check_no":"82237","date":"3/05/2026","vendor_code":"P01800","vendor":"PUBLIC EMPLOYEES RETIREMENT SYST","type":"Check","status":"Outstanding","void":0,"amount":40652.18},{"check_no":"82238","date":"3/12/2026","vendor_code":"A00655","vendor":"ADY EXCAVATING LLC","type":"Check","status":"Outstanding","void":0,"amount":5484.53},{"check_no":"82239","date":"3/12/2026","vendor_code":"A00290","vendor":"AINSLEY OIL CO.","type":"Check","status":"Outstanding","void":0,"amount":3994.48},{"check_no":"82240","date":"3/12/2026","vendor_code":"T00175","vendor":"CHARTER COMMUNICATIONS","type":"Check","status":"Outstanding","void":0,"amount":1944.58},{"check_no":"82241","date":"3/12/2026","vendor_code":"D00200","vendor":"DEAN DRAVIS LAWNMOWER","type":"Check","status":"Outstanding","void":0,"amount":29.64},{"check_no":"82242","date":"3/12/2026","vendor_code":"D00401","vendor":"DOLLAR TREE","type":"Check","status":"Outstanding","void":0,"amount":98.75},{"check_no":"82243","date":"3/12/2026","vendor_code":"DT0123","vendor":"DOMESTIC UNIFORM RENTAL","type":"Check","status":"Outstanding","void":0,"amount":294.19},{"check_no":"82244","date":"3/12/2026","vendor_code":"D46389","vendor":"FERGUSON WATERWORKS","type":"Check","status":"Outstanding","void":0,"amount":6203.42},{"check_no":"82245","date":"3/12/2026","vendor_code":"F01250","vendor":"GIRARD MUNICIPAL COURT","type":"Check","status":"Outstanding","void":0,"amount":7500},{"check_no":"82246","date":"3/12/2026","vendor_code":"G00650","vendor":"JANE BECKNER","type":"Check","status":"Outstanding","void":0,"amount":150.13},{"check_no":"82247","date":"3/12/2026","vendor_code":"L00217","vendor":"LEAF","type":"Check","status":"Outstanding","void":0,"amount":329},{"check_no":"82248","date":"3/12/2026","vendor_code":"M00011","vendor":"MAHONING COUNTY CAREER & TECHNICAL","type":"Check","status":"Outstanding","void":0,"amount":1145},{"check_no":"82249","date":"3/12/2026","vendor_code":"MU7410","vendor":"MARK URBANIC","type":"Check","status":"Outstanding","void":0,"amount":45},{"check_no":"82250","date":"3/12/2026","vendor_code":"B00575","vendor":"MATTHEW BENDER & CO., INC.","type":"Check","status":"Outstanding","void":0,"amount":1148.43},{"check_no":"82251","date":"3/12/2026","vendor_code":"M0220","vendor":"MODERN OFFICE PRODUCTS","type":"Check","status":"Outstanding","void":0,"amount":2104.86},{"check_no":"82252","date":"3/12/2026","vendor_code":"PC0123","vendor":"PEREGRINE CORPORATION","type":"Check","status":"Outstanding","void":0,"amount":3599.38},{"check_no":"82253","date":"3/12/2026","vendor_code":"PS0123","vendor":"PHOENIX SAFETY OUTFITTERS","type":"Check","status":"Outstanding","void":0,"amount":600},{"check_no":"82254","date":"3/12/2026","vendor_code":"P01560","vendor":"PRECISION ODOR","type":"Check","status":"Voided","void":9428,"amount":0},{"check_no":"82255","date":"3/12/2026","vendor_code":"R00151","vendor":"R & J TRUCKING, CO., INC.","type":"Check","status":"Outstanding","void":0,"amount":1532.6},{"check_no":"82256","date":"3/12/2026","vendor_code":"A00440","vendor":"REPUBLIC SERVICES","type":"Check","status":"Outstanding","void":0,"amount":200},{"check_no":"82257","date":"3/12/2026","vendor_code":"S02134","vendor":"SCOTT STRAIN","type":"Check","status":"Outstanding","void":0,"amount":45},{"check_no":"82258","date":"3/12/2026","vendor_code":"T00101","vendor":"TASC","type":"Check","status":"Outstanding","void":0,"amount":2654.17},{"check_no":"82259","date":"3/12/2026","vendor_code":"M00101","vendor":"TEAM OFFICE TECHNOLOGIES","type":"Check","status":"Outstanding","void":0,"amount":15102.43},{"check_no":"82260","date":"3/12/2026","vendor_code":"T00496","vendor":"TREASURER, STATE OF OHIO","type":"Check","status":"Outstanding","void":0,"amount":600},{"check_no":"82261","date":"3/12/2026","vendor_code":"T01302","vendor":"TRUMBULL COUNTY LEGAL NEWS","type":"Check","status":"Outstanding","void":0,"amount":99},{"check_no":"82262","date":"3/12/2026","vendor_code":"V00200","vendor":"VERIZON WIRELESS","type":"Check","status":"Outstanding","void":0,"amount":40.14},{"check_no":"82263","date":"3/13/2026","vendor_code":"SM0123","vendor":"MONROE, SAMANTHA","type":"Check","status":"Outstanding","void":0,"amount":124.35},{"check_no":"82264","date":"3/19/2026","vendor_code":"A00840","vendor":"A & M TOWING & ROAD SERVICE, INC.","type":"Check","status":"Outstanding","void":0,"amount":977.01},{"check_no":"82265","date":"3/19/2026","vendor_code":"A00300","vendor":"AIRGAS USA, LLC","type":"Check","status":"Outstanding","void":0,"amount":381.08},{"check_no":"82266","date":"3/19/2026","vendor_code":"M02382","vendor":"ANDREW MOONEY","type":"Check","status":"Outstanding","void":0,"amount":98.74},{"check_no":"82267","date":"3/19/2026","vendor_code":"T02556","vendor":"BARBARA TOLNAR","type":"Check","status":"Outstanding","void":0,"amount":605.76},{"check_no":"82268","date":"3/19/2026","vendor_code":"C01450","vendor":"CLEMANS NELSON & ASSOC., INC.","type":"Check","status":"Outstanding","void":0,"amount":396.25},{"check_no":"82269","date":"3/19/2026","vendor_code":"E00100","vendor":"ENBRIDGE GAS OHIO","type":"Check","status":"Outstanding","void":0,"amount":7613.78},{"check_no":"82270","date":"3/19/2026","vendor_code":"GL0147","vendor":"GOOD LIFE CONTROL SOLUTIONS","type":"Check","status":"Outstanding","void":0,"amount":2711.25},{"check_no":"82271","date":"3/19/2026","vendor_code":"L00217","vendor":"LEAF","type":"Check","status":"Outstanding","void":0,"amount":159},{"check_no":"82272","date":"3/19/2026","vendor_code":"Z00405","vendor":"MARK ZUPPO","type":"Check","status":"Outstanding","void":0,"amount":63.6},{"check_no":"82273","date":"3/19/2026","vendor_code":"R00980","vendor":"MIKE REVELLA","type":"Check","status":"Outstanding","void":0,"amount":144.26},{"check_no":"82274","date":"3/19/2026","vendor_code":"M00389","vendor":"MUFFLEY'S SERVICE INC.","type":"Check","status":"Outstanding","void":0,"amount":4069.35},{"check_no":"82275","date":"3/19/2026","vendor_code":"O01100","vendor":"OHIO EDISON COMPANY","type":"Check","status":"Outstanding","void":0,"amount":39138.74},{"check_no":"82276","date":"3/19/2026","vendor_code":"O01590","vendor":"ON DEMAND TESTING AMERICA, L.L.C.","type":"Check","status":"Outstanding","void":0,"amount":535},{"check_no":"82277","date":"3/19/2026","vendor_code":"PC0123","vendor":"PEREGRINE CORPORATION","type":"Check","status":"Outstanding","void":0,"amount":23.34},{"check_no":"82278","date":"3/19/2026","vendor_code":"P01110","vendor":"PITNEY BOWES INC.","type":"Check","status":"Outstanding","void":0,"amount":79},{"check_no":"82279","date":"3/19/2026","vendor_code":"PS0123","vendor":"PHOENIX SAFELY OUTFITTERS","type":"Check","status":"Outstanding","void":0,"amount":387.72},{"check_no":"82280","date":"3/19/2026","vendor_code":"P01657","vendor":"PROTECT-N-SHRED","type":"Check","status":"Outstanding","void":0,"amount":59.4},{"check_no":"82281","date":"3/19/2026","vendor_code":"R00050","vendor":"RED DIAMOND UNIFORM, INC.","type":"Check","status":"Outstanding","void":0,"amount":174.93},{"check_no":"82282","date":"3/19/2026","vendor_code":"T00496","vendor":"TEAM OFFICE TECHNOLOGIES","type":"Check","status":"Outstanding","void":0,"amount":3146},{"check_no":"82283","date":"3/19/2026","vendor_code":"TR0123","vendor":"TEMA ROOFING SERVICES","type":"Check","status":"Outstanding","void":0,"amount":650},{"check_no":"82284","date":"3/19/2026","vendor_code":"T01302","vendor":"TRUMBULL COUNTY LEGAL NEWS","type":"Check","status":"Outstanding","void":0,"amount":87},{"check_no":"82285","date":"3/19/2026","vendor_code":"T05130","vendor":"TRUMBULL COUNTY WATER & SEWER A","type":"Check","status":"Outstanding","void":0,"amount":12.76},{"check_no":"82286","date":"3/19/2026","vendor_code":"U06625","vendor":"US SAFETY GEAR","type":"Check","status":"Outstanding","void":0,"amount":36521.68},{"check_no":"82287","date":"3/19/2026","vendor_code":"OHIO675","vendor":"VILLAGE OF MCDONALD","type":"Check","status":"Outstanding","void":0,"amount":1690},{"check_no":"82288","date":"3/19/2026","vendor_code":"M04000","vendor":"WEXBANK","type":"Check","status":"Outstanding","void":0,"amount":44577.8},{"check_no":"82289","date":"3/19/2026","vendor_code":"Z00420","vendor":"ZALUSKI INSURANCE","type":"Check","status":"Outstanding","void":0,"amount":5204.5},{"check_no":"82290","date":"3/26/2026","vendor_code":"A00840","vendor":"A & M TOWING & ROAD SERVICE, INC.","type":"Check","status":"Outstanding","void":0,"amount":1700},{"check_no":"82291","date":"3/26/2026","vendor_code":"A77619","vendor":"AMAZON CAPITAL SERVICES","type":"Check","status":"Outstanding","void":0,"amount":157.49},{"check_no":"82292","date":"3/26/2026","vendor_code":"JA0123","vendor":"ASENTE, JUSTIN","type":"Check","status":"Outstanding","void":0,"amount":202.2},{"check_no":"82293","date":"3/26/2026","vendor_code":"C00410","vendor":"CARDINAL ENVIRONMENTAL LABORATORY","type":"Check","status":"Outstanding","void":0,"amount":474.6},{"check_no":"82294","date":"3/26/2026","vendor_code":"T00175","vendor":"CHARTER COMMUNICATIONS","type":"Check","status":"Outstanding","void":0,"amount":2473},{"check_no":"82295","date":"3/26/2026","vendor_code":"C01300","vendor":"CITY OF NILES - DEPT. OF PUBLIC SERVICE","type":"Check","status":"Outstanding","void":0,"amount":144.29},{"check_no":"82296","date":"3/26/2026","vendor_code":"C01925","vendor":"CONTINENTAL FIRE & SECURITY, INC.","type":"Check","status":"Outstanding","void":0,"amount":153722.56},{"check_no":"82297","date":"3/26/2026","vendor_code":"S01085","vendor":"COSMO SIGNORIELLO","type":"Check","status":"Outstanding","void":0,"amount":1998},{"check_no":"82298","date":"3/26/2026","vendor_code":"D00401","vendor":"DE LAGE LANDEN FINANCIAL SERVICES","type":"Check","status":"Outstanding","void":0,"amount":45},{"check_no":"82299","date":"3/26/2026","vendor_code":"D00200","vendor":"DEAN DRAVIS LAWNMOWER","type":"Check","status":"Outstanding","void":0,"amount":215},{"check_no":"82300","date":"3/26/2026","vendor_code":"D00020","vendor":"ENBRIDGE GAS OHIO","type":"Check","status":"Outstanding","void":0,"amount":28.36},{"check_no":"82301","date":"3/26/2026","vendor_code":"O01652","vendor":"GALLS, INC.","type":"Check","status":"Outstanding","void":0,"amount":92.82},{"check_no":"82302","date":"3/26/2026","vendor_code":"G00020","vendor":"GEORGE THOMAS PLUMBING, LLC","type":"Check","status":"Outstanding","void":0,"amount":88.59},{"check_no":"82303","date":"3/26/2026","vendor_code":"T00621","vendor":"GIRARD MULTI-GENERATIONAL CENTER","type":"Check","status":"Outstanding","void":0,"amount":225},{"check_no":"82304","date":"3/26/2026","vendor_code":"G458963","vendor":"GIRARD WATER DEPT","type":"Check","status":"Outstanding","void":0,"amount":50},{"check_no":"82305","date":"3/26/2026","vendor_code":"G01000","vendor":"GIRARD ZONING DEPT","type":"Check","status":"Outstanding","void":0,"amount":722.18},{"check_no":"82306","date":"3/26/2026","vendor_code":"G74369","vendor":"GRAYBAR ELECTRIC COMPANY, INC.","type":"Check","status":"Outstanding","void":0,"amount":5889.87},{"check_no":"82307","date":"3/26/2026","vendor_code":"G01400","vendor":"HARBOR FREIGHT","type":"Check","status":"Outstanding","void":0,"amount":3160},{"check_no":"82308","date":"3/26/2026","vendor_code":"H00475","vendor":"HEALTH EQUITY","type":"Check","status":"Outstanding","void":0,"amount":263.41},{"check_no":"82309","date":"3/26/2026","vendor_code":"HE0123","vendor":"IWORQ SYSTEMS","type":"Check","status":"Outstanding","void":0,"amount":16500},{"check_no":"82310","date":"3/26/2026","vendor_code":"I56285","vendor":"JACKLYN MASSURI","type":"Check","status":"Outstanding","void":0,"amount":112},{"check_no":"82311","date":"3/26/2026","vendor_code":"M02580","vendor":"JOE DANKO","type":"Check","status":"Outstanding","void":0,"amount":78.48},{"check_no":"82312","date":"3/26/2026","vendor_code":"D00510","vendor":"JOHN FREEMAN","type":"Check","status":"Outstanding","void":0,"amount":418.01},{"check_no":"82313","date":"3/26/2026","vendor_code":"J00650","vendor":"Kerner, Valerie","type":"Check","status":"Outstanding","void":0,"amount":62.21},{"check_no":"82314","date":"3/26/2026","vendor_code":"P00468","vendor":"LEAF","type":"Check","status":"Outstanding","void":0,"amount":1544.21},{"check_no":"82315","date":"3/26/2026","vendor_code":"L00217","vendor":"MARK URBANIC","type":"Check","status":"Outstanding","void":0,"amount":45},{"check_no":"82316","date":"3/26/2026","vendor_code":"MU7410","vendor":"MCGOWAN, DARREN","type":"Check","status":"Outstanding","void":0,"amount":28524.27},{"check_no":"82317","date":"3/26/2026","vendor_code":"DM0159","vendor":"MEDICAL MUTUAL","type":"Check","status":"Outstanding","void":0,"amount":1271.6},{"check_no":"82318","date":"3/26/2026","vendor_code":"MM0123","vendor":"MES SERVICE COMPANY LLC","type":"Check","status":"Outstanding","void":0,"amount":1354.31},{"check_no":"82319","date":"3/26/2026","vendor_code":"M52998","vendor":"MONICA URBANIC","type":"Check","status":"Outstanding","void":0,"amount":56.69},{"check_no":"82320","date":"3/26/2026","vendor_code":"R00555","vendor":"MUFFLEY'S SERVICE INC.","type":"Check","status":"Outstanding","void":0,"amount":534.9},{"check_no":"82321","date":"3/26/2026","vendor_code":"M00389","vendor":"OHIO BUREAU OF WORKERS' COMPENSATION","type":"Check","status":"Outstanding","void":0,"amount":12056.09},{"check_no":"82322","date":"3/26/2026","vendor_code":"O04000","vendor":"ORION EQUIPMENT","type":"Check","status":"Outstanding","void":0,"amount":1766},{"check_no":"82323","date":"3/26/2026","vendor_code":"O01652","vendor":"PENN CARE MEDICAL PRODUCTS, INC.","type":"Check","status":"Outstanding","void":0,"amount":1048.75},{"check_no":"82324","date":"3/26/2026","vendor_code":"R00550","vendor":"PHOENIX SAFELY OUTFITTERS","type":"Check","status":"Outstanding","void":0,"amount":1804.78},{"check_no":"82325","date":"3/26/2026","vendor_code":"PS0123","vendor":"PITNEY BOWES INC.","type":"Check","status":"Outstanding","void":0,"amount":5322.02},{"check_no":"82326","date":"3/26/2026","vendor_code":"P01110","vendor":"RANDY WEIBEL","type":"Check","status":"Outstanding","void":0,"amount":355.95},{"check_no":"82327","date":"3/26/2026","vendor_code":"W00175","vendor":"RED DIAMOND UNIFORM, INC.","type":"Check","status":"Outstanding","void":0,"amount":1066.5},{"check_no":"82328","date":"3/26/2026","vendor_code":"R00050","vendor":"SUNDANCE SYSTEMS, INC.","type":"Check","status":"Outstanding","void":0,"amount":359.91},{"check_no":"82329","date":"3/26/2026","vendor_code":"R00550","vendor":"SUNRISE SPRING WATER CO.","type":"Check","status":"Outstanding","void":0,"amount":2200},{"check_no":"82330","date":"3/26/2026","vendor_code":"S00500","vendor":"TEAM OFFICE TECHNOLOGIES","type":"Check","status":"Outstanding","void":0,"amount":117.25},{"check_no":"82331","date":"3/26/2026","vendor_code":"P01305","vendor":"TERMINIX","type":"Check","status":"Outstanding","void":0,"amount":5107.14},{"check_no":"82332","date":"3/26/2026","vendor_code":"T00496","vendor":"T-MOBILE","type":"Check","status":"Outstanding","void":0,"amount":129},{"check_no":"82333","date":"3/26/2026","vendor_code":"T00496","vendor":"TREASURER, STATE OF OHIO","type":"Check","status":"Outstanding","void":0,"amount":100.38},{"check_no":"82334","date":"3/26/2026","vendor_code":"B00370","vendor":"TREASURER, STATE OF OHIO","type":"Check","status":"Outstanding","void":0,"amount":274.2},{"check_no":"82335","date":"3/26/2026","vendor_code":"OHIO852","vendor":"WHARMBY SPORTS","type":"Check","status":"Outstanding","void":0,"amount":330.25},{"check_no":"82336","date":"3/26/2026","vendor_code":"OHIO125","vendor":"WILLIAMS, ROBERT","type":"Check","status":"Outstanding","void":0,"amount":5720},{"check_no":"82337","date":"3/26/2026","vendor_code":"OHIO700","vendor":"YOUNGSTOWN WATER DEPARTMENT","type":"Check","status":"Outstanding","void":0,"amount":180},{"check_no":"82338","date":"3/26/2026","vendor_code":"W00400","vendor":"(misc)","type":"Check","status":"Outstanding","void":0,"amount":107.49},{"check_no":"82340","date":"3/26/2026","vendor_code":"Y00300","vendor":"YOUNGSTOWN WATER DEPARTMENT","type":"Check","status":"Outstanding","void":0,"amount":71080.64},{"check_no":"82341","date":"3/26/2026","vendor_code":"Y00301","vendor":"YOUNGSTOWN/WARREN REGIONAL CHA","type":"Check","status":"Outstanding","void":0,"amount":50},{"check_no":"82342","date":"3/31/2026","vendor_code":"W00001","vendor":"JACOBVASIL, ADAM","type":"Check","status":"Outstanding","void":0,"amount":45.82},{"check_no":"82343","date":"3/31/2026","vendor_code":"W00001","vendor":"HILL, CALEB","type":"Check","status":"Outstanding","void":0,"amount":34.91},{"check_no":"82344","date":"3/31/2026","vendor_code":"W00001","vendor":"GATTA, MARILYN","type":"Check","status":"Outstanding","void":0,"amount":50},{"check_no":"82345","date":"3/31/2026","vendor_code":"W00001","vendor":"BURRUS, ANTHONY","type":"Check","status":"Outstanding","void":0,"amount":275},{"check_no":"82346","date":"3/31/2026","vendor_code":"W00001","vendor":"WESTLEY, DOMINIC","type":"Check","status":"Outstanding","void":0,"amount":5.39},{"check_no":"82347","date":"3/31/2026","vendor_code":"W00001","vendor":"BRAUN, JORDAN LOVETT","type":"Check","status":"Outstanding","void":0,"amount":157.43},{"check_no":"82348","date":"3/31/2026","vendor_code":"W00001","vendor":"UPSHAW, TERRENCE JULIAN","type":"Check","status":"Outstanding","void":0,"amount":1155.39},{"check_no":"82349","date":"3/31/2026","vendor_code":"W00001","vendor":"ROGERS, JORDAN","type":"Check","status":"Outstanding","void":0,"amount":50},{"check_no":"82350","date":"3/31/2026","vendor_code":"W00001","vendor":"MCGOWAN, DARREN","type":"Check","status":"Outstanding","void":0,"amount":87.13},{"check_no":"82351","date":"3/31/2026","vendor_code":"W00001","vendor":"ROGERS, JORDAN","type":"Check","status":"Outstanding","void":0,"amount":38.36},{"check_no":"82352","date":"3/31/2026","vendor_code":"W00001","vendor":"GATTA, MARILYN","type":"Check","status":"Outstanding","void":0,"amount":207.72},{"check_no":"82353","date":"3/31/2026","vendor_code":"P01560","vendor":"PRECISION ODOR","type":"Check","status":"Outstanding","void":0,"amount":9428}],"income_tax":{"rita":[{"collected":"Dec-25","distributed":"Jan-26","gross":376273.76,"retainer":11288.21,"net":364765.94},{"collected":"Jan-26","distributed":"Feb-26","gross":412612.55,"retainer":12378.38,"net":399752.9},{"collected":"Feb-26","distributed":"Mar-26","gross":335403.28,"retainer":10062.1,"net":324940.23}],"recap":[{"category":"Normal City Collection","jan":376273.76,"feb":412612.55,"mar":335403.28,"ytd":1124289.59},{"category":"Revenue Sharing (Vallourec Star)","jan":0,"feb":1161.99,"mar":1976.3,"ytd":3138.29},{"category":"Profit Tax (State Collected)","jan":0,"feb":4.62,"mar":4054.92,"ytd":4059.54},{"category":"Total Gross Collection","jan":376273.76,"feb":413779.16,"mar":341434.5,"ytd":1131487.42,"is_total":true},{"category":"RITA Fee","jan":11507.82,"feb":12859.65,"mar":10463.05,"ytd":34830.52,"is_expense":true},{"category":"Total Net Collections","jan":364765.94,"feb":400919.51,"mar":330971.45,"ytd":1096656.9,"is_total":true},{"category":"Transfers Out","jan":32828.93,"feb":36082.76,"mar":29760.43,"ytd":98672.12,"is_expense":true},{"category":"Net for General Fund","jan":331937.01,"feb":364836.75,"mar":301211.02,"ytd":997984.78,"is_total":true},{"category":"Recreation 5% Transfer","jan":18238.3,"feb":20045.98,"mar":16533.57,"ytd":54817.85},{"category":"Garbage 4% Transfer","jan":14590.64,"feb":16036.78,"mar":13226.86,"ytd":43854.28}],"traffic_cam":[{"month":"January","total":31880.69,"general":14665.12,"streets":7970.17,"police":6376.14,"wellman_safety":1594.03,"bike_trail":956.42,"wellman_theater":318.81},{"month":"February","total":28957.79,"general":13320.58,"streets":7239.45,"police":5791.56,"wellman_safety":1447.89,"bike_trail":868.73,"wellman_theater":289.58},{"month":"March","total":22048.55,"general":10142.33,"streets":5512.14,"police":4409.71,"wellman_safety":1102.43,"bike_trail":661.46,"wellman_theater":220.49}],"court_fees":[{"month":"January","tickets":540,"girard_total":10800,"court_share":5400},{"month":"February","tickets":750,"girard_total":15000,"court_share":7500},{"month":"March","tickets":386,"girard_total":7720,"court_share":3860}]}};
+
+const fmt = {
+  money: (n, sign=false) => {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    if (n === 0) return '$0';
+    const v = Math.abs(n);
+    let str;
+    if (v >= 1e6) str = '$' + (v/1e6).toFixed(2) + 'M';
+    else if (v >= 1e3) str = '$' + (v/1e3).toFixed(1) + 'K';
+    else str = '$' + v.toFixed(0);
+    if (n < 0) return '(' + str + ')';
+    return (sign && n > 0 ? '+' : '') + str;
+  },
+  moneyFull: (n, sign=false) => {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    if (n === 0) return '$0';
+    const v = Math.abs(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    if (n < 0) return '($' + v + ')';
+    return (sign && n > 0 ? '+' : '') + '$' + v;
+  },
+  pct: (n) => {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return (n * 100).toFixed(1) + '%';
+  },
+  num: (n) => {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return n.toLocaleString('en-US');
+  },
+  date: (s) => {
+    if (!s) return '—';
+    // Convert YYYY-MM-DD to MM/DD
+    const m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${parseInt(m[2])}/${parseInt(m[3])}`;
+    return s;
+  }
+};
+
+// ── Header meta ──
+document.getElementById('period-label').textContent = DATA.summary.period_label;
+document.getElementById('as-of-label').textContent = DATA.summary.as_of;
+document.getElementById('fund-count-meta').textContent = DATA.summary.kpis.fund_count;
+
+// ── KPI grid ──
+const kpis = DATA.summary.kpis;
+const netChange = kpis.net_change;
+const KPI_DEFS = [
+  { label: 'Beginning Balance', value: fmt.moneyFull(kpis.beg_balance), sub: 'All funds, January 1' },
+  { label: 'YTD Revenue', value: fmt.moneyFull(kpis.rev_ytd), sub: 'Through March 31' },
+  { label: 'YTD Expenses', value: fmt.moneyFull(kpis.exp_ytd), sub: 'Through March 31' },
+  { label: 'Net Change', value: fmt.moneyFull(netChange, true), sub: netChange >= 0 ? 'Surplus' : 'Cash drawdown', subClass: netChange >= 0 ? 'pos' : 'neg' },
+  { label: 'Unexpended Balance', value: fmt.moneyFull(kpis.unexpended), sub: 'Available cash' },
+  { label: 'Budget Utilization', value: kpis.budget_pct.toFixed(1) + '%', sub: 'Q1 target: 25.0%', subClass: kpis.budget_pct > 25 ? 'neg' : kpis.budget_pct >= 22 ? '' : 'pos' },
+  { label: 'Outstanding Checks', value: fmt.moneyFull(kpis.check_total), sub: kpis.check_count + ' issued in March' },
+  { label: 'Income Tax Q1 (Net)', value: fmt.moneyFull(kpis.income_tax_net_q1), sub: fmt.moneyFull(kpis.income_tax_general_q1) + ' to General' },
+];
+document.getElementById('kpi-grid').innerHTML = KPI_DEFS.map(k => `
+  <div class="kpi">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value">${k.value}</div>
+    <div class="kpi-sub ${k.subClass || ''}">${k.sub}</div>
+  </div>
+`).join('');
+
+// ── Tab switching ──
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    const id = t.dataset.panel;
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === t));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// ── Chart.js global defaults ──
+Chart.defaults.font.family = "'Inter Tight', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#4a5e74';
+Chart.defaults.borderColor = '#d8cfb9';
+
+const COLOR_INK = '#0e2438';
+const COLOR_TEAL = '#1a6e6e';
+const COLOR_AMBER = '#c47a2c';
+const COLOR_BRICK = '#983221';
+const COLOR_GOLD = '#b48a3c';
+
+// ── Chart: Top funds ──
+const topFunds = [...DATA.funds].sort((a,b) => b.exp_ytd - a.exp_ytd).slice(0, 10);
+new Chart(document.getElementById('chart-top-funds'), {
+  type: 'bar',
+  data: {
+    labels: topFunds.map(f => f.desc.length > 28 ? f.desc.slice(0, 26) + '…' : f.desc),
+    datasets: [{
+      label: 'YTD Expenses',
+      data: topFunds.map(f => f.exp_ytd),
+      backgroundColor: COLOR_INK,
+      hoverBackgroundColor: COLOR_GOLD,
+      borderRadius: 0,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: COLOR_INK, padding: 10, cornerRadius: 0,
+        titleFont: { family: "'Fraunces', serif", weight: 600, size: 13 },
+        callbacks: {
+          label: ctx => 'Fund ' + topFunds[ctx.dataIndex].fund + ' · ' + fmt.moneyFull(ctx.raw)
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: '#e0d7c2' }, ticks: { callback: v => fmt.money(v) } },
+      y: { grid: { display: false } }
+    },
+    onClick: (e, els) => {
+      if (els.length) openFundDetail(topFunds[els[0].index].fund);
+    }
+  }
+});
+
+// ── Chart: Revenue vs Expenses ──
+const topActive = [...DATA.funds]
+  .map(f => ({...f, total: f.rev_ytd + f.exp_ytd}))
+  .sort((a,b) => b.total - a.total)
+  .slice(0, 8);
+new Chart(document.getElementById('chart-rev-exp'), {
+  type: 'bar',
+  data: {
+    labels: topActive.map(f => f.desc.length > 22 ? f.desc.slice(0, 20) + '…' : f.desc),
+    datasets: [
+      { label: 'Revenue', data: topActive.map(f => f.rev_ytd), backgroundColor: COLOR_TEAL, borderRadius: 0 },
+      { label: 'Expenses', data: topActive.map(f => f.exp_ytd), backgroundColor: COLOR_BRICK, borderRadius: 0 },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 11 } } },
+      tooltip: {
+        backgroundColor: COLOR_INK, padding: 10, cornerRadius: 0,
+        callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt.moneyFull(ctx.raw) }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { grid: { color: '#e0d7c2' }, ticks: { callback: v => fmt.money(v) } }
+    },
+    onClick: (e, els) => {
+      if (els.length) openFundDetail(topActive[els[0].index].fund);
+    }
+  }
+});
+
+// ── Chart: Budget distribution histogram ──
+const buckets = [0, 0, 0, 0, 0, 0, 0]; // 0-10, 10-25, 25-30, 30-40, 40-60, 60-100, 100+
+const bucketColors = [COLOR_TEAL, COLOR_TEAL, COLOR_AMBER, COLOR_AMBER, COLOR_BRICK, COLOR_BRICK, COLOR_INK];
+const bucketLabels = ['0–10%', '10–25%', '25–30%', '30–40%', '40–60%', '60–100%', '>100%'];
+DATA.expenses.forEach(e => {
+  if (e.pct_used === null || e.budget === 0) return;
+  const p = e.pct_used * 100;
+  if (p < 10) buckets[0]++;
+  else if (p < 25) buckets[1]++;
+  else if (p < 30) buckets[2]++;
+  else if (p < 40) buckets[3]++;
+  else if (p < 60) buckets[4]++;
+  else if (p < 100) buckets[5]++;
+  else buckets[6]++;
+});
+new Chart(document.getElementById('chart-budget-dist'), {
+  type: 'bar',
+  data: {
+    labels: bucketLabels,
+    datasets: [{ data: buckets, backgroundColor: bucketColors, borderRadius: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: COLOR_INK, padding: 10, cornerRadius: 0,
+        callbacks: { label: ctx => ctx.raw + ' accounts' }
+      }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#e0d7c2' }, ticks: { stepSize: 10 } }
+    }
+  }
+});
+
+// ── Chart: Income tax trend ──
+const itr = DATA.income_tax.recap.find(r => r.category === 'Total Gross Collection');
+new Chart(document.getElementById('chart-income-trend'), {
+  type: 'line',
+  data: {
+    labels: ['January', 'February', 'March'],
+    datasets: [{
+      label: 'Gross Collection',
+      data: [itr.jan, itr.feb, itr.mar],
+      borderColor: COLOR_INK,
+      backgroundColor: 'rgba(180, 138, 60, 0.15)',
+      fill: true,
+      tension: 0.25,
+      pointBackgroundColor: COLOR_GOLD,
+      pointBorderColor: COLOR_INK,
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: COLOR_INK, padding: 10, cornerRadius: 0,
+        callbacks: { label: ctx => fmt.moneyFull(ctx.raw) }
+      }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#e0d7c2' }, ticks: { callback: v => fmt.money(v) } }
+    }
+  }
+});
+
+// ── FUNDS TABLE ──
+const fundsState = { sort: 'exp_ytd', dir: 'desc' };
+function renderFunds() {
+  const search = document.getElementById('fund-search').value.toLowerCase();
+  const activity = document.getElementById('fund-activity').value;
+  let rows = DATA.funds.filter(f => {
+    if (search && !(f.fund.toLowerCase().includes(search) || f.desc.toLowerCase().includes(search))) return false;
+    const hasActivity = f.rev_ytd > 0 || f.exp_ytd > 0;
+    const net = f.rev_ytd - f.exp_ytd;
+    if (activity === 'active' && !hasActivity) return false;
+    if (activity === 'dormant' && hasActivity) return false;
+    if (activity === 'negative' && net >= 0) return false;
+    return true;
+  });
+  rows = rows.map(f => ({...f, net: f.rev_ytd - f.exp_ytd}));
+  const dir = fundsState.dir === 'desc' ? -1 : 1;
+  rows.sort((a, b) => {
+    const va = a[fundsState.sort], vb = b[fundsState.sort];
+    if (typeof va === 'string') return va.localeCompare(vb) * dir;
+    return (va - vb) * dir;
+  });
+  document.getElementById('fund-count').textContent = rows.length;
+  document.getElementById('fund-total').textContent = DATA.funds.length;
+  const tbody = document.getElementById('funds-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">No funds match the current filters.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(f => `
+    <tr class="clickable" data-fund="${f.fund}">
+      <td><span class="fund-pill">${f.fund}</span></td>
+      <td>${f.desc}</td>
+      <td class="num ${f.beg_balance < 0 ? 'neg' : f.beg_balance === 0 ? 'zero' : ''}">${fmt.moneyFull(f.beg_balance)}</td>
+      <td class="num">${f.rev_ytd > 0 ? fmt.moneyFull(f.rev_ytd) : '<span class="zero">—</span>'}</td>
+      <td class="num">${f.exp_ytd > 0 ? fmt.moneyFull(f.exp_ytd) : '<span class="zero">—</span>'}</td>
+      <td class="num ${f.net > 0 ? 'pos' : f.net < 0 ? 'neg' : ''}">${f.net !== 0 ? fmt.moneyFull(f.net, true) : '<span class="zero">—</span>'}</td>
+      <td class="num">${fmt.moneyFull(f.unexpended)}</td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('tr.clickable').forEach(tr => {
+    tr.addEventListener('click', () => openFundDetail(tr.dataset.fund));
+  });
+  // Update sort indicators
+  document.querySelectorAll('#funds-table thead th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.sort === fundsState.sort) {
+      th.classList.add(fundsState.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+document.getElementById('fund-search').addEventListener('input', renderFunds);
+document.getElementById('fund-activity').addEventListener('change', renderFunds);
+document.getElementById('fund-clear').addEventListener('click', () => {
+  document.getElementById('fund-search').value = '';
+  document.getElementById('fund-activity').value = 'all';
+  renderFunds();
+});
+document.querySelectorAll('#funds-table thead th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.sort;
+    if (fundsState.sort === k) fundsState.dir = fundsState.dir === 'asc' ? 'desc' : 'asc';
+    else { fundsState.sort = k; fundsState.dir = (k === 'fund' || k === 'desc') ? 'asc' : 'desc'; }
+    renderFunds();
+  });
+});
+
+// ── EXPENSES TABLE ──
+const expState = { sort: 'ytd', dir: 'desc' };
+function populateExpFilters() {
+  const fundSel = document.getElementById('exp-fund');
+  const deptSel = document.getElementById('exp-dept');
+  const catSel = document.getElementById('exp-category');
+  const fundsSet = [...new Set(DATA.expenses.map(e => e.fund))].sort((a,b)=>parseInt(a)-parseInt(b));
+  const deptsSet = [...new Set(DATA.expenses.map(e => e.dept))].filter(Boolean).sort();
+  const catsSet = [...new Set(DATA.expenses.map(e => e.category))].filter(Boolean).sort();
+  fundsSet.forEach(f => {
+    const fn = DATA.funds.find(x => x.fund === f);
+    const desc = fn ? ` · ${fn.desc}` : '';
+    fundSel.insertAdjacentHTML('beforeend', `<option value="${f}">${f}${desc}</option>`);
+  });
+  deptsSet.forEach(d => deptSel.insertAdjacentHTML('beforeend', `<option value="${d}">${d}</option>`));
+  catsSet.forEach(c => catSel.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
+}
+populateExpFilters();
+function renderExpenses() {
+  const search = document.getElementById('exp-search').value.toLowerCase();
+  const fund = document.getElementById('exp-fund').value;
+  const dept = document.getElementById('exp-dept').value;
+  const cat = document.getElementById('exp-category').value;
+  let rows = DATA.expenses.filter(e => {
+    if (fund !== 'all' && e.fund !== fund) return false;
+    if (dept !== 'all' && e.dept !== dept) return false;
+    if (cat !== 'all' && e.category !== cat) return false;
+    if (search) {
+      const hay = (e.account + ' ' + e.desc + ' ' + e.dept + ' ' + e.category).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  const dir = expState.dir === 'desc' ? -1 : 1;
+  rows.sort((a, b) => {
+    let va = a[expState.sort], vb = b[expState.sort];
+    if (va === null || va === undefined) va = -Infinity;
+    if (vb === null || vb === undefined) vb = -Infinity;
+    if (typeof va === 'string') return va.localeCompare(vb) * dir;
+    return (va - vb) * dir;
+  });
+  document.getElementById('exp-count').textContent = rows.length;
+  document.getElementById('exp-total').textContent = DATA.expenses.length;
+  document.getElementById('exp-budget-sum').textContent = fmt.moneyFull(rows.reduce((s, e) => s + e.budget, 0));
+  document.getElementById('exp-ytd-sum').textContent = fmt.moneyFull(rows.reduce((s, e) => s + e.ytd, 0));
+  const tbody = document.getElementById('exp-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">No expense lines match the current filters.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(e => {
+    const pct = e.pct_used !== null ? e.pct_used * 100 : null;
+    let barCls = '';
+    if (pct === null) barCls = '';
+    else if (pct > 50) barCls = 'over';
+    else if (pct >= 25) barCls = 'warning';
+    const barW = pct === null ? 0 : Math.min(100, pct);
+    return `
+      <tr>
+        <td><span class="fund-pill">${e.fund}</span></td>
+        <td><span class="muted" style="font-size:11px;">${e.dept}</span></td>
+        <td><code style="font-family:'JetBrains Mono',monospace;font-size:11px;">${e.account}</code></td>
+        <td>${e.desc}</td>
+        <td class="num">${e.budget > 0 ? fmt.moneyFull(e.budget) : '<span class="zero">—</span>'}</td>
+        <td class="num">${e.ytd !== 0 ? fmt.moneyFull(e.ytd) : '<span class="zero">—</span>'}</td>
+        <td class="num">${e.encumbrance > 0 ? fmt.moneyFull(e.encumbrance) : '<span class="zero">—</span>'}</td>
+        <td class="num">
+          ${pct === null ? '<span class="zero">—</span>' : `
+            <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;">
+              <div class="bar-wrap">
+                <div class="bar-fill ${barCls}" style="width:${barW}%"></div>
+                <div class="bar-target"></div>
+                <div class="bar-pct">${pct.toFixed(1)}%</div>
+              </div>
+            </div>`}
+        </td>
+      </tr>
+    `;
+  }).join('');
+  document.querySelectorAll('#exp-table thead th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.sort === expState.sort) {
+      th.classList.add(expState.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+['exp-search', 'exp-fund', 'exp-dept', 'exp-category'].forEach(id => {
+  document.getElementById(id).addEventListener(id === 'exp-search' ? 'input' : 'change', renderExpenses);
+});
+document.getElementById('exp-clear').addEventListener('click', () => {
+  document.getElementById('exp-search').value = '';
+  document.getElementById('exp-fund').value = 'all';
+  document.getElementById('exp-dept').value = 'all';
+  document.getElementById('exp-category').value = 'all';
+  renderExpenses();
+});
+document.querySelectorAll('#exp-table thead th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.sort;
+    if (expState.sort === k) expState.dir = expState.dir === 'asc' ? 'desc' : 'asc';
+    else { expState.sort = k; expState.dir = ['budget','ytd','encumbrance','pct_used'].includes(k) ? 'desc' : 'asc'; }
+    renderExpenses();
+  });
+});
+
+// ── CHECKS TABLE ──
+const chkState = { sort: 'amount', dir: 'desc' };
+function renderChecks() {
+  const search = document.getElementById('chk-search').value.toLowerCase();
+  const type = document.getElementById('chk-type').value;
+  const min = parseFloat(document.getElementById('chk-min').value);
+  let rows = DATA.checks.filter(c => {
+    if (type !== 'all' && c.type !== type) return false;
+    if (c.amount < min) return false;
+    if (search && !(c.vendor.toLowerCase().includes(search) || c.check_no.includes(search))) return false;
+    return true;
+  });
+  const dir = chkState.dir === 'desc' ? -1 : 1;
+  rows.sort((a, b) => {
+    let va = a[chkState.sort], vb = b[chkState.sort];
+    if (chkState.sort === 'check_no') { va = parseInt(va); vb = parseInt(vb); }
+    if (typeof va === 'string') return va.localeCompare(vb) * dir;
+    return (va - vb) * dir;
+  });
+  document.getElementById('chk-count').textContent = rows.length;
+  document.getElementById('chk-sum').textContent = fmt.moneyFull(rows.reduce((s,c)=>s+c.amount,0));
+  const tbody = document.getElementById('chk-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">No checks match the current filters.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(c => `
+    <tr>
+      <td><code style="font-family:'JetBrains Mono',monospace;font-size:11px;">${c.check_no}</code></td>
+      <td class="muted">${fmt.date(c.date)}</td>
+      <td>${c.vendor}</td>
+      <td><span style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-soft);font-weight:600;">${c.type}</span></td>
+      <td class="num"><strong>${fmt.moneyFull(c.amount)}</strong></td>
+      <td class="num ${c.void > 0 ? 'neg' : ''}">${c.void > 0 ? fmt.moneyFull(c.void) : '<span class="zero">—</span>'}</td>
+    </tr>
+  `).join('');
+  document.querySelectorAll('#chk-table thead th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.sort === chkState.sort) {
+      th.classList.add(chkState.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+['chk-search', 'chk-type', 'chk-min'].forEach(id => {
+  document.getElementById(id).addEventListener(id === 'chk-search' ? 'input' : 'change', renderChecks);
+});
+document.getElementById('chk-clear').addEventListener('click', () => {
+  document.getElementById('chk-search').value = '';
+  document.getElementById('chk-type').value = 'all';
+  document.getElementById('chk-min').value = '0';
+  renderChecks();
+});
+document.querySelectorAll('#chk-table thead th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.sort;
+    if (chkState.sort === k) chkState.dir = chkState.dir === 'asc' ? 'desc' : 'asc';
+    else { chkState.sort = k; chkState.dir = (k === 'amount' || k === 'void') ? 'desc' : 'asc'; }
+    renderChecks();
+  });
+});
+
+// ── REVENUE TABLES ──
+function renderRecap() {
+  const tbody = document.querySelector('#recap-table tbody');
+  tbody.innerHTML = DATA.income_tax.recap.map(r => {
+    const isTotal = r.is_total;
+    const isExpense = r.is_expense;
+    const cls = isTotal ? 'style="font-weight:600;background:var(--paper-2);"' : isExpense ? 'style="color:var(--brick);"' : '';
+    return `
+      <tr ${cls}>
+        <td>${r.category}</td>
+        <td class="num">${r.jan ? fmt.moneyFull(r.jan) : '<span class="zero">—</span>'}</td>
+        <td class="num">${r.feb ? fmt.moneyFull(r.feb) : '<span class="zero">—</span>'}</td>
+        <td class="num">${r.mar ? fmt.moneyFull(r.mar) : '<span class="zero">—</span>'}</td>
+        <td class="num"><strong>${r.ytd ? fmt.moneyFull(r.ytd) : '—'}</strong></td>
+      </tr>
+    `;
+  }).join('');
+}
+renderRecap();
+
+// RITA stacked bar
+new Chart(document.getElementById('chart-rita'), {
+  type: 'bar',
+  data: {
+    labels: DATA.income_tax.rita.map(r => r.distributed),
+    datasets: [
+      { label: 'Net distribution', data: DATA.income_tax.rita.map(r => r.net), backgroundColor: COLOR_TEAL, borderRadius: 0 },
+      { label: 'RITA retainer', data: DATA.income_tax.rita.map(r => r.retainer), backgroundColor: COLOR_AMBER, borderRadius: 0 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } },
+      tooltip: {
+        backgroundColor: COLOR_INK, padding: 10, cornerRadius: 0,
+        callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt.moneyFull(ctx.raw) }
+      }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: { color: '#e0d7c2' }, ticks: { callback: v => fmt.money(v) } }
+    }
+  }
+});
+
+// Traffic camera stacked bar
+const tc = DATA.income_tax.traffic_cam;
+new Chart(document.getElementById('chart-traffic'), {
+  type: 'bar',
+  data: {
+    labels: tc.map(t => t.month),
+    datasets: [
+      { label: 'General Fund (46%)', data: tc.map(t => t.general), backgroundColor: COLOR_INK, borderRadius: 0 },
+      { label: 'Streets (25%)', data: tc.map(t => t.streets), backgroundColor: COLOR_TEAL, borderRadius: 0 },
+      { label: 'Police (20%)', data: tc.map(t => t.police), backgroundColor: COLOR_BRICK, borderRadius: 0 },
+      { label: 'Wellman Safety (5%)', data: tc.map(t => t.wellman_safety), backgroundColor: COLOR_AMBER, borderRadius: 0 },
+      { label: 'Bike Trail (3%)', data: tc.map(t => t.bike_trail), backgroundColor: COLOR_GOLD, borderRadius: 0 },
+      { label: 'Wellman Theater (1%)', data: tc.map(t => t.wellman_theater), backgroundColor: '#7a9bab', borderRadius: 0 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8, font: { size: 10 } } },
+      tooltip: {
+        backgroundColor: COLOR_INK, padding: 10, cornerRadius: 0,
+        callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt.moneyFull(ctx.raw) }
+      }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: { color: '#e0d7c2' }, ticks: { callback: v => fmt.money(v) } }
+    }
+  }
+});
+
+// Court fees combo chart
+const cf = DATA.income_tax.court_fees;
+new Chart(document.getElementById('chart-court'), {
+  data: {
+    labels: cf.map(c => c.month),
+    datasets: [
+      { type: 'bar', label: 'Tickets filed', data: cf.map(c => c.tickets), backgroundColor: COLOR_GOLD, yAxisID: 'y1', borderRadius: 0 },
+      { type: 'line', label: 'Girard total ($)', data: cf.map(c => c.girard_total), borderColor: COLOR_INK, backgroundColor: COLOR_INK, yAxisID: 'y', tension: 0.2, pointRadius: 5, borderWidth: 2 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } },
+      tooltip: { backgroundColor: COLOR_INK, padding: 10, cornerRadius: 0 }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { position: 'left', grid: { color: '#e0d7c2' }, ticks: { callback: v => fmt.money(v) } },
+      y1: { position: 'right', grid: { display: false }, ticks: { callback: v => v + ' tix' } }
+    }
+  }
+});
+
+// ── DRILL-DOWN MODAL ──
+function openFundDetail(fundNo) {
+  const fund = DATA.funds.find(f => f.fund === fundNo);
+  if (!fund) return;
+  const lines = DATA.expenses.filter(e => e.fund === fundNo);
+  document.getElementById('modal-eyebrow').textContent = `Fund ${fund.fund} · ${lines.length} accounts`;
+  document.getElementById('modal-title').textContent = fund.desc;
+  const net = fund.rev_ytd - fund.exp_ytd;
+  const totalBudget = lines.reduce((s, e) => s + e.budget, 0);
+  const totalYtd = lines.reduce((s, e) => s + e.ytd, 0);
+  const utilization = totalBudget > 0 ? (totalYtd / totalBudget * 100).toFixed(1) + '%' : '—';
+  let body = `
+    <div class="modal-stats">
+      <div class="modal-stat"><div class="modal-stat-label">Beginning Balance</div><div class="modal-stat-value">${fmt.moneyFull(fund.beg_balance)}</div></div>
+      <div class="modal-stat"><div class="modal-stat-label">YTD Revenue</div><div class="modal-stat-value">${fmt.moneyFull(fund.rev_ytd)}</div></div>
+      <div class="modal-stat"><div class="modal-stat-label">YTD Expenses</div><div class="modal-stat-value">${fmt.moneyFull(fund.exp_ytd)}</div></div>
+      <div class="modal-stat"><div class="modal-stat-label">Net / Unexpended</div><div class="modal-stat-value ${net >= 0 ? 'pos' : 'neg'}">${fmt.moneyFull(fund.unexpended)}</div></div>
+    </div>
+  `;
+  if (lines.length === 0) {
+    body += '<div class="empty">No itemized expense accounts on file for this fund.<br>Activity may be reported only at the fund level.</div>';
+  } else {
+    body += `
+      <div style="margin-bottom: 12px; font-size: 12px; color: var(--ink-soft);">
+        <strong style="color:var(--ink);">Account-level utilization</strong> · Total budget ${fmt.moneyFull(totalBudget)} · YTD ${fmt.moneyFull(totalYtd)} (${utilization})
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Department</th><th>Account</th><th>Description</th>
+            <th class="num">Budget</th><th class="num">YTD</th><th class="num">% Used</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lines.sort((a,b)=>b.ytd-a.ytd).map(e => {
+            const pct = e.pct_used !== null ? e.pct_used * 100 : null;
+            const barCls = pct === null ? '' : pct > 50 ? 'over' : pct >= 25 ? 'warning' : '';
+            const barW = pct === null ? 0 : Math.min(100, pct);
+            return `
+              <tr>
+                <td><span class="muted" style="font-size:11px;">${e.dept}</span></td>
+                <td><code style="font-family:'JetBrains Mono',monospace;font-size:11px;">${e.account}</code></td>
+                <td>${e.desc}</td>
+                <td class="num">${e.budget > 0 ? fmt.moneyFull(e.budget) : '<span class="zero">—</span>'}</td>
+                <td class="num">${e.ytd !== 0 ? fmt.moneyFull(e.ytd) : '<span class="zero">—</span>'}</td>
+                <td class="num">
+                  ${pct === null ? '<span class="zero">—</span>' : `
+                    <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;">
+                      <div class="bar-wrap" style="width:100px;">
+                        <div class="bar-fill ${barCls}" style="width:${barW}%"></div>
+                        <div class="bar-target"></div>
+                        <div class="bar-pct">${pct.toFixed(1)}%</div>
+                      </div>
+                    </div>`}
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal').classList.add('active');
+}
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('modal').classList.remove('active');
+});
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') document.getElementById('modal').classList.remove('active');
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.getElementById('modal').classList.remove('active');
+});
+
+// ── Initial render ──
+renderFunds();
+renderExpenses();
+renderChecks();
+</script>
+</body>
+</html>

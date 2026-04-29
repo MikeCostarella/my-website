@@ -1,8 +1,13 @@
 {
   "ExpandedNodes": [
     "",
-    "\\AddressPoints"
+    "\\AddressPoints",
+    "\\Governments",
+    "\\Governments\\Ohio",
+    "\\Governments\\Ohio\\Trumbull",
+    "\\Governments\\Ohio\\Trumbull\\Girard",
+    "\\Governments\\Ohio\\Trumbull\\Girard\\RentalsReport"
   ],
-  "SelectedNode": "\\AddressPoints",
+  "SelectedNode": "\\Governments\\Ohio\\Trumbull\\Girard\\RentalsReport",
   "PreviewInSolutionExplorer": false
 }
