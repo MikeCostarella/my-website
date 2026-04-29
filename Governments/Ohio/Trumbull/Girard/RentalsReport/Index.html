@@ -51,7 +51,7 @@
 
   /* Stats */
   .stats {
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 1px; background: var(--rule);
     border: 1px solid var(--rule); margin-bottom: 28px;
   }
@@ -62,9 +62,10 @@
   }
   .stat-value {
     font-family: 'Fraunces', serif; font-weight: 600;
-    font-size: clamp(20px, 5vw, 28px); line-height: 1;
+    font-size: clamp(20px, 4.5vw, 28px); line-height: 1;
     font-variation-settings: 'opsz' 144;
   }
+  .stat.accent .stat-value { color: var(--accent); }
   .stat-note { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
 
   /* Controls */
@@ -122,6 +123,12 @@
     font-variant-numeric: tabular-nums; min-width: 40px; text-align: right;
     font-variation-settings: 'opsz' 144;
   }
+  .row .fee {
+    font-size: 11px; color: var(--ink-soft); text-align: right;
+    margin-top: 2px; font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+  .count-block { display: flex; flex-direction: column; align-items: flex-end; }
   .empty {
     text-align: center; padding: 40px 20px; color: var(--ink-soft);
     font-style: italic; font-family: 'Fraunces', serif;
@@ -133,13 +140,17 @@
   }
 
   /* Mobile tweaks */
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 480px) {
     .page { padding: 24px 16px 60px; }
-    .stats { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
     .stat { padding: 14px 16px; }
     .row { grid-template-columns: 22px 1fr auto; gap: 10px; padding: 12px 2px; }
     .street { font-size: 14px; }
     .row .count { font-size: 16px; min-width: 36px; }
+    .row .fee { font-size: 11px; }
   }
 </style>
 </head>
@@ -167,9 +178,14 @@
       <div class="stat-value" id="stat-total">—</div>
       <div class="stat-note">across all streets</div>
     </div>
+    <div class="stat accent">
+      <div class="stat-label">Annual Fees</div>
+      <div class="stat-value" id="stat-fees">—</div>
+      <div class="stat-note">at $25 per unit</div>
+    </div>
     <div class="stat">
       <div class="stat-label">Top Street</div>
-      <div class="stat-value" id="stat-top-name" style="font-size:clamp(15px,3.5vw,18px);font-weight:600;">—</div>
+      <div class="stat-value" id="stat-top-name" style="font-size:clamp(15px,3vw,18px);font-weight:600;">—</div>
       <div class="stat-note"><span id="stat-top-count">—</span> units</div>
     </div>
   </section>
@@ -190,18 +206,20 @@
 
   <ul class="list" id="list"></ul>
 
-  <footer>Bars are scaled relative to the street with the most units.</footer>
+  <footer>Bars are scaled relative to the street with the most units. Annual registration fee is $25 per unit per City of Girard Codified Ordinance § 1375.07.</footer>
 </div>
 
 <script>
-const DATA = [{"street":"Abbey St NE","count":7},{"street":"Avon Ave","count":1},{"street":"Beaver Ave","count":2},{"street":"Beechwood Ave","count":15},{"street":"Broadview Ave","count":1},{"street":"Browns Ct","count":1},{"street":"Cherry","count":1},{"street":"Churchill Rd","count":117},{"street":"Clermont St","count":1},{"street":"Crumlin Ave","count":12},{"street":"Davis St","count":9},{"street":"Dearborn St SE","count":13},{"street":"Dravis St SE","count":3},{"street":"E 2nd St","count":19},{"street":"E Broadway Ave","count":40},{"street":"E Howard St","count":27},{"street":"E Kline St","count":33},{"street":"E Liberty St","count":33},{"street":"E Prospect St","count":31},{"street":"Earl St SE","count":2},{"street":"Ella St","count":2},{"street":"Elruth Ct","count":168},{"street":"Emma St","count":8},{"street":"Forsythe Ave","count":11},{"street":"Gary Ave SE","count":7},{"street":"Glendale Ave SE","count":5},{"street":"Gordon St","count":7},{"street":"Hancock St SE","count":7},{"street":"Hartzell St","count":1},{"street":"Hazel St","count":19},{"street":"Idaho Ave","count":5},{"street":"Illinois Ave","count":11},{"street":"Indiana Ave","count":9},{"street":"Iowa Ave","count":13},{"street":"Joan Ave SE","count":10},{"street":"Jones Ct SE","count":2},{"street":"Krehl Ave","count":7},{"street":"La Salle Pl SE","count":1},{"street":"Lawrence Ave","count":26},{"street":"Lincoln Ave SE","count":5},{"street":"Louis Ave","count":14},{"street":"Main St","count":26},{"street":"Maple Ave","count":7},{"street":"Marie Dr","count":13},{"street":"Moccasin Trail","count":1},{"street":"Morris Ave","count":18},{"street":"Mosier Rd","count":4},{"street":"N Davis St","count":4},{"street":"N Highland Ave","count":115},{"street":"N Lorain Ave SE","count":3},{"street":"N Randolph Ave","count":1},{"street":"N St Clair St","count":9},{"street":"N State St","count":10},{"street":"N Stewart","count":2},{"street":"N Ward Ave","count":32},{"street":"North Ave","count":25},{"street":"Norwood","count":1},{"street":"Oak St","count":1},{"street":"Ohio","count":13},{"street":"Olive St","count":9},{"street":"Otis Ct SE","count":1},{"street":"Park Ave","count":82},{"street":"Parkview Dr","count":1},{"street":"Patricia Dr","count":89},{"street":"Plymouth Ave SE","count":11},{"street":"Powers Ave","count":6},{"street":"Reeds Ct","count":4},{"street":"S Elruth Ave","count":19},{"street":"S Elruth Ct","count":1},{"street":"S Lorain Ave SE","count":5},{"street":"S Market St","count":9},{"street":"S Patricia Dr","count":32},{"street":"S Randolph Ave SE","count":6},{"street":"S State St","count":2},{"street":"S Stewart Ave SE","count":4},{"street":"S Ward Ave SE","count":2},{"street":"Shannon Rd","count":10},{"street":"Shelby St","count":5},{"street":"Smithsonian St","count":15},{"street":"Squaw Creek Dr","count":3},{"street":"St Clair St","count":2},{"street":"Stambaugh St","count":13},{"street":"Steel St","count":4},{"street":"Stull Ave","count":24},{"street":"Taylor","count":7},{"street":"Tod Ave","count":4},{"street":"Townsend Ave","count":14},{"street":"Trumbull Ave","count":11},{"street":"Verona St SE","count":3},{"street":"W 2nd St","count":9},{"street":"W Broadway Ave","count":2},{"street":"W Howard St","count":3},{"street":"W Kline St SE","count":1},{"street":"W Liberty St","count":15},{"street":"W Liberty St SE","count":1},{"street":"W Prospect St","count":3},{"street":"W. Wilson Ave","count":3},{"street":"Washington Ave","count":29},{"street":"Wellman Ave SE","count":1},{"street":"Williams Ct","count":1},{"street":"Wilson Ave","count":22},{"street":"Woodlawn Ave","count":12}];
+const DATA = [{"street":"Abbey St NE","count":7,"fee":175},{"street":"Avon Ave","count":1,"fee":25},{"street":"Beaver Ave","count":2,"fee":50},{"street":"Beechwood Ave","count":15,"fee":375},{"street":"Broadview Ave","count":1,"fee":25},{"street":"Browns Ct","count":1,"fee":25},{"street":"Cherry","count":1,"fee":25},{"street":"Churchill Rd","count":117,"fee":2925},{"street":"Clermont St","count":1,"fee":25},{"street":"Crumlin Ave","count":12,"fee":300},{"street":"Davis St","count":9,"fee":225},{"street":"Dearborn St SE","count":13,"fee":325},{"street":"Dravis St SE","count":3,"fee":75},{"street":"E 2nd St","count":19,"fee":475},{"street":"E Broadway Ave","count":40,"fee":1000},{"street":"E Howard St","count":27,"fee":675},{"street":"E Kline St","count":33,"fee":825},{"street":"E Liberty St","count":33,"fee":825},{"street":"E Prospect St","count":31,"fee":775},{"street":"Earl St SE","count":2,"fee":50},{"street":"Ella St","count":2,"fee":50},{"street":"Elruth Ct","count":168,"fee":4200},{"street":"Emma St","count":8,"fee":200},{"street":"Forsythe Ave","count":11,"fee":275},{"street":"Gary Ave SE","count":7,"fee":175},{"street":"Glendale Ave SE","count":5,"fee":125},{"street":"Gordon St","count":7,"fee":175},{"street":"Hancock St SE","count":7,"fee":175},{"street":"Hartzell St","count":1,"fee":25},{"street":"Hazel St","count":19,"fee":475},{"street":"Idaho Ave","count":5,"fee":125},{"street":"Illinois Ave","count":11,"fee":275},{"street":"Indiana Ave","count":9,"fee":225},{"street":"Iowa Ave","count":13,"fee":325},{"street":"Joan Ave SE","count":10,"fee":250},{"street":"Jones Ct SE","count":2,"fee":50},{"street":"Krehl Ave","count":7,"fee":175},{"street":"La Salle Pl SE","count":1,"fee":25},{"street":"Lawrence Ave","count":26,"fee":650},{"street":"Lincoln Ave SE","count":5,"fee":125},{"street":"Louis Ave","count":14,"fee":350},{"street":"Main St","count":26,"fee":650},{"street":"Maple Ave","count":7,"fee":175},{"street":"Marie Dr","count":13,"fee":325},{"street":"Moccasin Trail","count":1,"fee":25},{"street":"Morris Ave","count":18,"fee":450},{"street":"Mosier Rd","count":4,"fee":100},{"street":"N Davis St","count":4,"fee":100},{"street":"N Highland Ave","count":115,"fee":2875},{"street":"N Lorain Ave SE","count":3,"fee":75},{"street":"N Randolph Ave","count":1,"fee":25},{"street":"N St Clair St","count":9,"fee":225},{"street":"N State St","count":10,"fee":250},{"street":"N Stewart","count":2,"fee":50},{"street":"N Ward Ave","count":32,"fee":800},{"street":"North Ave","count":25,"fee":625},{"street":"Norwood","count":1,"fee":25},{"street":"Oak St","count":1,"fee":25},{"street":"Ohio","count":13,"fee":325},{"street":"Olive St","count":9,"fee":225},{"street":"Otis Ct SE","count":1,"fee":25},{"street":"Park Ave","count":82,"fee":2050},{"street":"Parkview Dr","count":1,"fee":25},{"street":"Patricia Dr","count":89,"fee":2225},{"street":"Plymouth Ave SE","count":11,"fee":275},{"street":"Powers Ave","count":6,"fee":150},{"street":"Reeds Ct","count":4,"fee":100},{"street":"S Elruth Ave","count":19,"fee":475},{"street":"S Elruth Ct","count":1,"fee":25},{"street":"S Lorain Ave SE","count":5,"fee":125},{"street":"S Market St","count":9,"fee":225},{"street":"S Patricia Dr","count":32,"fee":800},{"street":"S Randolph Ave SE","count":6,"fee":150},{"street":"S State St","count":2,"fee":50},{"street":"S Stewart Ave SE","count":4,"fee":100},{"street":"S Ward Ave SE","count":2,"fee":50},{"street":"Shannon Rd","count":10,"fee":250},{"street":"Shelby St","count":5,"fee":125},{"street":"Smithsonian St","count":15,"fee":375},{"street":"Squaw Creek Dr","count":3,"fee":75},{"street":"St Clair St","count":2,"fee":50},{"street":"Stambaugh St","count":13,"fee":325},{"street":"Steel St","count":4,"fee":100},{"street":"Stull Ave","count":24,"fee":600},{"street":"Taylor","count":7,"fee":175},{"street":"Tod Ave","count":4,"fee":100},{"street":"Townsend Ave","count":14,"fee":350},{"street":"Trumbull Ave","count":11,"fee":275},{"street":"Verona St SE","count":3,"fee":75},{"street":"W 2nd St","count":9,"fee":225},{"street":"W Broadway Ave","count":2,"fee":50},{"street":"W Howard St","count":3,"fee":75},{"street":"W Kline St SE","count":1,"fee":25},{"street":"W Liberty St","count":15,"fee":375},{"street":"W Liberty St SE","count":1,"fee":25},{"street":"W Prospect St","count":3,"fee":75},{"street":"W. Wilson Ave","count":3,"fee":75},{"street":"Washington Ave","count":29,"fee":725},{"street":"Wellman Ave SE","count":1,"fee":25},{"street":"Williams Ct","count":1,"fee":25},{"street":"Wilson Ave","count":22,"fee":550},{"street":"Woodlawn Ave","count":12,"fee":300}];
 
 const MAX = Math.max(...DATA.map(d => d.count));
 const TOTAL = DATA.reduce((s, d) => s + d.count, 0);
+const TOTAL_FEES = DATA.reduce((s, d) => s + d.fee, 0);
 const TOP = DATA.reduce((a, b) => a.count >= b.count ? a : b);
 
 document.getElementById('stat-streets').textContent = DATA.length.toLocaleString();
 document.getElementById('stat-total').textContent = TOTAL.toLocaleString();
+document.getElementById('stat-fees').textContent = '$' + TOTAL_FEES.toLocaleString();
 document.getElementById('stat-top-name').textContent = TOP.street;
 document.getElementById('stat-top-count').textContent = TOP.count.toLocaleString();
 
@@ -235,9 +253,10 @@ function render() {
   }
 
   const sum = arr.reduce((s,d) => s + d.count, 0);
+  const feeSum = arr.reduce((s,d) => s + d.fee, 0);
   document.getElementById('result-count').textContent =
     arr.length === DATA.length ? `Showing all ${arr.length} streets` : `${arr.length} of ${DATA.length} streets`;
-  document.getElementById('result-sum').textContent = `${sum.toLocaleString()} units`;
+  document.getElementById('result-sum').textContent = `${sum.toLocaleString()} units · $${feeSum.toLocaleString()}`;
 
   const showRank = currentSort.startsWith('count');
   const html = arr.map((d, i) => {
@@ -251,7 +270,10 @@ function render() {
           <div class="street">${escapeHtml(d.street)}</div>
           <div class="bar-track"><div class="bar-fill" data-pct="${pct}"></div></div>
         </div>
-        <div class="count">${d.count}</div>
+        <div class="count-block">
+          <div class="count">${d.count}</div>
+          <div class="fee">$${d.fee.toLocaleString()}</div>
+        </div>
       </li>`;
   }).join('');
   list.innerHTML = html;
