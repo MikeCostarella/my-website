@@ -41,6 +41,13 @@
     font-variation-settings: 'opsz' 144;
   }
   .subtitle { color: var(--ink-soft); margin-top: 10px; font-size: 15px; }
+  .byline {
+    margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px 14px;
+    font-size: 12px; color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+  .byline .by { color: var(--ink); font-weight: 500; }
+  .byline .dot { color: var(--rule); }
 
   /* Stats */
   .stats {
@@ -142,6 +149,11 @@
     <div class="eyebrow">Open Data · Rental Registry</div>
     <h1>Rental Locations by Street</h1>
     <p class="subtitle">A breakdown of registered rental units across every street in the dataset.</p>
+    <div class="byline">
+      <span><span class="by">Report by Mike Costarella</span></span>
+      <span class="dot">·</span>
+      <span>Last updated <span id="last-updated">—</span></span>
+    </div>
   </header>
 
   <section class="stats" aria-label="Summary statistics">
@@ -192,6 +204,12 @@ document.getElementById('stat-streets').textContent = DATA.length.toLocaleString
 document.getElementById('stat-total').textContent = TOTAL.toLocaleString();
 document.getElementById('stat-top-name').textContent = TOP.street;
 document.getElementById('stat-top-count').textContent = TOP.count.toLocaleString();
+
+// Last-updated timestamp (set when page loads in viewer's local time)
+const now = new Date();
+const dateStr = now.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+const timeStr = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+document.getElementById('last-updated').textContent = `${dateStr} at ${timeStr}`;
 
 let currentSort = 'count-desc';
 let currentQuery = '';
