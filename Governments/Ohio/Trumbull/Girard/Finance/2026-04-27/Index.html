@@ -101,6 +101,35 @@
   }
   .masthead-meta strong { color: var(--ink); font-weight: 600; }
 
+  .masthead-credit {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: baseline;
+    font-size: 11px;
+  }
+  .masthead-credit .credit-label {
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-size: 10px;
+  }
+  .masthead-credit .credit-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .masthead-credit .credit-divider {
+    color: var(--rule);
+    font-weight: 400;
+  }
+
   /* ── Tab Navigation ────────────────────────────────── */
   .tabs {
     background: var(--ink);
@@ -586,6 +615,13 @@
     <span>Reporting period <strong id="period-label">—</strong></span>
     <span>Source data through <strong id="as-of-label">—</strong></span>
     <span><strong id="fund-count-meta">—</strong> active funds</span>
+  </div>
+  <div class="masthead-credit">
+    <span class="credit-label">Prepared by</span>
+    <span class="credit-name">Mike Costarella</span>
+    <span class="credit-divider">·</span>
+    <span class="credit-label">Last updated</span>
+    <span class="credit-name">April 29, 2026 at 7:54 PM UTC</span>
   </div>
 </header>
 
