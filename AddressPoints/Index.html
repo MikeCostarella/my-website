@@ -1164,6 +1164,45 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .locate-btn:hover { background: var(--ink); color: var(--panel); }
   .locate-btn svg { display: block; }
 
+  /* BOUNDARIES TOGGLE BUTTON (Leaflet control) */
+  .boundaries-control { background: var(--panel); }
+  .boundaries-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .boundaries-btn:hover { background: var(--ink); color: var(--panel); }
+  .boundaries-btn.active { background: var(--accent-2); color: var(--panel); }
+  .boundaries-btn.active:hover { background: var(--ink); color: var(--panel); }
+  .boundaries-btn svg { display: block; }
+
+  /* TOWNSHIP / MUNICIPALITY LABELS */
+  .leaflet-tooltip.boundary-label {
+    background: rgba(255, 255, 255, 0.82);
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .leaflet-tooltip.boundary-label.muni {
+    color: var(--accent);
+    background: rgba(255, 248, 240, 0.92);
+  }
+  .leaflet-tooltip.boundary-label::before { display: none; }
+
   /* USER LOCATION MARKER (blue pulsing dot) */
   .user-location-marker { background: transparent !important; border: none !important; }
   .user-location-marker .ulm-dot {
@@ -1634,6 +1673,197 @@ svg.leaflet-image-layer.leaflet-interactive path {
     }
   });
   map.addControl(new LocateControl());
+
+  // ---------- Township & Municipality boundaries ----------
+  // Sourced from US Census Bureau TIGERweb (current vintage). In Ohio every
+  // square inch of a county is in either a township OR a city/village — all of
+  // which appear in the County Subdivisions layer (layer 22). LSADC code 44 =
+  // township, 25 = city, 47 = village. We label by BASENAME and color cities/
+  // villages with a warm accent so they stand out against the townships.
+  //
+  // The polygons sit in their own pane (z-index 380) so they render above the
+  // basemap tiles but below the address-point canvas (z-index 400). The layer
+  // is created lazily on first toggle-on and cached.
+  // Pane sits at z-index 450 so polygon outlines render ABOVE the
+  // address-point canvas (z-index 400). With dense point coverage the
+  // boundaries would otherwise be completely buried.
+  map.createPane('boundariesPane');
+  map.getPane('boundariesPane').style.zIndex = 450;
+  map.getPane('boundariesPane').style.pointerEvents = 'none';
+
+  let boundariesLayer = null;        // L.geoJSON instance once loaded
+  let boundariesLoading = false;     // in-flight fetch guard
+  let boundariesEnabled = false;     // current toggle state
+  let boundariesBtn = null;          // reference to the control button (set below)
+
+  // Hide labels at very low zoom (county overview) to avoid clutter.
+  // Keep polygon outlines visible at all zooms.
+  const BOUNDARY_LABEL_MIN_ZOOM = 11;
+  function updateBoundaryLabelVisibility() {
+    if (!boundariesLayer) return;
+    const z = map.getZoom();
+    const showLabels = z >= BOUNDARY_LABEL_MIN_ZOOM;
+    boundariesLayer.eachLayer((feat) => {
+      const tip = feat.getTooltip && feat.getTooltip();
+      if (!tip) return;
+      const el = tip.getElement && tip.getElement();
+      if (el) el.style.display = showLabels ? '' : 'none';
+    });
+  }
+
+  function styleBoundaryFeature(feature) {
+    const lsadc = (feature.properties && feature.properties.LSADC) || '';
+    const isMuni = (lsadc === '25' || lsadc === '47'); // city or village
+    return {
+      color: isMuni ? '#b8410e' : '#1a4c3b',  // warm accent vs. forest green
+      weight: isMuni ? 3 : 2.5,
+      opacity: 1,
+      fillColor: isMuni ? '#b8410e' : '#1a4c3b',
+      fillOpacity: 0,                          // outlines only — no fill
+      dashArray: isMuni ? null : '6 4',
+      interactive: false,
+    };
+  }
+
+  function loadBoundaries() {
+    if (boundariesLayer || boundariesLoading) return Promise.resolve(boundariesLayer);
+    boundariesLoading = true;
+    // Trumbull County, Ohio = state FIPS 39, county FIPS 155.
+    //
+    // We need TWO TIGERweb layers because in Ohio (unlike e.g. Michigan):
+    //   - Layer 22 (County Subdivisions) holds the townships only
+    //   - Layer 28 (Incorporated Places) holds the cities & villages
+    //     (Warren, Niles, Girard, Hubbard, Newton Falls, etc.)
+    // Querying only one would leave half the county unmarked.
+    //
+    // Incorporated Places aren't tagged with a COUNTY field (they can cross
+    // county lines), so we filter by the bounding box of Trumbull County
+    // using a spatial extent query (geometry= + geometryType=esriGeometryEnvelope).
+    const TIGER_BASE = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer';
+    const subdivisionsUrl =
+      TIGER_BASE + '/22/query'
+      + '?where=' + encodeURIComponent("STATE='39' AND COUNTY='155'")
+      + '&outFields=BASENAME,NAME,LSADC,GEOID'
+      + '&outSR=4326'
+      + '&f=geojson';
+    // Trumbull County bounding box (rough, lon/lat WGS84): W -81.0, S 41.0, E -80.50, N 41.55
+    const trumbullEnvelope = '-81.0,41.0,-80.50,41.55';
+    const placesUrl =
+      TIGER_BASE + '/28/query'
+      + '?where=' + encodeURIComponent("STATE='39'")
+      + '&geometry=' + encodeURIComponent(trumbullEnvelope)
+      + '&geometryType=esriGeometryEnvelope'
+      + '&inSR=4326'
+      + '&spatialRel=esriSpatialRelIntersects'
+      + '&outFields=BASENAME,NAME,LSADC,GEOID'
+      + '&outSR=4326'
+      + '&f=geojson';
+
+    function fetchJson(url, label) {
+      return fetch(url).then((resp) => {
+        if (!resp.ok) throw new Error(label + ' HTTP ' + resp.status);
+        return resp.json();
+      }).then((geo) => {
+        const n = (geo && geo.features) ? geo.features.length : 0;
+        console.log('[boundaries] ' + label + ': ' + n + ' features loaded');
+        return geo;
+      });
+    }
+
+    return Promise.all([
+      fetchJson(subdivisionsUrl, 'townships'),
+      fetchJson(placesUrl, 'cities/villages'),
+    ])
+      .then(([townshipsGeo, placesGeo]) => {
+        // Merge the two FeatureCollections
+        const combined = {
+          type: 'FeatureCollection',
+          features: (townshipsGeo.features || []).concat(placesGeo.features || []),
+        };
+        boundariesLayer = L.geoJSON(combined, {
+          pane: 'boundariesPane',
+          style: styleBoundaryFeature,
+          onEachFeature: (feature, layer) => {
+            const props = feature.properties || {};
+            const name = props.NAME || props.BASENAME || 'Unnamed';
+            const lsadc = props.LSADC || '';
+            const isMuni = (lsadc === '25' || lsadc === '47');
+            const labelClass = 'boundary-label' + (isMuni ? ' muni' : '');
+            // Permanent label centered on the polygon
+            layer.bindTooltip(name, {
+              permanent: true,
+              direction: 'center',
+              className: labelClass,
+              opacity: 1,
+            });
+          },
+        });
+        boundariesLoading = false;
+        return boundariesLayer;
+      })
+      .catch((err) => {
+        boundariesLoading = false;
+        console.warn('Failed to load boundaries:', err);
+        statusEl.classList.add('visible');
+        statusTextEl.textContent = 'Could not load boundaries: ' + (err && err.message ? err.message : 'network error');
+        setTimeout(() => { statusEl.classList.remove('visible'); }, 4000);
+        throw err;
+      });
+  }
+
+  function setBoundariesEnabled(on) {
+    boundariesEnabled = !!on;
+    if (boundariesBtn) boundariesBtn.classList.toggle('active', boundariesEnabled);
+    if (!boundariesEnabled) {
+      if (boundariesLayer && map.hasLayer(boundariesLayer)) map.removeLayer(boundariesLayer);
+      return;
+    }
+    // Turning on
+    if (boundariesLayer) {
+      if (!map.hasLayer(boundariesLayer)) boundariesLayer.addTo(map);
+      updateBoundaryLabelVisibility();
+    } else {
+      loadBoundaries().then((layer) => {
+        if (boundariesEnabled && layer) {
+          layer.addTo(map);
+          updateBoundaryLabelVisibility();
+        }
+      }).catch(() => {
+        // Reset toggle if load failed
+        boundariesEnabled = false;
+        if (boundariesBtn) boundariesBtn.classList.remove('active');
+      });
+    }
+  }
+
+  // Boundaries toggle control (sits below the locate button in the top-left bar)
+  const BoundariesControl = L.Control.extend({
+    options: { position: 'topleft' },
+    onAdd: function() {
+      const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control boundaries-control');
+      const btn = L.DomUtil.create('a', 'boundaries-btn', container);
+      btn.href = '#';
+      btn.title = 'Toggle township & municipality boundaries';
+      btn.setAttribute('role', 'button');
+      btn.setAttribute('aria-label', 'Toggle township and municipality boundaries');
+      // Layered-stack icon (a common "boundaries / layers" glyph)
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>';
+      L.DomEvent.on(btn, 'click', (e) => {
+        L.DomEvent.stop(e);
+        setBoundariesEnabled(!boundariesEnabled);
+      });
+      boundariesBtn = btn;
+      return container;
+    }
+  });
+  map.addControl(new BoundariesControl());
+
+  // Auto-enable boundaries on first load. The toggle button can still be
+  // used to hide them.
+  setBoundariesEnabled(true);
+
+  // Re-evaluate label visibility whenever the user zooms
+  map.on('zoomend', updateBoundaryLabelVisibility);
 
   // ---------- Canvas overlay ----------
   // Canvas sits in the map's container (not a transformed pane) so it stays
