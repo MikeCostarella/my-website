@@ -2048,7 +2048,37 @@ svg.leaflet-image-layer.leaflet-interactive path {
   const sidebar = document.getElementById('sidebar');
   document.getElementById('close-sidebar').addEventListener('click', () => sidebar.classList.add('collapsed'));
   document.getElementById('sidebar-toggle').addEventListener('click', () => sidebar.classList.remove('collapsed'));
-  if (window.innerWidth <= 640) sidebar.classList.add('collapsed');
+
+  // Auto-collapse the Structure Types panel whenever the viewport is in
+  // mobile width. Reacts both at initial load and on window resize / rotation,
+  // so dragging the browser narrower (or rotating a tablet into portrait)
+  // collapses the panel automatically. Going back to desktop width re-opens it,
+  // unless the user explicitly closed it while on desktop.
+  const MOBILE_BREAKPOINT = 640;
+  let wasMobile = null;            // tracks last known mode so we only act on transitions
+  let userClosedOnDesktop = false; // if user closed it on desktop, don't auto-reopen on resize
+
+  // Track explicit user close on desktop so we don't fight them on resize
+  document.getElementById('close-sidebar').addEventListener('click', () => {
+    if (window.innerWidth > MOBILE_BREAKPOINT) userClosedOnDesktop = true;
+  });
+  document.getElementById('sidebar-toggle').addEventListener('click', () => {
+    userClosedOnDesktop = false;
+  });
+
+  function applyResponsiveSidebar() {
+    const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+    if (isMobile && wasMobile !== true) {
+      // Entering mobile: always collapse
+      sidebar.classList.add('collapsed');
+    } else if (!isMobile && wasMobile === true && !userClosedOnDesktop) {
+      // Returning to desktop from mobile: re-open unless user had closed it
+      sidebar.classList.remove('collapsed');
+    }
+    wasMobile = isMobile;
+  }
+  applyResponsiveSidebar();
+  window.addEventListener('resize', applyResponsiveSidebar);
 
   // Search panel toggling
   const searchPanel = document.getElementById('search-panel');
