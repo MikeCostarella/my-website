@@ -46,8 +46,8 @@ html, body {
 .legdot.s { background:#2b7de9; }
 .legdot.m { background:#e8420a; }
 #map {
-  flex: 1;
   width: 100%;
+  height: 100%;
 }
 /* Modal */
 #overlay {
@@ -104,6 +104,84 @@ html, body {
 }
 .coords { display:flex; gap:16px; margin-top:12px; padding-top:10px; border-top:1px solid #e0e6f0; }
 .coords .row { flex:1; margin:0; }
+#updated { font-size: 0.72rem; color: #667; font-style: italic; margin-left: 16px; }
+
+/* Search panel - floating over the map */
+#searchPanel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  font-family: Arial, sans-serif;
+  width: 38px;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+#searchPanel.open { width: 280px; }
+#searchPanel.open #searchToggle {
+  border-bottom: 1px solid #e0e6f0;
+}
+#searchToggle {
+  width: 100%;
+  background: #1a3a5c;
+  color: #fff;
+  border: none;
+  padding: 9px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+#searchToggle svg { flex-shrink: 0; }
+#searchPanel:not(.open) #searchToggleLabel { display: none; }
+#searchBody {
+  display: none;
+  padding: 10px;
+}
+#searchPanel.open #searchBody { display: block; }
+#searchInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 9px;
+  border: 1px solid #c8d4e0;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+}
+#searchInput:focus { border-color: #2b7de9; }
+#searchHint {
+  font-size: 0.7rem;
+  color: #667;
+  margin-top: 6px;
+}
+#searchResults {
+  margin-top: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.searchResult {
+  padding: 7px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  border-bottom: 1px solid #f0f4f8;
+}
+.searchResult:hover { background: #f0f4f8; }
+.searchResult:last-child { border-bottom: none; }
+.searchResult .sr-addr { color: #1a3a5c; font-weight: 600; }
+.searchResult .sr-meta { color: #667; font-size: 0.72rem; margin-top: 1px; }
+.searchResult.empty { color: #999; cursor: default; font-style: italic; text-align: center; padding: 12px; }
+.searchResult.empty:hover { background: transparent; }
+
+#mapWrap { flex: 1; position: relative; width: 100%; min-height: 0; }
 </style>
 </head>
 <body>
@@ -120,8 +198,22 @@ html, body {
       <span class="legdot s"></span> Single-Unit &nbsp;
       <span class="legdot m"></span> Multi-Tenant
     </div>
+    <span id="updated"></span>
   </div>
-  <div id="map"></div>
+  <div id="mapWrap">
+    <div id="map"></div>
+    <div id="searchPanel">
+      <button id="searchToggle" onclick="toggleSearch()" title="Search addresses">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <span id="searchToggleLabel">Search Addresses</span>
+      </button>
+      <div id="searchBody">
+        <input type="text" id="searchInput" placeholder="Type a street, number, or account..." oninput="runSearch()" />
+        <div id="searchHint">Click a result to zoom &amp; open details</div>
+        <div id="searchResults"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="overlay">
@@ -151,7 +243,10 @@ function addr(u) {
   return a + ' ' + u.st;
 }
 
+var selectedLoc = null;
+
 function openModal(loc) {
+  selectedLoc = loc;
   var b = '';
   if (loc.multi) {
     b += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
@@ -174,10 +269,19 @@ function openModal(loc) {
   b += '<div class="row"><div class="lbl">Latitude</div><div class="val">' + loc.lat + '</div></div>';
   b += '<div class="row"><div class="lbl">Longitude</div><div class="val">' + loc.lng + '</div></div>';
   b += '</div>';
-  var gmUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + loc.lat + ',' + loc.lng;
-  b += '<a href="' + gmUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;margin-top:12px;padding:9px 14px;background:#4285f4;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:600;justify-content:center;">'
-     + '<svg width="16" height="16" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>'
-     + 'Get Directions in Google Maps</a>';
+
+  var gmViewUrl = 'https://www.google.com/maps/search/?api=1&query=' + loc.lat + ',' + loc.lng;
+  var gmDirUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + loc.lat + ',' + loc.lng;
+
+  b += '<div style="display:flex;gap:8px;margin-top:12px;">';
+  b += '<a href="' + gmViewUrl + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;gap:6px;padding:9px 10px;background:#1a3a5c;color:#fff;border-radius:6px;text-decoration:none;font-size:0.82rem;font-weight:600;justify-content:center;">'
+     + '<svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>'
+     + 'View on Google Maps</a>';
+  b += '<a href="' + gmDirUrl + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;gap:6px;padding:9px 10px;background:#4285f4;color:#fff;border-radius:6px;text-decoration:none;font-size:0.82rem;font-weight:600;justify-content:center;">'
+     + '<svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M21.71 11.29l-9-9a.996.996 0 00-1.41 0l-9 9a.996.996 0 000 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 000-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/></svg>'
+     + 'Get Directions</a>';
+  b += '</div>';
+
   document.getElementById('dlg-body').innerHTML = b;
   document.getElementById('overlay').classList.add('show');
 }
@@ -191,7 +295,8 @@ document.getElementById('overlay').addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 
 var ns = 0, nm = 0;
-LOCS.forEach(function(loc) {
+var locMarkers = [];
+LOCS.forEach(function(loc, idx) {
   if (loc.multi) nm++; else ns++;
   var color = loc.multi ? '#e8420a' : '#2b7de9';
   var icon = L.divIcon({
@@ -217,11 +322,73 @@ LOCS.forEach(function(loc) {
   var m = L.marker([loc.lat, loc.lng], {icon: icon}).addTo(map);
   m.bindTooltip(ttLines, {direction:'right', opacity:0.97});
   m.on('click', function() { openModal(loc); });
+  locMarkers.push(m);
 });
 
 document.getElementById('st').textContent = LOCS.length;
 document.getElementById('ss').textContent = ns;
 document.getElementById('sm').textContent = nm;
+
+// Last updated timestamp
+(function() {
+  var d = new Date(document.lastModified);
+  var opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+  document.getElementById('updated').textContent = 'Last updated: ' + d.toLocaleString(undefined, opts);
+})();
+
+// Search panel toggle
+function toggleSearch() {
+  var p = document.getElementById('searchPanel');
+  p.classList.toggle('open');
+  if (p.classList.contains('open')) {
+    setTimeout(function() { document.getElementById('searchInput').focus(); }, 250);
+  }
+}
+
+// Search logic
+function runSearch() {
+  var q = document.getElementById('searchInput').value.trim().toLowerCase();
+  var resultsEl = document.getElementById('searchResults');
+  if (!q) { resultsEl.innerHTML = ''; return; }
+
+  var matches = [];
+  for (var i = 0; i < LOCS.length && matches.length < 50; i++) {
+    var loc = LOCS[i];
+    for (var j = 0; j < loc.units.length; j++) {
+      var u = loc.units[j];
+      var hay = (u.sn + ' ' + (u.apt || '') + ' ' + u.st + ' ' + u.city + ' ' + u.zip + ' ' + u.wan).toLowerCase();
+      if (hay.indexOf(q) !== -1) {
+        matches.push({ locIdx: i, unit: u, loc: loc });
+        break; // one entry per location
+      }
+    }
+  }
+
+  if (matches.length === 0) {
+    resultsEl.innerHTML = '<div class="searchResult empty">No matches found</div>';
+    return;
+  }
+
+  var html = '';
+  matches.forEach(function(m) {
+    var label = addr(m.unit);
+    var meta = m.unit.wan + ' &middot; ' + (m.loc.multi ? m.loc.units.length + ' units' : 'Single-unit');
+    html += '<div class="searchResult" onclick="goToLoc(' + m.locIdx + ')">'
+         + '<div class="sr-addr">' + label + '</div>'
+         + '<div class="sr-meta">' + meta + '</div>'
+         + '</div>';
+  });
+  resultsEl.innerHTML = html;
+}
+
+function goToLoc(idx) {
+  var loc = LOCS[idx];
+  map.setView([loc.lat, loc.lng], 19, { animate: true });
+  // Open the marker tooltip and the detail dialog
+  var marker = locMarkers[idx];
+  if (marker) marker.openTooltip();
+  openModal(loc);
+}
 </script>
 </body>
 </html>
