@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trumbull County Police Departments — Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink:        #0f1a2e;
+    --ink-soft:   #1c2a44;
+    --paper:      #f5f0e6;
+    --paper-warm: #ebe3d3;
+    --rule:       #2c3a55;
+    --rule-soft:  #c9bfa9;
+    --accent:     #b8341d;
+    --accent-dim: #8a2614;
+    --gold:       #b8923a;
+    --muted:      #5a5040;
+    --shadow:     0 30px 80px -20px rgba(15, 26, 46, 0.45);
+
+    --serif: 'Fraunces', 'Times New Roman', serif;
+    --sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono:  'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(184, 52, 29, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(15, 26, 46, 0.05) 0%, transparent 50%);
+  }
+
+  /* paper grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 1;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.15 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* MASTHEAD */
+  header.masthead {
+    border-top: 4px double var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 18px 0 28px;
+    margin-bottom: 36px;
+    position: relative;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule-soft);
+    margin-bottom: 24px;
+  }
+
+  .masthead-top .seal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .seal-mark {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--accent);
+  }
+
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2.2rem, 6vw, 4.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    font-style: italic;
+    font-variation-settings: "opsz" 144;
+    color: var(--ink);
+  }
+  h1.title .small {
+    display: block;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.32em;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-variation-settings: "opsz" 9;
+  }
+
+  .subhead {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 40px;
+    align-items: baseline;
+    font-family: var(--serif);
+    font-size: 15px;
+    color: var(--ink-soft);
+  }
+  .subhead .dek {
+    flex: 1 1 320px;
+    max-width: 640px;
+    line-height: 1.55;
+  }
+  .subhead .meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-align: right;
+  }
+  .subhead .meta div + div { margin-top: 4px; }
+  .subhead .meta strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 32px;
+    padding: 18px 22px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule-soft);
+    border-radius: 2px;
+  }
+  .search-wrap {
+    flex: 1 1 280px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    border: 1px solid var(--rule-soft);
+    background: var(--paper);
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    border-radius: 2px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .search-wrap input:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(15, 26, 46, 0.08);
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .filter-btn {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--rule-soft);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+  .count strong { color: var(--ink); font-weight: 500; }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--rule-soft);
+    border: 1px solid var(--rule-soft);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .card {
+    background: var(--paper);
+    padding: 24px 22px 22px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 200px;
+  }
+  .card:hover {
+    background: var(--paper-warm);
+  }
+  .card:hover .card-name {
+    color: var(--accent);
+  }
+  .card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -4px;
+  }
+
+  .card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    padding: 4px 8px;
+    border: 1px solid var(--rule-soft);
+    border-radius: 2px;
+    align-self: flex-start;
+  }
+  .card-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .card-tag[data-type="City"]::before     { background: var(--accent); }
+  .card-tag[data-type="Township"]::before { background: var(--ink); }
+  .card-tag[data-type="Village"]::before  { background: var(--gold); }
+  .card-tag[data-type="County"]::before   { background: #2d5e3e; }
+  .card-tag[data-type="State"]::before    { background: #4a3a78; }
+
+  .card-name {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 21px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    transition: color 0.2s;
+    font-variation-settings: "opsz" 36;
+  }
+
+  .card-loc {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    margin-top: auto;
+  }
+  .card-loc .city {
+    font-weight: 500;
+  }
+
+  .card-arrow {
+    position: absolute;
+    top: 24px;
+    right: 22px;
+    width: 22px;
+    height: 22px;
+    color: var(--rule-soft);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .card:hover .card-arrow {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+  }
+
+  .empty {
+    grid-column: 1 / -1;
+    padding: 64px 24px;
+    text-align: center;
+    background: var(--paper);
+    color: var(--muted);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+  }
+
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 26, 46, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal {
+    background: var(--paper);
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--ink);
+    box-shadow: var(--shadow);
+    transform: translateY(20px) scale(0.98);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+  }
+  .modal-backdrop.open .modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-header {
+    padding: 28px 32px 22px;
+    border-bottom: 1px solid var(--rule-soft);
+    background: var(--paper-warm);
+    position: relative;
+  }
+  .modal-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .modal-eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule-soft);
+  }
+
+  #modal-name {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    font-variation-settings: "opsz" 72;
+    padding-right: 40px;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.15s;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(15, 26, 46, 0.12);
+  }
+  .modal-close:hover {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+    transform: rotate(90deg);
+  }
+  .modal-close:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .modal-body {
+    padding: 28px 32px 32px;
+  }
+
+  .field {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    align-items: baseline;
+  }
+  .field:last-of-type { border-bottom: none; }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    padding-top: 2px;
+  }
+  .field-value {
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .field-value a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    transition: color 0.15s;
+  }
+  .field-value a:hover { color: var(--accent-dim); }
+  .field-value.muted {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 14px;
+  }
+
+  .modal-actions {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .action-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    padding: 11px 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .action-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .action-btn.secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+  .action-btn.secondary:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .action-btn[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* FOOTER */
+  footer {
+    margin-top: 64px;
+    padding-top: 28px;
+    border-top: 4px double var(--ink);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+  footer .credit {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-soft);
+  }
+  footer .credit strong {
+    color: var(--ink);
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 28px 18px 64px; }
+    .field { grid-template-columns: 1fr; gap: 4px; }
+    .modal-header, .modal-body { padding-left: 22px; padding-right: 22px; }
+    .count { margin-left: 0; width: 100%; }
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* entrance animation */
+  .card {
+    animation: cardIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <div class="seal">
+        <span class="seal-mark"></span>
+        <span>Trumbull County · Ohio</span>
+      </div>
+      <div>Vol. I &nbsp;·&nbsp; No. 1</div>
+    </div>
+
+    <h1 class="title">
+      <span class="small">A Directory of</span>
+      Police Departments
+    </h1>
+
+    <div class="subhead">
+      <p class="dek">
+        A reference listing of the twenty-six law-enforcement agencies that serve the cities,
+        townships, villages, and unincorporated areas of Trumbull County. Select an agency
+        below for full contact information.
+      </p>
+      <div class="meta">
+        <div>Last updated</div>
+        <div><strong id="last-updated">—</strong></div>
+        <div style="margin-top: 14px;">Compiled by</div>
+        <div><strong>Mike Costarella</strong></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="search" id="search" placeholder="Search by name, city, or address…" aria-label="Search departments" />
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Filter by department type">
+      <button class="filter-btn active" data-type="all">All</button>
+      <button class="filter-btn" data-type="City">City</button>
+      <button class="filter-btn" data-type="Township">Township</button>
+      <button class="filter-btn" data-type="Village">Village</button>
+      <button class="filter-btn" data-type="County">County</button>
+      <button class="filter-btn" data-type="State">State</button>
+    </div>
+    <div class="count"><strong id="count">26</strong>&nbsp;agencies</div>
+  </div>
+
+  <div class="grid" id="grid" role="list"></div>
+
+  <footer>
+    <div class="credit">
+      Directory compiled and maintained by <strong>Mike Costarella</strong>.
+    </div>
+    <div>
+      Source data &nbsp;·&nbsp; Trumbull County
+    </div>
+  </footer>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-name" aria-hidden="true">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close dialog" title="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-header">
+      <div class="modal-eyebrow"><span id="modal-eyebrow">Department</span></div>
+      <h2 id="modal-name">—</h2>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <div class="field-label">Address</div>
+        <div class="field-value" id="f-address">—</div>
+      </div>
+      <div class="field">
+        <div class="field-label">City / ZIP</div>
+        <div class="field-value" id="f-city">—</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Phone</div>
+        <div class="field-value" id="f-phone">—</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Email</div>
+        <div class="field-value" id="f-email">—</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Website</div>
+        <div class="field-value" id="f-web">—</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Patrol Areas</div>
+        <div class="field-value" id="f-patrol">—</div>
+      </div>
+
+      <div class="modal-actions">
+        <a id="a-call" class="action-btn" href="#">Call</a>
+        <a id="a-directions" class="action-btn secondary" href="#" target="_blank" rel="noopener">Directions ↗</a>
+        <a id="a-email" class="action-btn secondary" href="#">Email</a>
+        <a id="a-web" class="action-btn secondary" href="#" target="_blank" rel="noopener">Visit website ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEPARTMENTS = [
+  {"id":"23F8555C-06A7-4B79-9ADE-FE3CEF53D0B1","name":"Bazetta Township Police Department","type":"Township","address":"3372 State Route 5 NE","city":"Cortland","zip":"44410","phone":"(330) 637-3711","website":"https://www.bazettatwp.org/?page_id=53","email":"cherlinger@bazettatwp.org","patrolAreas":2},
+  {"id":"12B63F63-FC6D-4D23-A548-C0C705FD7B2D","name":"Braceville Township Police Department","type":"Township","address":"2767 State Route 5","city":"Newton Falls","zip":"44444","phone":"(330) 898-8766","website":"https://bracevilletownship.com/government/police/","email":null,"patrolAreas":2},
+  {"id":"2FEAA12A-BA89-4F3F-9F6F-B12033B0C462","name":"Brookfield Township Police Department","type":"Township","address":"6844 Strimbu Drive","city":"Brookfield","zip":"44403","phone":"(330) 448-6960","website":"https://brookfieldtwp.org/information-1","email":null,"patrolAreas":2},
+  {"id":"D3125B9C-778D-4AD5-8AD6-4613F3435EAE","name":"Champion Township Police Department","type":"Township","address":"5597 Mahoning Avenue NW","city":"Warren","zip":"44483","phone":"(330) 847-8500","website":"https://championtownship.org/police-chief","email":"cpdrecords@neo.rr.com","patrolAreas":2},
+  {"id":"301BC5C4-A3FF-4111-AC2D-C067270992F6","name":"Cortland Police Department","type":"City","address":"400 N High Street","city":"Cortland","zip":"44410","phone":"(330) 638-1000","website":"https://www.cortlandoh.gov/departments/police-dept/","email":"police@cortlandoh.gov","patrolAreas":2},
+  {"id":"475E64A6-E99E-4BF7-9DBB-9A09482A9DFB","name":"Fowler Township Police Department","type":"Township","address":"PO Box 12","city":"Fowler","zip":"44418","phone":"(330) 637-5050","website":"https://www.fowlertownship.org/police-department","email":null,"patrolAreas":2},
+  {"id":"A698BB7A-CC3D-4500-A9E3-AA13E85598E6","name":"Girard Police Department","type":"City","address":"100 N Market Street","city":"Girard","zip":"44420","phone":"(330) 545-0211","website":"https://girardpolice.com/","email":"girardpolice@cityofgirardoh.gov","patrolAreas":2},
+  {"id":"1C622C6D-1ACD-4BEC-B4E6-C4548FC0AC35","name":"Hartford Township Police Department","type":"Township","address":"6901 State Route 305","city":"Fowler","zip":"44418","phone":"(330) 772-5661","website":"https://www.hartfordtwp.org/about-1","email":"police@hartfordtwp.org","patrolAreas":2},
+  {"id":"C7A48AC8-4F99-4AE9-BBE5-BAF3B7F4E6AD","name":"Howland Township Police Department","type":"Township","address":"169 Niles Cortland Road NE","city":"Warren","zip":"44484","phone":"(330) 856-5555","website":"https://howlandtownship.org/police","email":null,"patrolAreas":6},
+  {"id":"F572D445-6C96-4F5E-AB1F-19AFC00F201E","name":"Hubbard Police Department","type":"City","address":"233 School Street","city":"Hubbard","zip":"44425","phone":"(330) 534-1133","website":"https://cityofhubbard-oh.gov/public-safety/","email":"s.rentz@cityofhubbard-oh.gov","patrolAreas":1},
+  {"id":"D2C36CB2-6054-4DAA-AFC1-B21D7A1FE280","name":"Hubbard Township Police Department","type":"Township","address":"2600 Elmwood Drive","city":"Hubbard","zip":"44425","phone":"(330) 534-1900","website":"https://www.hubbardtwpohio.gov/police","email":"brenda.freeman@hubbardtwpohio.gov","patrolAreas":1},
+  {"id":"5B2FE70A-4819-4B88-9935-593D15427F09","name":"Johnston Township Police Department","type":"Township","address":"4420 State Route 5","city":"Farmdale","zip":"44417","phone":"(330) 876-1234","website":"https://www.johnstontwp.net/","email":"johnstontwptrumbull@gmail.com","patrolAreas":0},
+  {"id":"768F7F66-2F99-4429-89EA-6FE73093EEA9","name":"Kinsman Township Police Department","type":"Township","address":"8070 Main Street","city":"Kinsman","zip":"44428","phone":"(330) 876-3661","website":"https://www.kinsmantownship.org/police-department","email":"Kinsmanpd@kinsmanpd.org","patrolAreas":1},
+  {"id":"F4D2EB6D-BEF3-4145-93CD-FB2E8275896B","name":"Liberty Township Police Department","type":"Township","address":"1315 Churchill Hubbard Road","city":"Youngstown","zip":"44505","phone":"(330) 759-1315","website":"https://libertytwp.com/","email":"reports@libertytwp.com","patrolAreas":2},
+  {"id":"C21B2DF7-0976-479D-B73E-48269963D684","name":"Lordstown Police Department","type":"Village","address":"1583 Salt Springs Road","city":"Warren","zip":"44481","phone":"(330) 824-2507","website":"https://www.lordstownpd.com/","email":"chief@lordstownpd.com","patrolAreas":0},
+  {"id":"D1C42CB8-1CA5-43AC-ADA4-63192121A0C6","name":"McDonald Police Department","type":"Village","address":"451 Ohio Avenue","city":"McDonald","zip":"44437","phone":"(330) 530-9712","website":"https://mcdonaldvillage.com/offices/police-department/","email":"OfficeManager@mcdonaldvillageoh.gov","patrolAreas":1},
+  {"id":"3F70B1B5-B69A-41F3-85C5-2A4910711194","name":"Newton Falls Police Department","type":"City","address":"19 N Canal Street","city":"Newton Falls","zip":"44444","phone":"(330) 872-5757","website":"https://ci.newtonfalls.oh.us/police/","email":"nfpdoic2@gmail.com","patrolAreas":2},
+  {"id":"E267B8BA-8454-490C-B099-7CB23587CD1E","name":"Newton Township Police Department","type":"Township","address":"4410 Newton Falls Bailey Road","city":"Newton Falls","zip":"44444","phone":"(330) 872-3411","website":"https://www.newtontwptc.org/services","email":null,"patrolAreas":0},
+  {"id":"2BA30FA8-FFB8-4003-9BED-6EDCA467B9CF","name":"Niles Police Department","type":"City","address":"15 E State Street","city":"Niles","zip":"44446","phone":"(330) 652-9944","website":"https://thecityofniles.com/services/safety/police/","email":null,"patrolAreas":2},
+  {"id":"62898623-FF08-4A2F-B05A-EF748C02ACD3","name":"Ohio State Highway Patrol — Warren Post","type":"State","address":"3424 US Route 422","city":"Southington","zip":"44470","phone":"(330) 898-1888","website":"https://statepatrol.ohio.gov/","email":null,"patrolAreas":0},
+  {"id":"BA9325AC-FD6E-4C5C-B8DE-8776E03FE069","name":"Trumbull County Sheriff's Office","type":"County","address":"150 High Street NW","city":"Warren","zip":"44481","phone":"(330) 675-2508","website":"https://www.co.trumbull.oh.us/sheriff","email":"info@trumbullcountysheriff.com","patrolAreas":2},
+  {"id":"109A1A44-810C-4FB0-9C5F-763FBCC4C6B0","name":"Vienna Township Police Department","type":"Township","address":"843 Youngstown Kingsville Road","city":"Vienna","zip":"44473","phone":"(330) 856-4421","website":"https://www.viennatownship.com/","email":"bdarbey@viennapd.com","patrolAreas":2},
+  {"id":"7764E47A-6E3D-4DEE-83FA-56B6242355CE","name":"Warren Police Department","type":"City","address":"141 South Street SE","city":"Warren","zip":"44483","phone":"(330) 841-2512","website":"https://www.warren.org/police_department/","email":"emerkel@warren.org","patrolAreas":1},
+  {"id":"3A9EDAC2-8BE8-4625-94E0-81003E5CAC02","name":"Warren Township Police Department","type":"Township","address":"3765 West Market Street","city":"Leavittsburg","zip":"44430","phone":"(330) 898-2323","website":"https://www.warrentwptrumbull.gov/police-department","email":"ryoho@warrentwptrumbull.gov","patrolAreas":2},
+  {"id":"9FA3B4CB-6A57-4DCD-A2DC-D70111CF0241","name":"Weathersfield Township Police Department","type":"Township","address":"1451 Prospect Street","city":"Mineral Ridge","zip":"44440","phone":"(330) 652-0123","website":"https://weathersfieldtwp.org/police-department","email":"mailbox@weathersfieldtwp.com","patrolAreas":3},
+  {"id":"875BBBE6-4386-40A9-A758-86890EAF46E2","name":"West Farmington Police Department","type":"Village","address":"251 4th Street","city":"West Farmington","zip":"44491","phone":"(330) 889-3736","website":"https://westfarmingtonvillage.com/departments_police","email":"Dan.Gladd@yahoo.com","patrolAreas":1}
+];
+
+// Sort alphabetically (already sorted, but safe)
+DEPARTMENTS.sort((a, b) => a.name.localeCompare(b.name));
+
+// Last-updated timestamp baked in at page generation time
+const LAST_UPDATED = "May 1, 2026";
+document.getElementById('last-updated').textContent = LAST_UPDATED;
+
+// State
+let activeFilter = 'all';
+let searchQuery = '';
+
+const grid = document.getElementById('grid');
+const countEl = document.getElementById('count');
+const searchInput = document.getElementById('search');
+const filterButtons = document.querySelectorAll('.filter-btn');
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function render() {
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = DEPARTMENTS.filter(d => {
+    if (activeFilter !== 'all' && d.type !== activeFilter) return false;
+    if (!q) return true;
+    return (d.name + ' ' + d.city + ' ' + d.address + ' ' + d.zip).toLowerCase().includes(q);
+  });
+
+  countEl.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">No departments match the current filters.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map((d, i) => `
+    <article class="card" role="listitem" tabindex="0" data-id="${d.id}" style="animation-delay: ${Math.min(i * 30, 400)}ms">
+      <span class="card-tag" data-type="${d.type}">${escapeHtml(d.type)}</span>
+      <h3 class="card-name">${escapeHtml(d.name)}</h3>
+      <div class="card-loc">
+        <div>${escapeHtml(d.address)}</div>
+        <div><span class="city">${escapeHtml(d.city)}</span>, OH ${escapeHtml(d.zip)}</div>
+      </div>
+      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="7" y1="17" x2="17" y2="7"/>
+        <polyline points="7 7 17 7 17 17"/>
+      </svg>
+    </article>
+  `).join('');
+}
+
+// Modal handling
+const modal = document.getElementById('modal');
+const modalClose = document.getElementById('modal-close');
+let lastFocused = null;
+
+function openModal(dept) {
+  lastFocused = document.activeElement;
+  document.getElementById('modal-eyebrow').textContent = `${dept.type} · Trumbull County`;
+  document.getElementById('modal-name').textContent = dept.name;
+
+  // Build a Google Maps query from the full address (handles PO boxes by falling back to dept name + city)
+  const fullAddress = `${dept.address}, ${dept.city}, OH ${dept.zip}`;
+  const mapsQuery = /^PO Box/i.test(dept.address)
+    ? encodeURIComponent(`${dept.name}, ${dept.city}, OH ${dept.zip}`)
+    : encodeURIComponent(fullAddress);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapsQuery}`;
+
+  document.getElementById('f-address').innerHTML =
+    `<a href="${mapsUrl}" target="_blank" rel="noopener" title="View on Google Maps">${escapeHtml(dept.address)}</a>`;
+  document.getElementById('f-city').textContent = `${dept.city}, OH ${dept.zip}`;
+
+  const phoneEl = document.getElementById('f-phone');
+  const phoneDigits = dept.phone.replace(/\D/g, '');
+  phoneEl.innerHTML = `<a href="tel:${phoneDigits}">${escapeHtml(dept.phone)}</a>`;
+
+  const emailEl = document.getElementById('f-email');
+  if (dept.email) {
+    emailEl.classList.remove('muted');
+    emailEl.innerHTML = `<a href="mailto:${escapeHtml(dept.email)}">${escapeHtml(dept.email)}</a>`;
+  } else {
+    emailEl.classList.add('muted');
+    emailEl.textContent = 'Not published';
+  }
+
+  const webEl = document.getElementById('f-web');
+  webEl.innerHTML = `<a href="${escapeHtml(dept.website)}" target="_blank" rel="noopener">${escapeHtml(dept.website.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>`;
+
+  document.getElementById('f-patrol').textContent = dept.patrolAreas + (dept.patrolAreas === 1 ? ' area' : ' areas');
+
+  // Action buttons
+  document.getElementById('a-call').href = `tel:${phoneDigits}`;
+  document.getElementById('a-directions').href = directionsUrl;
+  const emailBtn = document.getElementById('a-email');
+  if (dept.email) {
+    emailBtn.href = `mailto:${dept.email}`;
+    emailBtn.removeAttribute('disabled');
+  } else {
+    emailBtn.removeAttribute('href');
+    emailBtn.setAttribute('disabled', '');
+  }
+  document.getElementById('a-web').href = dept.website;
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => modalClose.focus(), 50);
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if (lastFocused) lastFocused.focus();
+}
+
+// Event delegation for cards
+grid.addEventListener('click', (e) => {
+  const card = e.target.closest('.card');
+  if (!card) return;
+  const dept = DEPARTMENTS.find(d => d.id === card.dataset.id);
+  if (dept) openModal(dept);
+});
+grid.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const card = e.target.closest('.card');
+  if (!card) return;
+  e.preventDefault();
+  const dept = DEPARTMENTS.find(d => d.id === card.dataset.id);
+  if (dept) openModal(dept);
+});
+
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+});
+
+// Search
+searchInput.addEventListener('input', (e) => {
+  searchQuery = e.target.value;
+  render();
+});
+
+// Filters
+filterButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.type;
+    render();
+  });
+});
+
+// Initial render
+render();
+</script>
+
+</body>
+</html>
