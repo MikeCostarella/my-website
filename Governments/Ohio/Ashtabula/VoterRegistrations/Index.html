@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashtabula County Voter Registration — A Public Records Dashboard</title>
+<meta name="description" content="An aggregate-only dashboard of voter registration in Ashtabula County, Ohio. No individual records are exposed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --ink: #1a1f2e;
+    --ink-soft: #3d4555;
+    --ink-faint: #6b7280;
+    --paper: #f5f1e8;
+    --paper-deep: #ebe4d3;
+    --rule: #c8bfa8;
+    --accent: #8a1c2b;
+    --accent-soft: #b8404f;
+    --navy: #1e3a5f;
+    --navy-soft: #4a6b8a;
+    --gold: #c19a3d;
+    --gray: #8a8779;
+    --green: #4a6b3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(193,154,61,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(30,58,95,0.04) 0%, transparent 50%);
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+
+  /* MASTHEAD */
+  .masthead {
+    border-bottom: 3px double var(--ink);
+    padding: 48px 0 32px;
+    margin-bottom: 48px;
+  }
+  .masthead .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+  .masthead h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .masthead .lede {
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 640px;
+    font-weight: 400;
+  }
+
+  /* PRIVACY NOTE */
+  .privacy-note {
+    border-left: 3px solid var(--accent);
+    background: rgba(138, 28, 43, 0.04);
+    padding: 16px 20px;
+    margin: 24px 0 0;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    max-width: 720px;
+  }
+  .privacy-note strong {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* HEADLINE STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    margin: 56px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .stat {
+    padding: 28px 24px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .stat:last-child { border-right: none; }
+  .stat .num {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .stat .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* SECTIONS */
+  section { margin: 80px 0; }
+  .section-head { margin-bottom: 36px; max-width: 720px; }
+  .section-head .num-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .section-head p {
+    font-family: 'Fraunces', serif;
+    font-size: 1.08rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* CHART CARDS */
+  .chart-card {
+    background: #fdfbf4;
+    border: 1px solid var(--rule);
+    padding: 28px 28px 24px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .chart-card .ctitle {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+  .chart-card .csub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 20px;
+  }
+  .chart-wrap { position: relative; height: 320px; }
+  .chart-wrap.tall { height: 420px; }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 800px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .container { padding: 0 20px; }
+    .stat { border-right: none; border-bottom: 1px solid var(--rule); }
+    .stat:last-child { border-bottom: none; }
+  }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .pill {
+    background: transparent;
+    border: 1px solid var(--rule);
+    padding: 6px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .pill:hover { border-color: var(--ink); color: var(--ink); }
+  .pill.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .data-table th, .data-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .data-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+  }
+  .data-table td.num {
+    font-family: 'JetBrains Mono', monospace;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .data-table tr:hover { background: rgba(30, 58, 95, 0.03); }
+  .bar-cell {
+    position: relative;
+    background: linear-gradient(90deg, rgba(30,58,95,0.12) var(--w, 0%), transparent var(--w, 0%));
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 3px double var(--ink);
+    margin-top: 80px;
+    padding: 32px 0 48px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+  footer p { margin-bottom: 8px; max-width: 720px; }
+  footer .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-top: 16px;
+  }
+
+  /* INTRO REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: reveal 0.8s ease forwards;
+  }
+  .reveal.d1 { animation-delay: 0.1s; }
+  .reveal.d2 { animation-delay: 0.25s; }
+  .reveal.d3 { animation-delay: 0.4s; }
+  @keyframes reveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ORNAMENT */
+  .ornament {
+    text-align: center;
+    margin: 60px 0;
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    color: var(--rule);
+    letter-spacing: 1em;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="kicker reveal">
+      <span>VOL. I &nbsp;·&nbsp; PUBLIC RECORDS DASHBOARD</span>
+      <span>DATA AS OF 07 APR 2026</span>
+    </div>
+    <h1 class="reveal d1">The Ashtabula <em>Voter</em> File, in Aggregate.</h1>
+    <p class="lede reveal d2">A summary view of who is registered to vote in Ashtabula County, Ohio — drawn from the county's public voter file and presented only as totals, never as individuals.</p>
+    <div class="privacy-note reveal d3">
+      <strong>About this page</strong>
+      Ohio voter registration data is a public record. To respect the privacy of individual voters, this dashboard publishes <em>only</em> aggregate counts. No names, addresses, birth dates, or per-person voting histories are loaded into your browser or shown anywhere on this page. To look up your own registration, visit the <a href="https://voterlookup.ohiosos.gov" style="color:var(--accent);">Ohio Secretary of State's voter lookup</a>.
+    </div>
+  </header>
+
+  <!-- HEADLINE STATS -->
+  <div class="stats-grid">
+    <div class="stat"><div class="num" id="stat-total">—</div><div class="label">Registered Voters</div></div>
+    <div class="stat"><div class="num" id="stat-active">—</div><div class="label">Active Status</div></div>
+    <div class="stat"><div class="num" id="stat-precincts">—</div><div class="label">Precincts</div></div>
+    <div class="stat"><div class="num" id="stat-cities">—</div><div class="label">Cities & Townships</div></div>
+  </div>
+
+  <!-- TURNOUT TIMELINE -->
+  <section>
+    <div class="section-head">
+      <div class="num-tag">§ 01 &nbsp;—&nbsp; Turnout</div>
+      <h2>Ballots cast in every election since 2008.</h2>
+      <p>Each bar is one election. Generals tower over primaries; presidential years tower over midterms. Filter to see the pattern more clearly.</p>
+    </div>
+    <div class="chart-card">
+      <div class="controls">
+        <button class="pill active" data-filter="all">All Elections</button>
+        <button class="pill" data-filter="General">Generals Only</button>
+        <button class="pill" data-filter="Primary">Primaries</button>
+        <button class="pill" data-filter="Special">Specials</button>
+      </div>
+      <div class="chart-wrap tall"><canvas id="chart-turnout"></canvas></div>
+    </div>
+  </section>
+
+  <!-- PARTY -->
+  <section>
+    <div class="section-head">
+      <div class="num-tag">§ 02 &nbsp;—&nbsp; Party Affiliation</div>
+      <h2>A largely unaffiliated electorate.</h2>
+      <p>In Ohio, party affiliation is determined by the most recent partisan primary a person voted in. Voters who haven't pulled a primary ballot — or have skipped them recently — appear as unaffiliated. Active voters only.</p>
+    </div>
+    <div class="grid-2">
+      <div class="chart-card">
+        <div class="ctitle">Active voters by party</div>
+        <div class="csub">Total composition</div>
+        <div class="chart-wrap"><canvas id="chart-party"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="ctitle">Party leaning by age cohort</div>
+        <div class="csub">Stacked, % within each age band</div>
+        <div class="chart-wrap"><canvas id="chart-age-party"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGE -->
+  <section>
+    <div class="section-head">
+      <div class="num-tag">§ 03 &nbsp;—&nbsp; Age</div>
+      <h2>An older electorate, an even older voter.</h2>
+      <p>The county's registered voter pool skews toward retirement age. The gap between those bands' <em>share</em> of registration and their <em>share</em> of actual votes cast widens further when you look at turnout.</p>
+    </div>
+    <div class="grid-2">
+      <div class="chart-card">
+        <div class="ctitle">Active voters by age cohort</div>
+        <div class="csub">Computed from birth year, as of 2026</div>
+        <div class="chart-wrap"><canvas id="chart-age"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="ctitle">2024 General turnout rate by age</div>
+        <div class="csub">% of cohort who cast a ballot</div>
+        <div class="chart-wrap"><canvas id="chart-age-turnout"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABSENTEE -->
+  <section>
+    <div class="section-head">
+      <div class="num-tag">§ 04 &nbsp;—&nbsp; Mode of Voting</div>
+      <h2>The shape of how people vote has shifted.</h2>
+      <p>Absentee voting surged in 2020 and has held a higher share of the electorate ever since.</p>
+    </div>
+    <div class="chart-card">
+      <div class="ctitle">Recent General Elections — absentee vs. election day</div>
+      <div class="csub">Stacked counts of ballots cast</div>
+      <div class="chart-wrap"><canvas id="chart-absentee"></canvas></div>
+    </div>
+  </section>
+
+  <!-- CITIES -->
+  <section>
+    <div class="section-head">
+      <div class="num-tag">§ 05 &nbsp;—&nbsp; Geography</div>
+      <h2>Where voters live.</h2>
+      <p>Three population centers — Ashtabula, Conneaut, and Geneva — together account for over six in ten registered voters. The remaining twenty cities and townships fill out the rural balance.</p>
+    </div>
+    <div class="chart-card">
+      <table class="data-table" id="city-table">
+        <thead>
+          <tr>
+            <th>City / Township</th>
+            <th class="num">Active Voters</th>
+            <th class="num">Share</th>
+            <th class="num">Dem</th>
+            <th class="num">Rep</th>
+            <th class="num">Unaff.</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PARTICIPATION FREQUENCY -->
+  <section>
+    <div class="section-head">
+      <div class="num-tag">§ 06 &nbsp;—&nbsp; Participation Frequency</div>
+      <h2>Most active voters show up reliably.</h2>
+      <p>Of the five most recent general elections — 2016, 2018, 2020, 2022, 2024 — how many did each currently-active voter participate in?</p>
+    </div>
+    <div class="chart-card">
+      <div class="ctitle">Active voters by number of recent generals participated in</div>
+      <div class="csub">Out of the last 5 general elections (2016–2024)</div>
+      <div class="chart-wrap"><canvas id="chart-frequency"></canvas></div>
+    </div>
+  </section>
+
+  <!-- REGISTRATION TRENDS -->
+  <section>
+    <div class="section-head">
+      <div class="num-tag">§ 07 &nbsp;—&nbsp; Registration over time</div>
+      <h2>When today's voters first registered.</h2>
+      <p>New registrations spike in presidential years. Note: this counts only voters still on the rolls today; people who registered, moved, and were removed don't appear.</p>
+    </div>
+    <div class="chart-card">
+      <div class="chart-wrap"><canvas id="chart-registration"></canvas></div>
+    </div>
+  </section>
+
+  <div class="ornament">· · ·</div>
+
+  <footer>
+    <p><strong>Source.</strong> Ashtabula County, Ohio voter file, dated 7 April 2026, obtained as a public record.</p>
+    <p><strong>Method.</strong> All figures on this page were computed offline before publication. The page contains no individual records — only the aggregate counts you see in the charts. "Active voters" excludes registrants flagged as confirmation, NCOA, or list-maintenance status. Age bands are derived from birth year as of 2026; placeholder birth years (e.g., 1800) were excluded.</p>
+    <p><strong>Caveats.</strong> Ohio's "party affiliation" reflects the most recent partisan primary a voter participated in, not a registration-time declaration as in some other states. A voter shown as "Unaffiliated" may hold strong partisan preferences but skip primaries. Turnout counts reflect the rolls as they exist today and do not capture voters who have since been removed.</p>
+    <div class="meta">Generated · Ashtabula County · Ohio · Public Records</div>
+  </footer>
+
+</div>
+
+<script>
+// ============================================================
+// DATA — embedded inline so the page is fully self-contained
+// ============================================================
+const DATA = {"summary":{"total_registered":58709,"active_voters":49571,"inactive_voters":9138,"precincts":104,"cities":23,"data_date":"2026-04-07","county":"Ashtabula County, Ohio"},"party":[{"party":"Unaffiliated","count":30761},{"party":"Republican","count":12434},{"party":"Democrat","count":5687},{"party":"Nonpartisan","count":688}],"age":[{"bucket":"18-24","count":3276},{"bucket":"25-34","count":5480},{"bucket":"35-44","count":6253},{"bucket":"45-54","count":7199},{"bucket":"55-64","count":9245},{"bucket":"65-74","count":10112},{"bucket":"75-84","count":6098},{"bucket":"85+","count":1907}],"age_party":[{"bucket":"18-24","Democrat":75,"Republican":176,"Unaffiliated":3007,"Nonpartisan":18},{"bucket":"25-34","Democrat":152,"Republican":474,"Unaffiliated":4821,"Nonpartisan":33},{"bucket":"35-44","Democrat":310,"Republican":941,"Unaffiliated":4932,"Nonpartisan":70},{"bucket":"45-54","Democrat":482,"Republican":1558,"Unaffiliated":5038,"Nonpartisan":121},{"bucket":"55-64","Democrat":898,"Republican":2788,"Unaffiliated":5418,"Nonpartisan":141},{"bucket":"65-74","Democrat":1896,"Republican":3561,"Unaffiliated":4494,"Nonpartisan":161},{"bucket":"75-84","Democrat":1462,"Republican":2216,"Unaffiliated":2305,"Nonpartisan":115},{"bucket":"85+","Democrat":412,"Republican":720,"Unaffiliated":746,"Nonpartisan":29}],"city":[{"city":"ASHTABULA","count":15440},{"city":"CONNEAUT","count":7514},{"city":"GENEVA","count":7461},{"city":"JEFFERSON","count":5263},{"city":"ROCK CREEK","count":2366},{"city":"ANDOVER","count":2282},{"city":"ORWELL","count":1847},{"city":"ROME","count":1717},{"city":"KINGSVILLE","count":1363},{"city":"AUSTINBURG","count":1056},{"city":"DORSET","count":746},{"city":"WILLIAMSFIELD","count":723},{"city":"PIERPONT","count":697},{"city":"WINDSOR","count":623},{"city":"NORTH KINGSVILLE","count":263},{"city":"KINSMAN","count":49},{"city":"MIDDLEFIELD","count":34},{"city":"THOMPSON","count":33},{"city":"MONTVILLE","count":31},{"city":"UNIONVILLE","count":21},{"city":"MADISON","count":17},{"city":"HUNTSBURG","count":4},{"city":"NEW LYME","count":1}],"city_party":[{"city":"ASHTABULA","Democrat":2130,"Republican":3070,"Unaffiliated":9995,"Nonpartisan":245},{"city":"CONNEAUT","Democrat":971,"Republican":1698,"Unaffiliated":4723,"Nonpartisan":122},{"city":"GENEVA","Democrat":823,"Republican":1866,"Unaffiliated":4637,"Nonpartisan":135},{"city":"JEFFERSON","Democrat":453,"Republican":1568,"Unaffiliated":3203,"Nonpartisan":39},{"city":"ROCK CREEK","Democrat":210,"Republican":628,"Unaffiliated":1504,"Nonpartisan":24},{"city":"ANDOVER","Democrat":182,"Republican":641,"Unaffiliated":1455,"Nonpartisan":4},{"city":"ORWELL","Democrat":189,"Republican":516,"Unaffiliated":1135,"Nonpartisan":7},{"city":"ROME","Democrat":145,"Republican":510,"Unaffiliated":1054,"Nonpartisan":8},{"city":"KINGSVILLE","Democrat":162,"Republican":497,"Unaffiliated":640,"Nonpartisan":64},{"city":"AUSTINBURG","Democrat":121,"Republican":354,"Unaffiliated":574,"Nonpartisan":7},{"city":"DORSET","Democrat":55,"Republican":252,"Unaffiliated":436,"Nonpartisan":3},{"city":"WILLIAMSFIELD","Democrat":62,"Republican":235,"Unaffiliated":424,"Nonpartisan":2}],"turnout":[{"date":"2008-11-04","year":2008,"type":"General","voted":25015,"label":"Nov 2008 General"},{"date":"2009-02-03","year":2009,"type":"Special","voted":1914,"label":"Feb 2009 Special"},{"date":"2009-05-05","year":2009,"type":"Primary/Special","voted":4840,"label":"May 2009 Primary/Special"},{"date":"2009-11-03","year":2009,"type":"General","voted":15900,"label":"Nov 2009 General"},{"date":"2010-05-04","year":2010,"type":"Primary","voted":10007,"label":"May 2010 Primary"},{"date":"2010-11-02","year":2010,"type":"General","voted":18071,"label":"Nov 2010 General"},{"date":"2011-05-03","year":2011,"type":"Primary/Special","voted":1116,"label":"May 2011 Primary/Special"},{"date":"2011-08-02","year":2011,"type":"Special","voted":749,"label":"Aug 2011 Special"},{"date":"2011-11-08","year":2011,"type":"General","voted":19161,"label":"Nov 2011 General"},{"date":"2012-03-06","year":2012,"type":"Primary","voted":10519,"label":"Mar 2012 Primary"},{"date":"2012-08-07","year":2012,"type":"Special","voted":6341,"label":"Aug 2012 Special"},{"date":"2012-11-06","year":2012,"type":"General","voted":27112,"label":"Nov 2012 General"},{"date":"2013-05-07","year":2013,"type":"Special","voted":4896,"label":"May 2013 Special"},{"date":"2013-11-05","year":2013,"type":"General","voted":13969,"label":"Nov 2013 General"},{"date":"2014-05-06","year":2014,"type":"Primary","voted":9476,"label":"May 2014 Primary"},{"date":"2014-11-04","year":2014,"type":"General","voted":18477,"label":"Nov 2014 General"},{"date":"2015-05-05","year":2015,"type":"Primary/Special","voted":1789,"label":"May 2015 Primary/Special"},{"date":"2015-11-03","year":2015,"type":"General","voted":19743,"label":"Nov 2015 General"},{"date":"2016-03-15","year":2016,"type":"Primary","voted":17634,"label":"Mar 2016 Primary"},{"date":"2016-11-08","year":2016,"type":"General","voted":30285,"label":"Nov 2016 General"},{"date":"2017-05-02","year":2017,"type":"Primary/Special","voted":3726,"label":"May 2017 Primary/Special"},{"date":"2017-11-07","year":2017,"type":"General","voted":15866,"label":"Nov 2017 General"},{"date":"2018-05-08","year":2018,"type":"Primary","voted":11679,"label":"May 2018 Primary"},{"date":"2018-11-06","year":2018,"type":"General","voted":26114,"label":"Nov 2018 General"},{"date":"2019-05-07","year":2019,"type":"Special","voted":7339,"label":"May 2019 Special"},{"date":"2019-11-05","year":2019,"type":"General","voted":16363,"label":"Nov 2019 General"},{"date":"2020-04-28","year":2020,"type":"Primary","voted":11734,"label":"Apr 2020 Primary"},{"date":"2020-11-03","year":2020,"type":"General","voted":38021,"label":"Nov 2020 General"},{"date":"2021-05-04","year":2021,"type":"Primary/Special","voted":2940,"label":"May 2021 Primary/Special"},{"date":"2021-11-02","year":2021,"type":"General","voted":14834,"label":"Nov 2021 General"},{"date":"2022-05-03","year":2022,"type":"Primary","voted":12530,"label":"May 2022 Primary"},{"date":"2022-08-02","year":2022,"type":"Primary","voted":4230,"label":"Aug 2022 Primary"},{"date":"2022-11-08","year":2022,"type":"General","voted":28847,"label":"Nov 2022 General"},{"date":"2023-05-02","year":2023,"type":"Primary/Special","voted":2545,"label":"May 2023 Primary/Special"},{"date":"2023-08-08","year":2023,"type":"Special","voted":21885,"label":"Aug 2023 Special"},{"date":"2023-11-07","year":2023,"type":"General","voted":29188,"label":"Nov 2023 General"},{"date":"2024-03-19","year":2024,"type":"Primary","voted":15439,"label":"Mar 2024 Primary"},{"date":"2024-11-05","year":2024,"type":"General","voted":42545,"label":"Nov 2024 General"},{"date":"2025-05-06","year":2025,"type":"Special","voted":8369,"label":"May 2025 Special"},{"date":"2025-11-04","year":2025,"type":"General","voted":19099,"label":"Nov 2025 General"}],"absentee":[{"year":2016,"label":"2016 General","absentee":6852,"eday":23433},{"year":2018,"label":"2018 General","absentee":5871,"eday":20243},{"year":2020,"label":"2020 General","absentee":19124,"eday":18897},{"year":2022,"label":"2022 General","absentee":7887,"eday":20960},{"year":2024,"label":"2024 General","absentee":15612,"eday":26933}],"registration":[{"year":1980,"count":726},{"year":1981,"count":232},{"year":1982,"count":333},{"year":1983,"count":395},{"year":1984,"count":754},{"year":1985,"count":201},{"year":1986,"count":304},{"year":1987,"count":370},{"year":1988,"count":998},{"year":1989,"count":388},{"year":1990,"count":710},{"year":1991,"count":571},{"year":1992,"count":1284},{"year":1993,"count":482},{"year":1994,"count":513},{"year":1995,"count":710},{"year":1996,"count":765},{"year":1997,"count":629},{"year":1998,"count":645},{"year":1999,"count":485},{"year":2000,"count":955},{"year":2001,"count":438},{"year":2002,"count":737},{"year":2003,"count":744},{"year":2004,"count":2189},{"year":2005,"count":662},{"year":2006,"count":712},{"year":2007,"count":947},{"year":2008,"count":1731},{"year":2009,"count":717},{"year":2010,"count":838},{"year":2011,"count":1000},{"year":2012,"count":1620},{"year":2013,"count":912},{"year":2014,"count":1058},{"year":2015,"count":1415},{"year":2016,"count":2571},{"year":2017,"count":1147},{"year":2018,"count":2055},{"year":2019,"count":1672},{"year":2020,"count":4650},{"year":2021,"count":1604},{"year":2022,"count":2302},{"year":2023,"count":2673},{"year":2024,"count":4442},{"year":2025,"count":1542},{"year":2026,"count":416}],"frequency":[{"elections_voted":0,"voters":5543},{"elections_voted":1,"voters":7076},{"elections_voted":2,"voters":5300},{"elections_voted":3,"voters":5876},{"elections_voted":4,"voters":6686},{"elections_voted":5,"voters":19089}],"party_turnout_2024":[{"party":"Democrat","total":5687,"voted":5599,"rate":98.5},{"party":"Nonpartisan","total":688,"voted":655,"rate":95.2},{"party":"Republican","total":12434,"voted":12240,"rate":98.4},{"party":"Unaffiliated","total":30761,"voted":23617,"rate":76.8}],"age_turnout_2024":[{"bucket":"18-24","total":3276,"voted":1780,"rate":54.3},{"bucket":"25-34","total":5480,"voted":3916,"rate":71.5},{"bucket":"35-44","total":6253,"voted":5001,"rate":80.0},{"bucket":"45-54","total":7199,"voted":6162,"rate":85.6},{"bucket":"55-64","total":9245,"voted":8325,"rate":90.0},{"bucket":"65-74","total":10112,"voted":9421,"rate":93.2},{"bucket":"75-84","total":6098,"voted":5752,"rate":94.3},{"bucket":"85+","total":1907,"voted":1754,"rate":92.0}]};
+
+// ============================================================
+// PALETTE
+// ============================================================
+const C = {
+  ink: '#1a1f2e',
+  navy: '#1e3a5f',
+  navySoft: '#4a6b8a',
+  accent: '#8a1c2b',
+  accentSoft: '#b8404f',
+  gold: '#c19a3d',
+  gray: '#8a8779',
+  green: '#4a6b3a',
+  rule: '#c8bfa8',
+  paper: '#fdfbf4'
+};
+const PARTY_COLORS = {
+  'Democrat': C.navy,
+  'Republican': C.accent,
+  'Unaffiliated': C.gray,
+  'Nonpartisan': C.gold
+};
+
+// ============================================================
+// FORMATTING
+// ============================================================
+const fmt = n => n.toLocaleString('en-US');
+const pct = (n, d) => d ? ((n/d)*100).toFixed(1) + '%' : '0%';
+
+// ============================================================
+// CHART DEFAULTS
+// ============================================================
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#3d4555';
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.plugins.legend.labels.boxHeight = 10;
+Chart.defaults.plugins.legend.labels.padding = 14;
+Chart.defaults.plugins.legend.labels.font = { family: "'JetBrains Mono', monospace", size: 10 };
+Chart.defaults.plugins.tooltip.backgroundColor = '#1a1f2e';
+Chart.defaults.plugins.tooltip.titleFont = { family: "'Fraunces', serif", size: 13, weight: '600' };
+Chart.defaults.plugins.tooltip.bodyFont = { family: "'JetBrains Mono', monospace", size: 11 };
+Chart.defaults.plugins.tooltip.padding = 10;
+Chart.defaults.plugins.tooltip.cornerRadius = 0;
+Chart.defaults.plugins.tooltip.displayColors = true;
+Chart.defaults.plugins.tooltip.boxPadding = 6;
+
+const gridStyle = { color: 'rgba(0,0,0,0.06)', drawBorder: false };
+const tickStyle = { color: '#6b7280', font: { family: "'JetBrains Mono', monospace", size: 10 } };
+
+// ============================================================
+// HEADLINE STATS
+// ============================================================
+document.getElementById('stat-total').textContent = fmt(DATA.summary.total_registered);
+document.getElementById('stat-active').textContent = fmt(DATA.summary.active_voters);
+document.getElementById('stat-precincts').textContent = DATA.summary.precincts;
+document.getElementById('stat-cities').textContent = DATA.summary.cities;
+
+// ============================================================
+// CHART 1 — TURNOUT TIMELINE (with filter)
+// ============================================================
+let turnoutChart;
+function renderTurnout(filter='all') {
+  const filtered = filter === 'all'
+    ? DATA.turnout
+    : DATA.turnout.filter(e => e.type.includes(filter));
+  const ctx = document.getElementById('chart-turnout').getContext('2d');
+  if (turnoutChart) turnoutChart.destroy();
+  turnoutChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: filtered.map(e => e.label),
+      datasets: [{
+        label: 'Ballots cast',
+        data: filtered.map(e => e.voted),
+        backgroundColor: filtered.map(e => {
+          if (e.type === 'General') return C.navy;
+          if (e.type.includes('Primary')) return C.accent;
+          return C.gold;
+        }),
+        borderWidth: 0,
+        barPercentage: 0.85
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => fmt(ctx.parsed.y) + ' ballots'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { ...tickStyle, maxRotation: 65, minRotation: 65, autoSkip: false }, grid: { display: false } },
+        y: { ticks: { ...tickStyle, callback: v => fmt(v) }, grid: gridStyle, beginAtZero: true }
+      }
+    }
+  });
+}
+renderTurnout();
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTurnout(btn.dataset.filter);
+  });
+});
+
+// ============================================================
+// CHART 2 — PARTY DOUGHNUT
+// ============================================================
+new Chart(document.getElementById('chart-party'), {
+  type: 'doughnut',
+  data: {
+    labels: DATA.party.map(p => p.party),
+    datasets: [{
+      data: DATA.party.map(p => p.count),
+      backgroundColor: DATA.party.map(p => PARTY_COLORS[p.party] || C.gray),
+      borderColor: C.paper,
+      borderWidth: 3
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '62%',
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+            return ctx.label + ': ' + fmt(ctx.parsed) + ' (' + pct(ctx.parsed, total) + ')';
+          }
+        }
+      }
+    }
+  }
+});
+
+// ============================================================
+// CHART 3 — AGE x PARTY (stacked %)
+// ============================================================
+const apParties = ['Democrat','Republican','Unaffiliated','Nonpartisan'];
+new Chart(document.getElementById('chart-age-party'), {
+  type: 'bar',
+  data: {
+    labels: DATA.age_party.map(a => a.bucket),
+    datasets: apParties.map(party => ({
+      label: party,
+      data: DATA.age_party.map(a => {
+        const total = apParties.reduce((s, p) => s + (a[p]||0), 0);
+        return total ? (a[party]||0) / total * 100 : 0;
+      }),
+      backgroundColor: PARTY_COLORS[party],
+      borderWidth: 0
+    }))
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'
+        }
+      }
+    },
+    scales: {
+      x: { stacked: true, ticks: tickStyle, grid: { display: false } },
+      y: { stacked: true, ticks: { ...tickStyle, callback: v => v + '%' }, grid: gridStyle, max: 100 }
+    }
+  }
+});
+
+// ============================================================
+// CHART 4 — AGE BUCKETS
+// ============================================================
+new Chart(document.getElementById('chart-age'), {
+  type: 'bar',
+  data: {
+    labels: DATA.age.map(a => a.bucket),
+    datasets: [{
+      label: 'Active voters',
+      data: DATA.age.map(a => a.count),
+      backgroundColor: C.navy,
+      borderWidth: 0,
+      barPercentage: 0.85
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => fmt(ctx.parsed.y) + ' voters' } } },
+    scales: {
+      x: { ticks: tickStyle, grid: { display: false } },
+      y: { ticks: { ...tickStyle, callback: v => fmt(v) }, grid: gridStyle, beginAtZero: true }
+    }
+  }
+});
+
+// ============================================================
+// CHART 5 — AGE TURNOUT 2024
+// ============================================================
+new Chart(document.getElementById('chart-age-turnout'), {
+  type: 'bar',
+  data: {
+    labels: DATA.age_turnout_2024.map(a => a.bucket),
+    datasets: [{
+      label: 'Turnout %',
+      data: DATA.age_turnout_2024.map(a => a.rate),
+      backgroundColor: DATA.age_turnout_2024.map(a => {
+        // intensity scale from gold->accent based on rate
+        return C.accent;
+      }),
+      borderWidth: 0,
+      barPercentage: 0.85
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const row = DATA.age_turnout_2024[ctx.dataIndex];
+            return [
+              'Turnout: ' + row.rate + '%',
+              fmt(row.voted) + ' of ' + fmt(row.total) + ' voted'
+            ];
+          }
+        }
+      }
+    },
+    scales: {
+      x: { ticks: tickStyle, grid: { display: false } },
+      y: { ticks: { ...tickStyle, callback: v => v + '%' }, grid: gridStyle, beginAtZero: true, max: 100 }
+    }
+  }
+});
+
+// ============================================================
+// CHART 6 — ABSENTEE vs ELECTION DAY
+// ============================================================
+new Chart(document.getElementById('chart-absentee'), {
+  type: 'bar',
+  data: {
+    labels: DATA.absentee.map(a => a.label),
+    datasets: [
+      { label: 'Election Day / Provisional', data: DATA.absentee.map(a => a.eday), backgroundColor: C.navy, borderWidth: 0 },
+      { label: 'Absentee', data: DATA.absentee.map(a => a.absentee), backgroundColor: C.gold, borderWidth: 0 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' },
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y) } }
+    },
+    scales: {
+      x: { stacked: true, ticks: tickStyle, grid: { display: false } },
+      y: { stacked: true, ticks: { ...tickStyle, callback: v => fmt(v) }, grid: gridStyle, beginAtZero: true }
+    }
+  }
+});
+
+// ============================================================
+// CITY TABLE
+// ============================================================
+(function buildCityTable() {
+  const tbody = document.querySelector('#city-table tbody');
+  const totalActive = DATA.summary.active_voters;
+  const cityPartyMap = Object.fromEntries(DATA.city_party.map(c => [c.city, c]));
+  const max = DATA.city[0].count;
+  DATA.city.forEach(row => {
+    const cp = cityPartyMap[row.city] || {};
+    const tr = document.createElement('tr');
+    const w = (row.count / max * 100).toFixed(1);
+    tr.innerHTML = `
+      <td class="bar-cell" style="--w:${w}%;">${row.city}</td>
+      <td class="num">${fmt(row.count)}</td>
+      <td class="num">${pct(row.count, totalActive)}</td>
+      <td class="num" style="color:${C.navy}">${cp.Democrat ? fmt(cp.Democrat) : '—'}</td>
+      <td class="num" style="color:${C.accent}">${cp.Republican ? fmt(cp.Republican) : '—'}</td>
+      <td class="num" style="color:${C.gray}">${cp.Unaffiliated ? fmt(cp.Unaffiliated) : '—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+})();
+
+// ============================================================
+// CHART 7 — PARTICIPATION FREQUENCY
+// ============================================================
+new Chart(document.getElementById('chart-frequency'), {
+  type: 'bar',
+  data: {
+    labels: DATA.frequency.map(f => f.elections_voted + ' of 5'),
+    datasets: [{
+      label: 'Active voters',
+      data: DATA.frequency.map(f => f.voters),
+      backgroundColor: DATA.frequency.map(f => {
+        const intensity = f.elections_voted / 5;
+        return f.elections_voted === 5 ? C.green
+             : f.elections_voted === 0 ? C.accent
+             : C.navySoft;
+      }),
+      borderWidth: 0,
+      barPercentage: 0.7
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const row = DATA.frequency[ctx.dataIndex];
+            const total = DATA.frequency.reduce((s,f)=>s+f.voters,0);
+            return [fmt(row.voters) + ' voters', pct(row.voters, total) + ' of active voters'];
+          }
+        }
+      }
+    },
+    scales: {
+      x: { ticks: tickStyle, grid: { display: false } },
+      y: { ticks: { ...tickStyle, callback: v => fmt(v) }, grid: gridStyle, beginAtZero: true }
+    }
+  }
+});
+
+// ============================================================
+// CHART 8 — REGISTRATION TRENDS
+// ============================================================
+new Chart(document.getElementById('chart-registration'), {
+  type: 'line',
+  data: {
+    labels: DATA.registration.map(r => r.year),
+    datasets: [{
+      label: 'New registrations (still on rolls)',
+      data: DATA.registration.map(r => r.count),
+      borderColor: C.accent,
+      backgroundColor: 'rgba(138, 28, 43, 0.08)',
+      borderWidth: 2,
+      tension: 0.25,
+      fill: true,
+      pointRadius: 2.5,
+      pointBackgroundColor: C.accent,
+      pointHoverRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmt(ctx.parsed.y) + ' registrations' } }
+    },
+    scales: {
+      x: { ticks: tickStyle, grid: { display: false } },
+      y: { ticks: { ...tickStyle, callback: v => fmt(v) }, grid: gridStyle, beginAtZero: true }
+    }
+  }
+});
+
+</script>
+
+</body>
+</html>
