@@ -137,6 +137,83 @@
             border-bottom: 1px dashed var(--rule);
         }
 
+        /* ── Collapsible groups ──────────────────────────── */
+        details.collapsible {
+            margin: 0;
+        }
+
+            details.collapsible > summary {
+                list-style: none;
+                cursor: pointer;
+                user-select: none;
+            }
+
+                details.collapsible > summary::-webkit-details-marker {
+                    display: none;
+                }
+
+                details.collapsible > summary.section-head,
+                details.collapsible > summary.subsection-head {
+                    margin-bottom: 0;
+                    transition: margin-bottom 0.15s ease;
+                }
+
+            details.collapsible[open] > summary.section-head {
+                margin-bottom: 24px;
+            }
+
+            details.collapsible[open] > summary.subsection-head {
+                margin-bottom: 18px;
+            }
+
+            details.collapsible > summary:hover .section-title,
+            details.collapsible > summary:hover .subsection-title {
+                color: var(--ink-2);
+            }
+
+            details.collapsible > summary:focus-visible {
+                outline: 2px solid var(--gold);
+                outline-offset: 4px;
+            }
+
+        .disclosure {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            margin-left: 14px;
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--paper);
+            background: var(--ink);
+            border: 1.5px solid var(--ink);
+            border-radius: 50%;
+            line-height: 1;
+            transition: transform 0.25s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            flex-shrink: 0;
+            transform: rotate(-90deg);
+            box-shadow: 0 2px 6px -2px rgba(14, 36, 56, 0.25);
+        }
+
+        details.collapsible[open] > summary .disclosure {
+            transform: rotate(0deg);
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        details.collapsible > summary:hover .disclosure {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: var(--paper);
+        }
+
+        .head-title-row {
+            display: flex;
+            align-items: center;
+        }
+
         .section-head-text {
             flex: 1;
             min-width: 280px;
@@ -445,280 +522,338 @@
         </div>
 
         <section class="section">
-            <div class="section-head">
-                <div class="section-head-text">
-                    <div class="section-eyebrow">Section One · Municipal</div>
-                    <h2 class="section-title">City of Girard, Ohio</h2>
-                    <p class="section-desc">Municipal finance reports and property-level mapping for the City of Girard.</p>
+            <details class="collapsible">
+                <summary class="section-head">
+                    <div class="section-head-text">
+                        <div class="section-eyebrow">Section One · Municipal</div>
+                        <div class="head-title-row">
+                            <h2 class="section-title">City of Girard, Ohio</h2>
+                            <span class="disclosure" aria-hidden="true">▾</span>
+                        </div>
+                        <p class="section-desc">Municipal finance reports and property-level mapping for the City of Girard.</p>
+                    </div>
+                    <div class="section-count"><strong>4</strong> projects</div>
+                </summary>
+
+                <div class="projects">
+                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Finance/Index.html" target="_blank" rel="noopener noreferrer">
+                        <div class="project-marker">
+                            <div class="marker-icon">$</div>
+                            <div class="marker-type">Reports</div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-title">Finance Reports</div>
+                            <div class="project-meta">Governments/Ohio/Trumbull/Girard/Finance/</div>
+                        </div>
+                        <div class="project-arrow">→</div>
+                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 17L17 7M17 7H8M17 7V16" />
+                        </svg>
+                    </a>
+
+                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Rentals" target="_blank" rel="noopener noreferrer">
+                        <div class="project-marker">
+                            <div class="marker-icon">⌂</div>
+                            <div class="marker-type">Map</div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-title">Rental Unit Locations Map</div>
+                            <div class="project-meta">Governments/Ohio/Trumbull/Girard/Rentals</div>
+                        </div>
+                        <div class="project-arrow">→</div>
+                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 17L17 7M17 7H8M17 7V16" />
+                        </svg>
+                    </a>
+
+                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/RentalsReport/Index.html" target="_blank" rel="noopener noreferrer">
+                        <div class="project-marker">
+                            <div class="marker-icon">⌂</div>
+                            <div class="marker-type">Report</div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-title">Rental Unit Locations Report</div>
+                            <div class="project-meta">Governments/Ohio/Trumbull/Girard/RentalsReport/</div>
+                        </div>
+                        <div class="project-arrow">→</div>
+                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 17L17 7M17 7H8M17 7V16" />
+                        </svg>
+                    </a>
+
+                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Water" target="_blank" rel="noopener noreferrer">
+                        <div class="project-marker">
+                            <div class="marker-icon">≈</div>
+                            <div class="marker-type">Map</div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-title">Water Account Locations Map</div>
+                            <div class="project-meta">Governments/Ohio/Trumbull/Girard/Water</div>
+                        </div>
+                        <div class="project-arrow">→</div>
+                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 17L17 7M17 7H8M17 7V16" />
+                        </svg>
+                    </a>
                 </div>
-                <div class="section-count"><strong>4</strong> projects</div>
-            </div>
-
-            <div class="projects">
-                <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Finance/Index.html" target="_blank" rel="noopener noreferrer">
-                    <div class="project-marker">
-                        <div class="marker-icon">$</div>
-                        <div class="marker-type">Reports</div>
-                    </div>
-                    <div class="project-body">
-                        <div class="project-title">Finance Reports</div>
-                        <div class="project-meta">Governments/Ohio/Trumbull/Girard/Finance/</div>
-                    </div>
-                    <div class="project-arrow">→</div>
-                    <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7 17L17 7M17 7H8M17 7V16" />
-                    </svg>
-                </a>
-
-                <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Rentals" target="_blank" rel="noopener noreferrer">
-                    <div class="project-marker">
-                        <div class="marker-icon">⌂</div>
-                        <div class="marker-type">Map</div>
-                    </div>
-                    <div class="project-body">
-                        <div class="project-title">Rental Unit Locations Map</div>
-                        <div class="project-meta">Governments/Ohio/Trumbull/Girard/Rentals</div>
-                    </div>
-                    <div class="project-arrow">→</div>
-                    <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7 17L17 7M17 7H8M17 7V16" />
-                    </svg>
-                </a>
-
-                <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/RentalsReport/Index.html" target="_blank" rel="noopener noreferrer">
-                    <div class="project-marker">
-                        <div class="marker-icon">⌂</div>
-                        <div class="marker-type">Report</div>
-                    </div>
-                    <div class="project-body">
-                        <div class="project-title">Rental Unit Locations Report</div>
-                        <div class="project-meta">Governments/Ohio/Trumbull/Girard/RentalsReport/</div>
-                    </div>
-                    <div class="project-arrow">→</div>
-                    <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7 17L17 7M17 7H8M17 7V16" />
-                    </svg>
-                </a>
-
-                <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Water" target="_blank" rel="noopener noreferrer">
-                    <div class="project-marker">
-                        <div class="marker-icon">≈</div>
-                        <div class="marker-type">Map</div>
-                    </div>
-                    <div class="project-body">
-                        <div class="project-title">Water Account Locations Map</div>
-                        <div class="project-meta">Governments/Ohio/Trumbull/Girard/Water</div>
-                    </div>
-                    <div class="project-arrow">→</div>
-                    <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7 17L17 7M17 7H8M17 7V16" />
-                    </svg>
-                </a>
-            </div>
+            </details>
         </section>
 
         <section class="section">
-            <div class="section-head">
-                <div class="section-head-text">
-                    <div class="section-eyebrow">Section Two · County</div>
-                    <h2 class="section-title">Ohio Counties</h2>
-                    <p class="section-desc">County-wide infrastructure, civic, and public-service maps and reports.</p>
-                </div>
-                <div class="section-count"><strong>11</strong> projects</div>
-            </div>
-
-            <div class="subsection">
-                <div class="subsection-head">
+            <details class="collapsible">
+                <summary class="section-head">
                     <div class="section-head-text">
-                        <h3 class="subsection-title">Ashtabula County</h3>
-                        <p class="subsection-desc">Public-records reports for Ashtabula County.</p>
+                        <div class="section-eyebrow">Section Two · County</div>
+                        <div class="head-title-row">
+                            <h2 class="section-title">Ohio Counties</h2>
+                            <span class="disclosure" aria-hidden="true">▾</span>
+                        </div>
+                        <p class="section-desc">County-wide infrastructure, civic, and public-service maps and reports.</p>
+                    </div>
+                    <div class="section-count"><strong>11</strong> projects</div>
+                </summary>
+
+                <div class="subsection">
+                    <details class="collapsible">
+                        <summary class="subsection-head">
+                            <div class="section-head-text">
+                                <div class="head-title-row">
+                                    <h3 class="subsection-title">Ashtabula County</h3>
+                                    <span class="disclosure" aria-hidden="true">▾</span>
+                                </div>
+                                <p class="subsection-desc">Public-records reports for Ashtabula County.</p>
+                            </div>
+                            <div class="section-count"><strong>1</strong> project</div>
+                        </summary>
+
+                        <div class="projects">
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Ashtabula/VoterRegistrations/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">⌂</div>
+                                    <div class="marker-type">Report</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Voter Registration</div>
+                                    <div class="project-meta">Governments/Ohio/Ashtabula/VoterRegistrations/Index.html</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="subsection">
+                    <details class="collapsible">
+                        <summary class="subsection-head">
+                            <div class="section-head-text">
+                                <div class="head-title-row">
+                                    <h3 class="subsection-title">Mahoning County</h3>
+                                    <span class="disclosure" aria-hidden="true">▾</span>
+                                </div>
+                                <p class="subsection-desc">Public-records reports for Mahoning County.</p>
+                            </div>
+                            <div class="section-count"><strong>1</strong> project</div>
+                        </summary>
+
+                        <div class="projects">
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Mahoning/VoterRegistrations/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">⌂</div>
+                                    <div class="marker-type">Report</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Voter Registration</div>
+                                    <div class="project-meta">Governments/Ohio/Mahoning/VoterRegistrations/Index.html</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="subsection">
+                    <details class="collapsible">
+                        <summary class="subsection-head">
+                            <div class="section-head-text">
+                                <div class="head-title-row">
+                                    <h3 class="subsection-title">Trumbull County</h3>
+                                    <span class="disclosure" aria-hidden="true">▾</span>
+                                </div>
+                                <p class="subsection-desc">County-wide infrastructure, civic, and public-service maps.</p>
+                            </div>
+                            <div class="section-count"><strong>9</strong> projects</div>
+                        </summary>
+
+                        <div class="projects">
+                            <a class="project" href="https://mikecostarella.github.io/my-website/AddressPoints/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">●</div>
+                                    <div class="marker-type">Map</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Address Points Map</div>
+                                    <div class="project-meta">AddressPoints/</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Hydrants/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">⚑</div>
+                                    <div class="marker-type">Map</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Hydrants Map</div>
+                                    <div class="project-meta">Hydrants/</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/HealthAccess/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">+</div>
+                                    <div class="marker-type">Map</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Healthcare Access Map</div>
+                                    <div class="project-meta">HealthAccess/</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/HealthcareFacilities/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">+</div>
+                                    <div class="marker-type">Map</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Healthcare Facilities Map</div>
+                                    <div class="project-meta">HealthcareFacilities/</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/InternetProviders/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">⌬</div>
+                                    <div class="marker-type">Report</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Internet Providers</div>
+                                    <div class="project-meta">Governments/Ohio/Trumbull/InternetProviders/Index.html</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/PoliceDepartments/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">★</div>
+                                    <div class="marker-type">Report</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Police Departments</div>
+                                    <div class="project-meta">Governments/Ohio/Trumbull/PoliceDepartments/Index.html</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Elections/Ohio/Counties/Trumbull/PollingLocations/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">✓</div>
+                                    <div class="marker-type">Map</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Polling Locations Map</div>
+                                    <div class="project-meta">Elections/Ohio/Counties/Trumbull/PollingLocations/</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Schools/Ohio/Trumbull/" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">¶</div>
+                                    <div class="marker-type">Map</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Schools Map</div>
+                                    <div class="project-meta">Schools/Ohio/Trumbull/</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+
+                            <a class="project" href="https://mikecostarella.github.io/my-website/Voters/Index.html" target="_blank" rel="noopener noreferrer">
+                                <div class="project-marker">
+                                    <div class="marker-icon">⌂</div>
+                                    <div class="marker-type">Report</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-title">Voter Registration</div>
+                                    <div class="project-meta">Voters/Index.html</div>
+                                </div>
+                                <div class="project-arrow">→</div>
+                                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17L17 7M17 7H8M17 7V16" />
+                                </svg>
+                            </a>
+                        </div>
+                    </details>
+                </div>
+            </details>
+        </section>
+
+        <section class="section">
+            <details class="collapsible">
+                <summary class="section-head">
+                    <div class="section-head-text">
+                        <div class="section-eyebrow">Section Three · Statewide</div>
+                        <div class="head-title-row">
+                            <h2 class="section-title">State of Ohio</h2>
+                            <span class="disclosure" aria-hidden="true">▾</span>
+                        </div>
+                        <p class="section-desc">Statewide reference maps.</p>
                     </div>
                     <div class="section-count"><strong>1</strong> project</div>
-                </div>
+                </summary>
 
                 <div class="projects">
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Ashtabula/VoterRegistrations/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">⌂</div>
-                            <div class="marker-type">Report</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Voter Registration</div>
-                            <div class="project-meta">Governments/Ohio/Ashtabula/VoterRegistrations/Index.html</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
-            <div class="subsection">
-                <div class="subsection-head">
-                    <div class="section-head-text">
-                        <h3 class="subsection-title">Mahoning County</h3>
-                        <p class="subsection-desc">Public-records reports for Mahoning County.</p>
-                    </div>
-                    <div class="section-count"><strong>1</strong> project</div>
-                </div>
-
-                <div class="projects">
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Mahoning/VoterRegistrations/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">⌂</div>
-                            <div class="marker-type">Report</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Voter Registration</div>
-                            <div class="project-meta">Governments/Ohio/Mahoning/VoterRegistrations/Index.html</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
-            <div class="subsection">
-                <div class="subsection-head">
-                    <div class="section-head-text">
-                        <h3 class="subsection-title">Trumbull County</h3>
-                        <p class="subsection-desc">County-wide infrastructure, civic, and public-service maps.</p>
-                    </div>
-                    <div class="section-count"><strong>9</strong> projects</div>
-                </div>
-
-                <div class="projects">
-                    <a class="project" href="https://mikecostarella.github.io/my-website/AddressPoints/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">●</div>
-                            <div class="marker-type">Map</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Address Points Map</div>
-                            <div class="project-meta">AddressPoints/</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Hydrants/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">⚑</div>
-                            <div class="marker-type">Map</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Hydrants Map</div>
-                            <div class="project-meta">Hydrants/</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/HealthAccess/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">+</div>
-                            <div class="marker-type">Map</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Healthcare Access Map</div>
-                            <div class="project-meta">HealthAccess/</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/HealthcareFacilities/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">+</div>
-                            <div class="marker-type">Map</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Healthcare Facilities Map</div>
-                            <div class="project-meta">HealthcareFacilities/</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/InternetProviders/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">⌬</div>
-                            <div class="marker-type">Report</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Internet Providers</div>
-                            <div class="project-meta">Governments/Ohio/Trumbull/InternetProviders/Index.html</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/PoliceDepartments/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">★</div>
-                            <div class="marker-type">Report</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Police Departments</div>
-                            <div class="project-meta">Governments/Ohio/Trumbull/PoliceDepartments/Index.html</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Elections/Ohio/Counties/Trumbull/PollingLocations/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">✓</div>
-                            <div class="marker-type">Map</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Polling Locations Map</div>
-                            <div class="project-meta">Elections/Ohio/Counties/Trumbull/PollingLocations/</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Schools/Ohio/Trumbull/" target="_blank" rel="noopener noreferrer">
+                    <a class="project" href="https://mikecostarella.github.io/my-website/Colleges/" target="_blank" rel="noopener noreferrer">
                         <div class="project-marker">
                             <div class="marker-icon">¶</div>
                             <div class="marker-type">Map</div>
                         </div>
                         <div class="project-body">
-                            <div class="project-title">Schools Map</div>
-                            <div class="project-meta">Schools/Ohio/Trumbull/</div>
-                        </div>
-                        <div class="project-arrow">→</div>
-                        <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                    </a>
-
-                    <a class="project" href="https://mikecostarella.github.io/my-website/Voters/Index.html" target="_blank" rel="noopener noreferrer">
-                        <div class="project-marker">
-                            <div class="marker-icon">⌂</div>
-                            <div class="marker-type">Report</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-title">Voter Registration</div>
-                            <div class="project-meta">Voters/Index.html</div>
+                            <div class="project-title">Colleges Map</div>
+                            <div class="project-meta">Colleges/</div>
                         </div>
                         <div class="project-arrow">→</div>
                         <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -726,35 +861,7 @@
                         </svg>
                     </a>
                 </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-head">
-                <div class="section-head-text">
-                    <div class="section-eyebrow">Section Three · Statewide</div>
-                    <h2 class="section-title">State of Ohio</h2>
-                    <p class="section-desc">Statewide reference maps.</p>
-                </div>
-                <div class="section-count"><strong>1</strong> project</div>
-            </div>
-
-            <div class="projects">
-                <a class="project" href="https://mikecostarella.github.io/my-website/Colleges/" target="_blank" rel="noopener noreferrer">
-                    <div class="project-marker">
-                        <div class="marker-icon">¶</div>
-                        <div class="marker-type">Map</div>
-                    </div>
-                    <div class="project-body">
-                        <div class="project-title">Colleges Map</div>
-                        <div class="project-meta">Colleges/</div>
-                    </div>
-                    <div class="project-arrow">→</div>
-                    <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7 17L17 7M17 7H8M17 7V16" />
-                    </svg>
-                </a>
-            </div>
+            </details>
         </section>
 
     </main>
