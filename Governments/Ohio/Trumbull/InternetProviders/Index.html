@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trumbull County Internet Providers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f4efe6;
+    --paper-2: #ebe4d6;
+    --rule: #1a1816;
+    --accent: #c8442a;
+    --accent-2: #1c4a3a;
+    --muted: #6b6457;
+    --shadow: 0 1px 0 rgba(0,0,0,.04), 0 24px 60px -20px rgba(15,14,12,.25);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(200,68,42,.04), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(28,74,58,.05), transparent 50%);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ===== Masthead ===== */
+  .masthead {
+    border-top: 6px double var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 22px 0 18px;
+    margin-bottom: 4px;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .masthead-top .vol { color: var(--accent); font-weight: 700; }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(40px, 7vw, 88px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    margin: 0;
+    font-variation-settings: "opsz" 144;
+  }
+
+  h1 .ampersand {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .masthead-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .byline {
+    color: var(--ink);
+  }
+
+  .byline strong {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .timestamp::before {
+    content: "●";
+    color: var(--accent-2);
+    margin-right: 6px;
+    font-size: 8px;
+    vertical-align: middle;
+  }
+
+  /* ===== Filters ===== */
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 24px 0 28px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 32px;
+  }
+
+  .filter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    align-self: center;
+    margin-right: 8px;
+  }
+
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all .18s ease;
+    font-weight: 500;
+  }
+
+  .chip:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .chip.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ===== Grid ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+  }
+
+  .card {
+    background: var(--paper);
+    padding: 28px 26px 24px;
+    cursor: pointer;
+    position: relative;
+    transition: background .25s ease, transform .25s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+  }
+
+  .card:hover {
+    background: var(--paper-2);
+  }
+
+  .card:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
+  }
+
+  .card .index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card .type-tag {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .card .name {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: auto;
+    padding-bottom: 24px;
+    font-variation-settings: "opsz" 96;
+  }
+
+  .card .footer-row {
+    border-top: 1px solid var(--ink);
+    padding-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .card .arrow {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .25s ease;
+    color: var(--ink);
+  }
+
+  .card:hover .arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+    transform: rotate(-45deg);
+  }
+
+  .card .arrow svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* Service-type accent stripe */
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--ink);
+  }
+
+  .card[data-type-key="cable"]::before { background: var(--accent); }
+  .card[data-type-key="fiber"]::before { background: var(--accent-2); }
+  .card[data-type-key="dsl"]::before { background: #8a6d3b; }
+  .card[data-type-key="wireless"]::before { background: #4a4a8a; }
+  .card[data-type-key="satellite"]::before { background: #2c2c2c; }
+
+  /* ===== Modal ===== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,14,12,.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+
+  .modal-backdrop.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal {
+    background: var(--paper);
+    width: 100%;
+    max-width: 580px;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    transform: translateY(20px) scale(.98);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    border: 1px solid var(--ink);
+    position: relative;
+  }
+
+  .modal-backdrop.active .modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-header {
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--ink);
+    position: relative;
+  }
+
+  .modal-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 52px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin: 0;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease;
+    color: var(--ink);
+  }
+
+  .modal-close:hover {
+    background: var(--ink);
+    color: var(--paper);
+    transform: rotate(90deg);
+  }
+
+  .modal-body {
+    padding: 24px 32px 28px;
+  }
+
+  .data-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px dotted #c4bcaa;
+    align-items: baseline;
+  }
+
+  .data-row:last-of-type {
+    border-bottom: none;
+  }
+
+  .data-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+  }
+
+  .data-value {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--ink);
+    word-break: break-word;
+  }
+
+  .data-value.id-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .modal-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 20px 32px 28px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .action-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    padding: 14px 10px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .action-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+    transform: translateY(-2px);
+  }
+
+  .action-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+  }
+
+  .action-btn.primary:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .action-btn.secondary {
+    background: var(--accent-2);
+    border-color: var(--accent-2);
+    color: var(--paper);
+  }
+
+  .action-btn.secondary:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .action-btn[aria-disabled="true"] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .action-btn svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 640px) {
+    .container { padding: 28px 18px 60px; }
+    .modal-actions { grid-template-columns: 1fr; }
+    .modal-header { padding: 24px 24px 20px; }
+    .modal-body { padding: 20px 24px; }
+    .modal-actions { padding: 16px 24px 24px; }
+    .data-row { grid-template-columns: 1fr; gap: 4px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .card .name { font-size: 26px; }
+    .toolbar { gap: 6px; }
+    .chip { padding: 7px 11px; font-size: 10px; }
+  }
+
+  /* ===== Animations ===== */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    animation: slideUp .5s ease backwards;
+  }
+
+  .card:nth-child(1) { animation-delay: .04s; }
+  .card:nth-child(2) { animation-delay: .08s; }
+  .card:nth-child(3) { animation-delay: .12s; }
+  .card:nth-child(4) { animation-delay: .16s; }
+  .card:nth-child(5) { animation-delay: .20s; }
+  .card:nth-child(6) { animation-delay: .24s; }
+  .card:nth-child(7) { animation-delay: .28s; }
+  .card:nth-child(8) { animation-delay: .32s; }
+  .card:nth-child(9) { animation-delay: .36s; }
+  .card:nth-child(10) { animation-delay: .40s; }
+  .card:nth-child(11) { animation-delay: .44s; }
+  .card:nth-child(12) { animation-delay: .48s; }
+  .card:nth-child(13) { animation-delay: .52s; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <span class="vol">VOL. I — DIRECTORY</span>
+      <span>Mahoning Valley · Northeast Ohio</span>
+    </div>
+
+    <h1>Trumbull County<br><span class="ampersand">&amp;</span> Internet Providers</h1>
+
+    <div class="masthead-bottom">
+      <span class="byline">Compiled by <strong>Mike Costarella</strong></span>
+      <span class="timestamp" id="timestamp">Last updated —</span>
+    </div>
+  </header>
+
+  <div class="toolbar" role="toolbar" aria-label="Filter providers">
+    <span class="filter-label">Filter ▸</span>
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="cable">Cable</button>
+    <button class="chip" data-filter="fiber">Fiber</button>
+    <button class="chip" data-filter="dsl">DSL</button>
+    <button class="chip" data-filter="wireless">Wireless</button>
+    <button class="chip" data-filter="satellite">Satellite</button>
+  </div>
+
+  <div class="grid" id="providerGrid" role="list"></div>
+
+  <footer>
+    <span>© 2026 · M. Costarella</span>
+    <span>Sources: FCC National Broadband Data · Provider Listings</span>
+  </footer>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal" role="document">
+    <div class="modal-header">
+      <div class="modal-eyebrow" id="modalEyebrow">Provider</div>
+      <h2 class="modal-title" id="modalTitle">—</h2>
+      <button class="modal-close" id="modalClose" aria-label="Close dialog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <a href="#" class="action-btn primary" id="actionCall">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+        Call
+      </a>
+      <a href="#" class="action-btn secondary" id="actionEmail">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <path d="M22 6l-10 7L2 6"/>
+        </svg>
+        Email
+      </a>
+      <a href="#" class="action-btn" id="actionWeb" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+        </svg>
+        Visit
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const providers = [
+    { id: "fd72099e-1e63-4072-9c72-f7b478fe4579", name: "Spectrum", type: "Cable", typeKey: "cable", phone: "1-855-243-8892", website: "https://www.spectrum.com", email: "support@spectrum.com", notes: "Most widely available; covers entire county; up to 1 Gbps" },
+    { id: "ec60a144-f637-4213-bb93-913245d03fae", name: "Optimum", type: "Cable", typeKey: "cable", phone: "1-866-200-7273", website: "https://www.optimum.com", email: "support@optimum.com", notes: "Cable service up to 400 Mbps in parts of the county" },
+    { id: "4a11eba6-da24-4381-96b4-f9da9cfdec21", name: "Brightspeed", type: "Fiber", typeKey: "fiber", phone: "1-833-692-7773", website: "https://www.brightspeed.com", email: "customercare@brightspeed.com", notes: "Launched fiber in Warren and Howland Center late 2024; multi-gig speeds" },
+    { id: "ddf2adf2-8a42-437a-bf3e-ba5f8e35168a", name: "Omni Fiber", type: "Fiber", typeKey: "fiber", phone: "1-959-200-6664", website: "https://omnifiber.com", email: "support@omnifiber.com", notes: "Up to 10 Gbps where available" },
+    { id: "b477492b-a496-4dd9-9aa8-0f463938eecb", name: "AT&T", type: "Fiber/DSL", typeKey: "fiber", phone: "1-800-288-2020", website: "https://www.att.com", email: "support@att.com", notes: "Fiber up to 5 Gbps; DSL up to 25 Mbps in non-fiber areas" },
+    { id: "6c2bfd87-cf42-49cd-a30d-40808ffc4979", name: "EarthLink", type: "Fiber/DSL", typeKey: "fiber", phone: "1-866-383-3080", website: "https://www.earthlink.net", email: "support@earthlink.net", notes: "Fiber up to 5 Gbps; also resells DSL" },
+    { id: "152c94f2-1537-4e63-b10e-b6393e70777d", name: "Windstream/Kinetic", type: "Fiber/DSL", typeKey: "fiber", phone: "1-866-445-8084", website: "https://www.windstream.com", email: "customerservice@windstream.com", notes: "Fiber up to 1 Gbps; DSL in other areas" },
+    { id: "0df03210-35e9-40c6-a62d-4a6e58c447b6", name: "Lumos", type: "Fiber", typeKey: "fiber", phone: "1-833-695-8667", website: "https://www.lumosfiber.com", email: "support@lumosfiber.com", notes: "$230M expansion into Mahoning/Trumbull; rolling out from late 2024" },
+    { id: "3fde017b-d4c0-4883-bfc7-3361fabf0989", name: "Frontier", type: "DSL", typeKey: "dsl", phone: "1-855-981-8002", website: "https://frontier.com", email: "support@frontier.com", notes: "DSL up to ~10 Mbps" },
+    { id: "cd43c91c-7906-4ff2-977c-3aaf40cf9c1c", name: "Verizon", type: "Fixed Wireless (5G)", typeKey: "wireless", phone: "1-800-922-0204", website: "https://www.verizon.com/home", email: "support@verizon.com", notes: "5G Home Internet in parts of the county" },
+    { id: "80fd4220-00e6-46c5-93c3-2a4759ef9919", name: "HughesNet", type: "Satellite", typeKey: "satellite", phone: "1-866-347-3292", website: "https://www.hughesnet.com", email: "support@hughesnet.com", notes: "Up to 25 Mbps; available everywhere" },
+    { id: "0d24d9a6-9be2-4f23-a19d-e20c13256b4d", name: "Viasat", type: "Satellite", typeKey: "satellite", phone: "1-855-463-9333", website: "https://www.viasat.com", email: "customercare@viasat.com", notes: "Up to 30 Mbps; available everywhere" },
+    { id: "08321ca7-36c0-4f08-9565-2e7450cdb02f", name: "Starlink", type: "Satellite (LEO)", typeKey: "satellite", phone: "Online support only", website: "https://www.starlink.com", email: null, notes: "Low-earth-orbit satellite; widely available" }
+  ];
+
+  // Set timestamp
+  const now = new Date();
+  const ts = now.toLocaleString('en-US', {
+    year: 'numeric', month: 'short', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+  document.getElementById('timestamp').textContent = `Last updated ${ts}`;
+
+  // Render grid
+  const grid = document.getElementById('providerGrid');
+  function renderGrid(filter = 'all') {
+    grid.innerHTML = '';
+    const list = filter === 'all' ? providers : providers.filter(p => p.typeKey === filter);
+    list.forEach((p, i) => {
+      const num = String(i + 1).padStart(2, '0');
+      const card = document.createElement('button');
+      card.className = 'card';
+      card.setAttribute('role', 'listitem');
+      card.setAttribute('data-id', p.id);
+      card.setAttribute('data-type-key', p.typeKey);
+      card.setAttribute('aria-label', `View details for ${p.name}`);
+      card.innerHTML = `
+        <div class="index">
+          <span>NO. ${num}</span>
+          <span class="type-tag">${p.type}</span>
+        </div>
+        <div class="name">${p.name}</div>
+        <div class="footer-row">
+          <span>Details</span>
+          <span class="arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </span>
+        </div>
+      `;
+      card.addEventListener('click', () => openModal(p));
+      grid.appendChild(card);
+    });
+  }
+  renderGrid();
+
+  // Filter chips
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderGrid(chip.dataset.filter);
+    });
+  });
+
+  // Modal
+  const backdrop = document.getElementById('modalBackdrop');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalEyebrow = document.getElementById('modalEyebrow');
+  const modalBody = document.getElementById('modalBody');
+  const actionCall = document.getElementById('actionCall');
+  const actionEmail = document.getElementById('actionEmail');
+  const actionWeb = document.getElementById('actionWeb');
+  const modalClose = document.getElementById('modalClose');
+
+  function openModal(p) {
+    modalTitle.textContent = p.name;
+    modalEyebrow.textContent = `${p.type} · Provider Profile`;
+    modalBody.innerHTML = `
+      <div class="data-row">
+        <span class="data-label">Service</span>
+        <span class="data-value">${p.type}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Phone</span>
+        <span class="data-value">${p.phone}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Website</span>
+        <span class="data-value">${p.website.replace(/^https?:\/\//, '')}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Notes</span>
+        <span class="data-value">${p.notes}</span>
+      </div>
+    `;
+
+    // Configure action buttons
+    const phoneDigits = p.phone.replace(/[^\d]/g, '');
+    if (phoneDigits.length >= 7) {
+      actionCall.href = `tel:${phoneDigits}`;
+      actionCall.setAttribute('aria-disabled', 'false');
+    } else {
+      actionCall.href = '#';
+      actionCall.setAttribute('aria-disabled', 'true');
+    }
+
+    if (p.email) {
+      actionEmail.href = `mailto:${p.email}?subject=Inquiry%20about%20${encodeURIComponent(p.name)}%20Service`;
+      actionEmail.setAttribute('aria-disabled', 'false');
+    } else {
+      actionEmail.href = '#';
+      actionEmail.setAttribute('aria-disabled', 'true');
+    }
+
+    actionWeb.href = p.website;
+
+    backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  modalClose.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && backdrop.classList.contains('active')) closeModal();
+  });
+</script>
+
+</body>
+</html>
