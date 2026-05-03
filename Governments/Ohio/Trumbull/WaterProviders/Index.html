@@ -352,6 +352,42 @@
   }
   tbody tr:hover .row-arrow { opacity: 1; transform: translateX(3px); }
 
+  .map-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    margin-left: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--ink);
+    text-decoration: none;
+    vertical-align: middle;
+    transition: transform .18s, background .18s;
+    box-shadow: 0 0 0 2px var(--paper-warm);
+    position: relative;
+  }
+  .map-icon svg { width: 12px; height: 12px; fill: currentColor; }
+  .map-icon:hover { background: var(--rust); color: var(--paper); transform: scale(1.15); }
+  .map-icon::after {
+    content: "Map available";
+    position: absolute;
+    bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    font-family: var(--mono);
+    font-size: 9px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .12em;
+    padding: 5px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity .15s;
+  }
+  .map-icon:hover::after { opacity: 1; }
+  /* hide tooltip on touch devices to avoid sticky-tap weirdness */
+  @media (hover: none) { .map-icon::after { display: none; } }
+
   .badge {
     display: inline-block;
     font-family: var(--mono);
@@ -540,6 +576,12 @@
     border: 1px solid var(--ink);
   }
   .dialog-actions .btn-secondary:hover { background: var(--ink); color: var(--paper); }
+  .dialog-actions .btn-accent {
+    background: var(--gold);
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .dialog-actions .btn-accent:hover { background: var(--rust); color: var(--paper); transform: translateY(-1px); }
 
   /* ============ FOOTER ============ */
   footer {
@@ -705,6 +747,18 @@
   // ============ DATA ============
   const DATA = [{"Water System Name":"Bazetta/Champion Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Bazetta Township / Champion Township","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/CH.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US"},{"Water System Name":"Braceville Township Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Braceville Township","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/BR.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US"},{"Water System Name":"Howland Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Howland Township","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/HO.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US"},{"Water System Name":"Mineral Ridge Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Mineral Ridge area (Weathersfield Township)","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/MI.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US"},{"Water System Name":"Mosquito Creek Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Mosquito Creek area","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/MC.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US"},{"Water System Name":"Southeast Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Southeastern Trumbull County","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/SE.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US"},{"Water System Name":"Warren Township Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Warren Township (unincorporated)","Category":"County Water District","Notes":"Separate from City of Warren system; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/WA.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US"},{"Water System Name":"City of Warren Water Department","Type / Operator":"Municipal","Service Area":"City of Warren","Category":"Municipal Water Department","Notes":"2323 Main Avenue SW, Warren OH; supplies bulk water to some county districts","Consumer Confidence Report":"https://www.warren.org/water_department/annual_report.php","Billing Address":"City of Warren Water Dept, 2323 Main Ave SW, Warren, OH 44481","Geocodio Latitude":41.202075,"Geocodio Longitude":-80.81282,"Street Number":2323,"Street Name":"Main Ave SW","Geocodio City":"Warren","Geocodio State":"OH","County":"Trumbull County","Postal Code":44481,"Country":"US"},{"Water System Name":"City of Niles Water Department","Type / Operator":"Municipal","Service Area":"City of Niles","Category":"Municipal Water Department","Notes":"Operates own municipal water system","Consumer Confidence Report":"https://thecityofniles.com/","Billing Address":"City of Niles Utility Billing, 34 West State Street, Niles, OH 44446","Geocodio Latitude":41.153303,"Geocodio Longitude":-80.700893,"Street Number":34,"Street Name":"S State St","Geocodio City":"Girard","Geocodio State":"OH","County":"Trumbull County","Postal Code":44420,"Country":"US"},{"Water System Name":"City of Girard Water Department","Type / Operator":"Municipal","Service Area":"City of Girard","Category":"Municipal Water Department","Notes":"100 W Main St, Ste 3, Girard OH","Consumer Confidence Report":"https://cityofgirardoh.gov/blog/ova_dep/water-department/","Billing Address":"City of Girard Water Dept, 100 West Main Street, Girard, OH 44420","Geocodio Latitude":41.155527,"Geocodio Longitude":-80.703711,"Street Number":100,"Street Name":"W Main St","Geocodio City":"Girard","Geocodio State":"OH","County":"Trumbull County","Postal Code":44420,"Country":"US"},{"Water System Name":"City of Hubbard Water Department","Type / Operator":"Municipal","Service Area":"City of Hubbard","Category":"Municipal Water Department","Notes":"824 North Main Street, Hubbard OH","Consumer Confidence Report":"https://cityofhubbard-oh.gov/water/","Billing Address":"City of Hubbard Municipal Building, 220 West Liberty Street, Hubbard, OH 44425","Geocodio Latitude":41.156569,"Geocodio Longitude":-80.573215,"Street Number":220,"Street Name":"W Liberty St","Geocodio City":"Hubbard","Geocodio State":"OH","County":"Trumbull County","Postal Code":44425,"Country":"US"},{"Water System Name":"City of Newton Falls Water Department","Type / Operator":"Municipal","Service Area":"City of Newton Falls","Category":"Municipal Water Department","Notes":"Operates own municipal water system","Consumer Confidence Report":"https://ci.newtonfalls.oh.us/water-utility-services/","Billing Address":"City of Newton Falls Utility Billing, 612 West Broad Street, Newton Falls, OH 44444","Geocodio Latitude":41.189084,"Geocodio Longitude":-80.984698,"Street Number":612,"Street Name":"W Broad St","Geocodio City":"Newton Falls","Geocodio State":"OH","County":"Trumbull County","Postal Code":44444,"Country":"US"},{"Water System Name":"City of Cortland Water Department","Type / Operator":"Municipal","Service Area":"City of Cortland","Category":"Municipal Water Department","Notes":"Operates own municipal water system","Consumer Confidence Report":"https://www.cortlandoh.gov/drinking-water-consumer-confidence-report/","Billing Address":"City of Cortland Administration, 400 North High Street, Cortland, OH 44410","Geocodio Latitude":41.338256,"Geocodio Longitude":-80.723489,"Street Number":400,"Street Name":"N High St","Geocodio City":"Cortland","Geocodio State":"OH","County":"Trumbull County","Postal Code":44410,"Country":"US"},{"Water System Name":"Village of McDonald Water Department","Type / Operator":"Municipal","Service Area":"Village of McDonald","Category":"Municipal Water Department","Notes":"Small village water system","Consumer Confidence Report":"https://mcdonaldvillage.com/offices/water-department/","Billing Address":"Village of McDonald Municipal Building, 451 Ohio Ave, McDonald, OH 44437","Geocodio Latitude":41.163543,"Geocodio Longitude":-80.723552,"Street Number":451,"Street Name":"Ohio Ave","Geocodio City":"McDonald","Geocodio State":"OH","County":"Trumbull County","Postal Code":44437,"Country":"US"}];
 
+  // ============ MAP LINKS ============
+  // Keyed by exact "Water System Name" — add more entries here as additional
+  // system maps become available.
+  const MAP_URLS = {
+    "City of Girard Water Department":
+      "https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Water/",
+    "Village of McDonald Water Department":
+      "https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Municipalities/McDonald/WaterSystemMap/Index.html"
+  };
+
+  const MAP_ICON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>';
+
   // ============ STATE ============
   let currentFilter = "all";
   let currentSearch = "";
@@ -785,9 +839,13 @@
 
     tableBody.innerHTML = rows.map((r, i) => {
       const idx = DATA.indexOf(r);
+      const mapUrl = MAP_URLS[r["Water System Name"]];
+      const mapIcon = mapUrl
+        ? `<a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener" class="map-icon" aria-label="Open ${escapeHtml(r["Water System Name"])} map in new tab" data-map-link>${MAP_ICON_SVG}</a>`
+        : "";
       return `
         <tr tabindex="0" data-index="${idx}">
-          <td data-label="System">${escapeHtml(r["Water System Name"])}<span class="row-arrow">→</span></td>
+          <td data-label="System">${escapeHtml(r["Water System Name"])}${mapIcon}<span class="row-arrow">→</span></td>
           <td data-label="Category">${badge(r.Category)}</td>
           <td data-label="Service Area">${escapeHtml(r["Service Area"])}</td>
           <td data-label="City">${escapeHtml(r["Geocodio City"])}, ${escapeHtml(r["Geocodio State"])}</td>
@@ -798,9 +856,13 @@
     // bind rows
     tableBody.querySelectorAll("tr").forEach(tr => {
       const idx = parseInt(tr.dataset.index, 10);
-      tr.addEventListener("click", () => openDialog(idx));
+      tr.addEventListener("click", e => {
+        // ignore clicks on the map icon — let the link navigate normally
+        if (e.target.closest("[data-map-link]")) return;
+        openDialog(idx);
+      });
       tr.addEventListener("keydown", e => {
-        if (e.key === "Enter" || e.key === " ") {
+        if ((e.key === "Enter" || e.key === " ") && !e.target.closest("[data-map-link]")) {
           e.preventDefault();
           openDialog(idx);
         }
@@ -864,6 +926,10 @@
     const lat = r["Geocodio Latitude"];
     const lng = r["Geocodio Longitude"];
     const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+    const systemMapUrl = MAP_URLS[r["Water System Name"]];
+    const systemMapBtn = systemMapUrl
+      ? `<a class="btn-accent" href="${escapeHtml(systemMapUrl)}" target="_blank" rel="noopener">View System Map ↗</a>`
+      : "";
 
     document.getElementById("dialogBody").innerHTML = `
       ${field("Operator / Type", r["Type / Operator"])}
@@ -881,6 +947,7 @@
       </div>
       ${field("Consumer Confidence Report", r["Consumer Confidence Report"], true)}
       <div class="dialog-actions">
+        ${systemMapBtn}
         <a class="btn-primary" href="${escapeHtml(r["Consumer Confidence Report"])}" target="_blank" rel="noopener">View CCR</a>
         <a class="btn-secondary" href="${mapsUrl}" target="_blank" rel="noopener">Open in Maps</a>
       </div>
