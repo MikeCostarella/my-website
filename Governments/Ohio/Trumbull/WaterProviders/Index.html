@@ -697,6 +697,7 @@
     <button class="chip active" data-filter="all">All <span class="count">14</span></button>
     <button class="chip" data-filter="County Water District">County Districts <span class="count">7</span></button>
     <button class="chip" data-filter="Municipal Water Department">Municipal <span class="count">7</span></button>
+    <button class="chip" data-filter="__mapped">Mapped <span class="count" id="chipMappedCount">0</span></button>
   </div>
 </section>
 
@@ -706,7 +707,7 @@
   <table id="systemsTable" aria-label="Water systems directory">
     <thead>
       <tr>
-        <th data-sort="Water System Name" class="sorted asc">Water System</th>
+        <th data-sort="Water System Name" class="sorted asc">Water Provider</th>
         <th data-sort="Category">Category</th>
         <th data-sort="Service Area">Service Area</th>
         <th data-sort="Geocodio City">City</th>
@@ -805,7 +806,9 @@
     let rows = DATA.slice();
 
     // filter
-    if (currentFilter !== "all") {
+    if (currentFilter === "__mapped") {
+      rows = rows.filter(r => MAP_URLS[r["Water System Name"]]);
+    } else if (currentFilter !== "all") {
       rows = rows.filter(r => r.Category === currentFilter);
     }
 
@@ -1021,6 +1024,7 @@
   document.getElementById("statCounty").textContent = county;
   document.getElementById("statMuni").textContent = muni;
   document.getElementById("statMapped").textContent = mapped;
+  document.getElementById("chipMappedCount").textContent = mapped;
 
   const now = new Date();
   const dateStr = now.toLocaleString("en-US", {
