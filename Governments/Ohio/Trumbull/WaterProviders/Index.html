@@ -843,8 +843,14 @@
     tableBody.innerHTML = rows.map((r, i) => {
       const idx = DATA.indexOf(r);
       const mapUrl = MAP_URLS[r["Water System Name"]];
+      const isMobile = window.matchMedia("(max-width: 820px)").matches;
+      const target = isMobile ? "_self" : "_blank";
+      const ariaLabel = isMobile
+        ? `Open ${r["Water System Name"]} map`
+        : `Open ${r["Water System Name"]} map in new tab`;
+      const relAttr = isMobile ? "" : ' rel="noopener"';
       const mapIcon = mapUrl
-        ? `<a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener" class="map-icon" aria-label="Open ${escapeHtml(r["Water System Name"])} map in new tab" data-map-link>${MAP_ICON_SVG}</a>`
+        ? `<a href="${escapeHtml(mapUrl)}" target="${target}"${relAttr} class="map-icon" aria-label="${escapeHtml(ariaLabel)}" data-map-link>${MAP_ICON_SVG}</a>`
         : "";
       return `
         <tr tabindex="0" data-index="${idx}">
@@ -905,6 +911,10 @@
       render();
     });
   });
+
+  // Re-render when the viewport crosses the mobile breakpoint so the map
+  // icon's target attribute (_self on mobile, _blank on desktop) stays in sync.
+  window.matchMedia("(max-width: 820px)").addEventListener("change", () => render());
 
   // ============ DIALOG ============
   // mode: "text" | "url" | "tel" | "email" | "domain"
