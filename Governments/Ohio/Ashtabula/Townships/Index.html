@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ashtabula County · Township Government Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1612;
+    --ink-soft:#3d352c;
+    --ink-faint:#6b5f51;
+    --rule:#c9bda9;
+    --rule-soft:#e3d8c2;
+    --paper:#f5ecd9;
+    --paper-2:#ede2c8;
+    --paper-3:#e6d8b6;
+    --accent:#8a2418;       /* deep cinnabar / official seal red */
+    --accent-soft:#b03a26;
+    --gold:#a17a2b;
+    --green:#3a5a36;
+    --shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 32px -16px rgba(60,40,20,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(160,120,60,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(138,36,24,.07), transparent 60%),
+      var(--paper);
+    background-attachment: fixed;
+    min-height:100vh;
+    line-height:1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* subtle paper grain */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    background-image:
+      radial-gradient(rgba(60,40,20,.05) 1px, transparent 1px),
+      radial-gradient(rgba(60,40,20,.04) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 2px;
+    mix-blend-mode: multiply;
+    opacity:.6;
+    z-index:0;
+  }
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 56px 40px 96px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    padding-bottom: 18px;
+    border-bottom: 3px double var(--ink);
+  }
+  .masthead .inner{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items:center;
+    gap: 24px;
+  }
+  .crest{
+    text-align:center;
+  }
+  .crest .seal{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:78px; height:78px; border-radius:50%;
+    border:2px solid var(--ink);
+    background: radial-gradient(circle at 30% 30%, var(--paper-3), var(--paper-2));
+    font-family: 'Fraunces', serif;
+    font-weight:700; font-size: 30px;
+    color:var(--accent);
+    letter-spacing:.02em;
+    box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 6px var(--ink);
+    position:relative;
+  }
+  .crest .seal::after{
+    content:""; position:absolute; inset:-9px;
+    border:1px solid var(--ink); border-radius:50%; opacity:.5;
+  }
+  .crest h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height:1;
+    margin: 14px 0 4px;
+    letter-spacing:-.01em;
+  }
+  .crest .sub{
+    font-family:'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .meta-left, .meta-right{
+    font-family:'DM Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    line-height: 1.7;
+  }
+  .meta-left{ text-align:left }
+  .meta-right{ text-align:right }
+  .meta-left b, .meta-right b{ color:var(--ink); font-weight:500 }
+
+  /* tagline strip */
+  .tagline{
+    margin-top: 14px;
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-soft);
+    text-align: center;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    display:grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 14px;
+    align-items: stretch;
+    margin: 24px 0 18px;
+  }
+  @media (max-width: 820px){
+    .toolbar{ grid-template-columns: 1fr 1fr }
+    .search-wrap{ grid-column: 1 / -1 }
+  }
+  .search-wrap{
+    position:relative;
+    display:flex; align-items:center;
+    background: var(--paper-2);
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    padding: 0 14px;
+    box-shadow: var(--shadow);
+  }
+  .search-wrap svg{ width:16px; height:16px; flex-shrink:0; color:var(--ink-soft); }
+  .search-wrap input{
+    flex:1;
+    border:0; background:transparent; outline:none;
+    font: 500 16px/1 'DM Sans', sans-serif;
+    color: var(--ink);
+    padding: 14px 12px;
+  }
+  .search-wrap input::placeholder{ color: var(--ink-faint); font-style: italic; }
+  .search-wrap kbd{
+    font-family:'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    border:1px solid var(--rule);
+    padding: 2px 5px;
+    border-radius:3px;
+    background: var(--paper);
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; gap: 8px;
+    border: 1px solid var(--ink);
+    background: var(--paper-2);
+    color: var(--ink);
+    font: 500 12px/1 'DM Mono', monospace;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 0 18px;
+    height: auto;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease, color .12s ease;
+    box-shadow: var(--shadow);
+  }
+  .btn:hover{ background: var(--ink); color: var(--paper); transform: translateY(-1px); }
+  .btn.primary{ background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .btn.primary:hover{ background: var(--ink); border-color: var(--ink); }
+
+  .filter-pills{
+    display:flex; gap:8px; align-items:center;
+    flex-wrap:wrap;
+  }
+  .pill{
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-soft);
+    font: 500 11px/1 'DM Mono', monospace;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all .12s ease;
+  }
+  .pill:hover{ border-color: var(--ink); color: var(--ink); }
+  .pill.active{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* ---------- Table (Ledger) ---------- */
+  .ledger{
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead th{
+    position: sticky; top: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font: 500 10.5px/1.2 'DM Mono', monospace;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    border-right: 1px solid #2a241c;
+  }
+  thead th:last-child{ border-right:0 }
+  thead th:hover{ background: var(--accent); }
+  thead th .sort-ind{
+    display:inline-block;
+    width: 10px;
+    color: var(--paper-3);
+    margin-left: 6px;
+    opacity:.5;
+  }
+  thead th.sorted .sort-ind{ opacity:1; color: var(--paper); }
+  thead th.numeric{ width: 56px; text-align: right; }
+
+  tbody tr{
+    border-bottom: 1px solid var(--rule-soft);
+    transition: background .12s ease;
+    cursor: pointer;
+  }
+  tbody tr:nth-child(odd){ background: rgba(255,255,255,.18); }
+  tbody tr:hover{ background: var(--paper-2); }
+  tbody tr.expanded{ background: var(--paper-3) !important; }
+  tbody tr.expanded td{ border-bottom: 1px solid var(--rule); }
+
+  tbody td{
+    padding: 14px 14px;
+    vertical-align: top;
+    color: var(--ink-soft);
+    border-right: 1px dotted var(--rule-soft);
+  }
+  tbody td:last-child{ border-right:0 }
+  td.idx{
+    font-family:'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-align: right;
+    width: 56px;
+    padding-top: 16px;
+  }
+  td.name{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--ink);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  td.name .chevron{
+    display:inline-flex;
+    align-items:center; justify-content:center;
+    width: 20px; height: 20px;
+    margin-right: 6px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink-soft);
+    border-radius: 50%;
+    transition: transform .2s ease, background .15s ease, color .15s ease, border-color .15s ease;
+    vertical-align: middle;
+  }
+  td.name .chevron svg{ width: 10px; height: 10px; }
+  tbody tr:hover td.name .chevron{ border-color: var(--ink); color: var(--ink); }
+  tbody tr.expanded td.name .chevron{
+    transform: rotate(90deg);
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+  }
+  td a{ color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent;}
+  td a:hover{ border-bottom-color: var(--accent); }
+  td .muted{ color: var(--ink-faint); font-style: italic; font-size: 12.5px; }
+  .pho, .fax{ font-family:'DM Mono', monospace; font-size: 13px; white-space: nowrap; }
+
+  /* expanded card */
+  .expand-row td{
+    padding: 0;
+    background: var(--paper-3);
+    border-bottom: 1px solid var(--rule);
+  }
+  .expand-inner{
+    display:grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0;
+    padding: 24px 28px 28px;
+    border-top: 2px dashed var(--accent);
+    animation: fadeIn .25s ease;
+  }
+  @keyframes fadeIn{
+    from{ opacity:0; transform: translateY(-4px) }
+    to{ opacity:1; transform: translateY(0) }
+  }
+  .field{
+    grid-column: span 4;
+    padding: 6px 16px 6px 0;
+  }
+  .field.full{ grid-column: span 12 }
+  .field.half{ grid-column: span 6 }
+  .field .label{
+    font: 500 10px/1 'DM Mono', monospace;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .field .value{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    color: var(--ink);
+    word-break: break-word;
+  }
+  .field .value.mono{ font-family:'DM Mono', monospace; font-size: 12.5px; }
+
+  .expand-row .actions{
+    grid-column: span 12;
+    margin-top: 8px;
+    display:flex; gap: 10px; flex-wrap: wrap;
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
+  }
+
+  /* empty state */
+  .empty{
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--ink-faint);
+  }
+  .empty h3{
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+  }
+
+  /* ---------- Collapsible sections (mobile only) ---------- */
+  .collapse-toggle{
+    display: none; /* hidden on desktop */
+  }
+  @media (max-width: 720px){
+    .collapsible{
+      position: relative;
+      border: 1px solid var(--ink);
+      background: var(--paper-2);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+    /* unify masthead so it gets the same collapse treatment */
+    .masthead.collapsible{
+      display: block;
+      border-bottom: 1px solid var(--ink);
+      padding: 0;
+    }
+    .collapse-toggle{
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: 12px 16px;
+      cursor: pointer;
+      font: 500 10.5px/1 'DM Mono', monospace;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-align: left;
+    }
+    .collapse-toggle .label-grp{
+      display:flex; align-items:center; gap: 10px;
+    }
+    .collapse-toggle .swatch{
+      width: 6px; height: 16px; background: var(--accent); display:inline-block;
+    }
+    .collapse-toggle .chev{
+      display:inline-flex; align-items:center; justify-content:center;
+      width: 22px; height: 22px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      transition: transform .2s ease, background .15s ease, color .15s ease;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .collapse-toggle .chev svg{ width: 10px; height: 10px; }
+    .collapsible.open .collapse-toggle .chev{
+      transform: rotate(90deg);
+      background: var(--accent);
+      color: var(--paper);
+      border-color: var(--accent);
+    }
+    .collapsible-body{
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease;
+    }
+    .collapsible.open .collapsible-body{
+      max-height: 1000px;
+    }
+    .collapsible.open .collapse-toggle{
+      border-bottom: 1px solid var(--rule);
+    }
+    .collapsible:not(.open) .collapse-toggle{
+      border-bottom: 0;
+    }
+    /* Inner masthead spacing once collapsible */
+    .masthead .collapsible-body > .inner{
+      display: grid;
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 12px;
+      padding: 18px 16px 22px;
+    }
+    .masthead .meta-left, .masthead .meta-right{
+      text-align: center;
+    }
+    /* Hide the standalone tagline on mobile — it lives inside the collapsible header now */
+    .tagline.mobile-hide{ display: none; }
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    margin-top: 30px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    display:flex; justify-content:space-between; flex-wrap: wrap; gap: 14px;
+    font: 500 10.5px/1.6 'DM Mono', monospace;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  footer b{ color: var(--ink); font-weight: 500; }
+  footer .byline{
+    flex-basis: 100%;
+    text-align: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dotted var(--rule);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink-soft);
+  }
+  footer .byline::before,
+  footer .byline::after{
+    content: "❦";
+    color: var(--accent);
+    margin: 0 12px;
+    font-style: normal;
+    font-size: 12px;
+    vertical-align: 1px;
+  }
+  footer .byline b{
+    font-style: normal;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: .01em;
+  }
+
+  /* hide some columns on small screens */
+  @media (max-width: 980px){
+    th.col-fax, td.col-fax,
+    th.col-id, td.col-id { display: none; }
+  }
+  @media (max-width: 680px){
+    th.col-website, td.col-website,
+    th.col-email, td.col-email { display: none; }
+  }
+
+  /* highlight matched search text */
+  mark{
+    background: rgba(161, 122, 43, .35);
+    color: var(--ink);
+    padding: 0 1px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead collapsible open" id="section-masthead">
+    <button class="collapse-toggle" type="button" aria-controls="masthead-body" aria-expanded="true">
+      <span class="label-grp"><span class="swatch"></span>Ashtabula County · Register</span>
+      <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+    </button>
+    <div class="collapsible-body" id="masthead-body">
+      <div class="inner">
+        <div class="meta-left">
+          Vol. I &middot; No. 27<br>
+          Established <b>1811</b><br>
+          27 Civil Townships
+        </div>
+        <div class="crest">
+          <div class="seal">A</div>
+          <h1>Ashtabula County</h1>
+          <div class="sub">Township Government Register · Ohio</div>
+        </div>
+        <div class="meta-right">
+          Updated <b><span id="today"></span></b><br>
+          Sources: County Directories<br>
+          Records: <b>27</b>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <p class="tagline mobile-hide">A consolidated index of trustee offices, fiscal officers, and official correspondence for the twenty-seven civil townships of Ashtabula County.</p>
+
+  <div class="toolbar">
+    <label class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search" type="search" placeholder="Search townships, contacts, addresses, emails…" autocomplete="off">
+      <kbd>/</kbd>
+    </label>
+    <div class="filter-pills">
+      <button class="pill active" data-filter="all">All</button>
+      <button class="pill" data-filter="website">Has website</button>
+      <button class="pill" data-filter="email">Has email</button>
+    </div>
+    <button class="btn" id="reset-btn">Reset</button>
+    <button class="btn primary" id="export-btn">Export CSV</button>
+  </div>
+
+  <div class="ledger">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th class="numeric" data-key="__idx" title="Row number">№<span class="sort-ind">▲</span></th>
+          <th data-key="Township Name" class="sorted">Township<span class="sort-ind">▲</span></th>
+          <th data-key="Mailing Address">Mailing Address<span class="sort-ind">▲</span></th>
+          <th data-key="Phone">Phone<span class="sort-ind">▲</span></th>
+          <th data-key="Fax" class="col-fax">Fax<span class="sort-ind">▲</span></th>
+          <th data-key="Website" class="col-website">Website<span class="sort-ind">▲</span></th>
+          <th data-key="General Email" class="col-email">Email<span class="sort-ind">▲</span></th>
+          <th data-key="Primary Contact Name">Fiscal Officer<span class="sort-ind">▲</span></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">
+      <h3>No matching townships</h3>
+      <div>Try a different search term, or reset the filters.</div>
+    </div>
+  </div>
+
+  <footer>
+    <div>Ashtabula County, Ohio &middot; <b>27 Townships</b> &middot; Click any row to view full record</div>
+    <div>Compiled from official 2023–2026 community directories</div>
+    <div class="byline">Created by <b>Mike Costarella</b></div>
+  </footer>
+
+</div>
+
+<script>
+const DATA = [
+  {"Id":"35039000-f39d-4a41-8764-8c3fb381218f","Township Name":"Andover Township","Mailing Address":"410 East Main St, Andover, OH 44003","Phone":"440-293-2489","Fax":"","Website":"","General Email":"andovertownshipohio@gmail.com","Primary Contact Name":"Betty M Legg","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"andovertownshipohio@gmail.com"},
+  {"Id":"a368f30e-c9d9-4f29-9043-6e5650021148","Township Name":"Ashtabula Township","Mailing Address":"2718 N. Ridge Rd E., Ashtabula, OH 44004","Phone":"440-997-9221","Fax":"440-992-4058","Website":"www.ashtabulatownship.com","General Email":"administration@atfd.net","Primary Contact Name":"Robert Dille","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"rdille@roadrunner.com"},
+  {"Id":"0a4f4b27-87e7-4760-9317-86c15b6716cc","Township Name":"Austinburg Township","Mailing Address":"P.O. Box 134, Austinburg, OH 44010","Phone":"440-275-1378","Fax":"","Website":"www.austinburg.org","General Email":"dtaustinburgfiscalofficer@gmail.com","Primary Contact Name":"Kanda O'Dell","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"KOdell@austinburg.org"},
+  {"Id":"475ee7f9-ac05-45c3-a273-11ee2919927f","Township Name":"Cherry Valley Township","Mailing Address":"4916 Russell Rd., Andover, OH 44003","Phone":"440-858-7014","Fax":"","Website":"","General Email":"cherryvalleytownship@hotmail.com","Primary Contact Name":"Jamie Elliott","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"cherryvalleytownship@hotmail.com"},
+  {"Id":"3b595d50-ff63-425e-b1a9-dfc1dc27cda5","Township Name":"Colebrook Township","Mailing Address":"931 US Rt. 322, Orwell, OH 44076","Phone":"330-607-9561","Fax":"","Website":"","General Email":"TYMAD30@yahoo.com","Primary Contact Name":"Todd Easton","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"TYMAD30@yahoo.com"},
+  {"Id":"32f2a017-ec55-4997-9c0b-35571882058c","Township Name":"Denmark Township","Mailing Address":"42 Clay Road, Jefferson, OH 44047","Phone":"440-858-2411","Fax":"","Website":"","General Email":"denmarktownshipohio@gmail.com","Primary Contact Name":"Janet Harrington","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"denmarktownshipohio@gmail.com"},
+  {"Id":"daf519f6-f814-4830-a9d6-6ae8a627781d","Township Name":"Dorset Township","Mailing Address":"PO Box 42, Dorset, OH 44032","Phone":"440-813-1608","Fax":"","Website":"","General Email":"dorsettownship@gmail.com","Primary Contact Name":"Jean B. Freeman","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"dorsettownship@gmail.com"},
+  {"Id":"f4f4f3a9-abe4-4f7f-959f-7fcefa26dd11","Township Name":"Geneva Township","Mailing Address":"P.O. Box 670, Geneva, OH 44041","Phone":"440-466-5599","Fax":"440-466-5287","Website":"www.genevatownshipohio.gov","General Email":"geneva5599@windstream.net","Primary Contact Name":"Tammy Caya","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"geneva5599@windstream.net"},
+  {"Id":"446f47de-3956-4f54-8604-01d68dbbb707","Township Name":"Harpersfield Township","Mailing Address":"1481 Harpersfield Road, Geneva, OH 44041","Phone":"440-466-7170","Fax":"440-466-2373","Website":"www.harpersfield.us","General Email":"trustees@harpersfield.us","Primary Contact Name":"Mickey Mihalick","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"mickey@harpersfield.us"},
+  {"Id":"5ef1ba7a-7c5c-4fd6-9569-ea6eadae2485","Township Name":"Hartsgrove Township","Mailing Address":"5321 State Rt. 534 S., Rome, OH 44085","Phone":"440-474-4114","Fax":"","Website":"www.hartsgrove.org","General Email":"hartsgrove@ncweb.com","Primary Contact Name":"Lisa Kovach","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"hartsgrove@ncweb.com"},
+  {"Id":"9cdaf2ce-e63b-4d9f-938c-f7a54262f07a","Township Name":"Jefferson Township","Mailing Address":"335 E. Erie St., Jefferson, OH 44047","Phone":"440-576-2430","Fax":"","Website":"https://jeffohtwp.org/","General Email":"jeffohtwp@gmail.com","Primary Contact Name":"Lisa Pickard","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"jeffohtwp.fiscalofficer@gmail.com"},
+  {"Id":"91ba6a59-20c4-42cd-b334-b3f61d125fb9","Township Name":"Kingsville Township","Mailing Address":"5890 Cemetery Rd., Kingsville, OH 44048","Phone":"440-224-3594","Fax":"","Website":"www.kingsvilletwp.org","General Email":"fiscal.officer@kingsvilletwp.org","Primary Contact Name":"Michael DeFazio","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"fiscal.officer@kingsvilletwp.org"},
+  {"Id":"d6200d8f-caae-4fac-833f-d71a8f627d83","Township Name":"Lenox Township","Mailing Address":"P.O. Box 423, Jefferson, OH 44047","Phone":"440-576-7964","Fax":"","Website":"","General Email":"lenoxfiscalofficer@gmail.com","Primary Contact Name":"Olivia Springer","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"lenoxfiscalofficer@gmail.com"},
+  {"Id":"8ccb273e-9628-4a6e-9d69-eb52035daa86","Township Name":"Monroe Township","Mailing Address":"7068 Hatches Corners Rd., Conneaut, OH 44030","Phone":"440-594-1629","Fax":"","Website":"","General Email":"monroetownship5578@yahoo.com","Primary Contact Name":"Jodi Forbes","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"monroetownship5578@yahoo.com"},
+  {"Id":"7f792e24-d6d5-46a9-a997-3d08d9e98028","Township Name":"Morgan Township","Mailing Address":"P.O. Box 245, Rock Creek, OH 44084","Phone":"440-563-1192","Fax":"","Website":"","General Email":"morgan.township@yahoo.com","Primary Contact Name":"Marie Lesko-Silbaugh","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"morgan.township@yahoo.com"},
+  {"Id":"73f7fd63-36b8-4d65-b6c0-f4876abc71d0","Township Name":"New Lyme Township","Mailing Address":"4672 Lenox New Lyme Road, Jefferson, OH 44047","Phone":"440-294-2811","Fax":"","Website":"www.newlymeoh.com","General Email":"wendiobrien@hotmail.com","Primary Contact Name":"Wendi O'Brien","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"wendiobrien@hotmail.com"},
+  {"Id":"79d28bee-cb3a-4921-a336-49175e6e8fa1","Township Name":"Orwell Township","Mailing Address":"P.O. Box 672, Orwell, OH 44076","Phone":"440-437-6404","Fax":"","Website":"","General Email":"","Primary Contact Name":"Cynthia Hart","Primary Contact Title":"Fiscal Officer","Primary Contact Email":""},
+  {"Id":"766dfe29-e612-4a10-819c-7695214a4629","Township Name":"Pierpont Township","Mailing Address":"1109 State Rt. 7, Pierpont, OH 44082","Phone":"440-577-1015","Fax":"","Website":"www.pierponttownship.com","General Email":"","Primary Contact Name":"Steve McNutt","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"steve@pierponttownship.com"},
+  {"Id":"b5e18a44-55fb-4524-ac84-6c2abc4dc397","Township Name":"Plymouth Township","Mailing Address":"450 Runkle Av. Extension, Ashtabula, OH 44004","Phone":"440-992-7484","Fax":"","Website":"www.plymouthtownshipohio.net","General Email":"plymouthtownshipohio@windstream.net","Primary Contact Name":"Maryann Stevenson","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"plymouthtownshipohio@windstream.net"},
+  {"Id":"84f07204-b78a-4a4d-908c-324a2304fcb1","Township Name":"Richmond Township","Mailing Address":"6489 Footville-Richmond Rd., Andover, OH 44003","Phone":"440-293-7229","Fax":"","Website":"","General Email":"hitchcockl69@yahoo.com","Primary Contact Name":"Linda Hitchcock","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"hitchcockl69@yahoo.com"},
+  {"Id":"2553c241-3ae8-4848-a7c4-fb03e207144a","Township Name":"Rome Township","Mailing Address":"P.O. Box 5057, Rome, OH 44085","Phone":"440-563-3445","Fax":"440-563-3445","Website":"","General Email":"gagerometownship@gmail.com","Primary Contact Name":"Jeanette Gage","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"gagerometownship@gmail.com"},
+  {"Id":"7480c79d-7f96-43e5-b481-b1b919d67666","Township Name":"Saybrook Township","Mailing Address":"7247 Center Road, Ashtabula, OH 44004","Phone":"440-969-1106","Fax":"440-969-7450","Website":"www.saybrooktownship.org","General Email":"saybrooktwpclerk@windstream.net","Primary Contact Name":"Larry Johnson","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"ljohnson@saybrooktownship.org"},
+  {"Id":"a2812cf2-3c56-430b-946b-98ec3aaed681","Township Name":"Sheffield Township","Mailing Address":"P.O. Box 38, Kingsville, OH 44048","Phone":"440-224-6006","Fax":"","Website":"www.sheffieldtwpash.com","General Email":"sheffieldtwp.fo@gmail.com","Primary Contact Name":"Tracy Kohta","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"sheffieldtwp.fo@gmail.com"},
+  {"Id":"9ac012b0-557b-4d4f-898a-affebef6bcd3","Township Name":"Trumbull Township","Mailing Address":"2443 State Rt. 534, Geneva, OH 44041","Phone":"440-474-0090","Fax":"440-474-0090","Website":"www.trumbulltownship.org","General Email":"mrohrbau@windstream.net","Primary Contact Name":"Marie Rohrbaugh","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"mrohrbau@windstream.net"},
+  {"Id":"9699c23d-a21f-4207-b4cb-916397ce146d","Township Name":"Wayne Township","Mailing Address":"9075 State Route 193, Orwell, OH 44076","Phone":"440-293-7884","Fax":"","Website":"","General Email":"djknowles@embarqmail.com","Primary Contact Name":"JoAnn Knowles","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"djknowles@embarqmail.com"},
+  {"Id":"a4db0f33-f4cb-4e2b-8766-dbc7f0c37485","Township Name":"Williamsfield Township","Mailing Address":"P.O. Box 157, Williamsfield, OH 44093","Phone":"440-689-0031","Fax":"","Website":"","General Email":"","Primary Contact Name":"Misty Huffman","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"mh.williamsfield@gmail.com"},
+  {"Id":"f785e290-134b-46c6-844a-a5660626f1b6","Township Name":"Windsor Township","Mailing Address":"P.O. Box 223, Windsor, OH 44099","Phone":"440-272-5795","Fax":"","Website":"windsortownship.org","General Email":"windsortwp04@yahoo.com","Primary Contact Name":"Allison Kalister","Primary Contact Title":"Fiscal Officer","Primary Contact Email":"windsortwp04@yahoo.com"}
+];
+
+const COLUMNS = ["Id","Township Name","Mailing Address","Phone","Fax","Website","General Email","Primary Contact Name","Primary Contact Title","Primary Contact Email"];
+
+const state = {
+  query: "",
+  filter: "all",
+  sortKey: "Township Name",
+  sortDir: 1, // 1 asc, -1 desc
+  expanded: new Set(),
+};
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+
+function escapeHTML(s){
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+function highlight(s, q){
+  const text = escapeHTML(s ?? "");
+  if(!q) return text;
+  const re = new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "ig");
+  return text.replace(re, "<mark>$1</mark>");
+}
+function urlify(u){
+  if(!u) return "";
+  return u.startsWith("http") ? u : "https://" + u;
+}
+function fmtPhoneLink(p){
+  if(!p) return "";
+  return "tel:" + p.replace(/[^\d+]/g, "");
+}
+function mapsUrl(address, name){
+  // P.O. boxes don't geocode well — search by township name instead
+  const isPoBox = /^\s*p\.?\s*o\.?\s*box/i.test(address || "");
+  const q = isPoBox
+    ? `${name}, Ashtabula County, Ohio`
+    : address;
+  return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+}
+
+function applyFilters(){
+  const q = state.query.trim().toLowerCase();
+  let rows = DATA.filter(r => {
+    if(state.filter === "website" && !r.Website) return false;
+    if(state.filter === "email" && !r["General Email"] && !r["Primary Contact Email"]) return false;
+    if(!q) return true;
+    return COLUMNS.some(k => String(r[k] ?? "").toLowerCase().includes(q));
+  });
+  rows.sort((a,b) => {
+    const ak = String(a[state.sortKey] ?? "").toLowerCase();
+    const bk = String(b[state.sortKey] ?? "").toLowerCase();
+    if(state.sortKey === "__idx") return 0; // keep current order
+    return ak < bk ? -1*state.sortDir : ak > bk ? 1*state.sortDir : 0;
+  });
+  return rows;
+}
+
+function render(){
+  const rows = applyFilters();
+  const tbody = $("#tbody");
+  const q = state.query.trim();
+  const empty = $("#empty");
+  if(rows.length === 0){
+    tbody.innerHTML = "";
+    empty.style.display = "block";
+  } else {
+    empty.style.display = "none";
+    tbody.innerHTML = rows.map((r, i) => renderRow(r, i+1, q)).join("");
+  }
+
+  // sort indicators
+  $$("thead th").forEach(th => {
+    th.classList.toggle("sorted", th.dataset.key === state.sortKey);
+    const ind = th.querySelector(".sort-ind");
+    if(ind) ind.textContent = (th.dataset.key === state.sortKey) ? (state.sortDir === 1 ? "▲" : "▼") : "▲";
+  });
+
+  // pill state
+  $$(".pill").forEach(p => p.classList.toggle("active", p.dataset.filter === state.filter));
+}
+
+function renderRow(r, idx, q){
+  const id = r.Id;
+  const isOpen = state.expanded.has(id);
+  const rowHTML = `
+    <tr data-id="${id}" class="${isOpen ? "expanded" : ""}">
+      <td class="idx">${String(idx).padStart(2,"0")}</td>
+      <td class="name"><span class="chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>${highlight(r["Township Name"], q)}</td>
+      <td>${highlight(r["Mailing Address"], q) || '<span class="muted">—</span>'}</td>
+      <td class="pho">${r.Phone ? `<a href="${fmtPhoneLink(r.Phone)}" onclick="event.stopPropagation()">${highlight(r.Phone,q)}</a>` : '<span class="muted">—</span>'}</td>
+      <td class="pho col-fax">${r.Fax ? highlight(r.Fax, q) : '<span class="muted">—</span>'}</td>
+      <td class="col-website">${r.Website ? `<a href="${urlify(r.Website)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${highlight(r.Website,q)}</a>` : '<span class="muted">—</span>'}</td>
+      <td class="col-email">${r["General Email"] ? `<a href="mailto:${r["General Email"]}" onclick="event.stopPropagation()">${highlight(r["General Email"],q)}</a>` : '<span class="muted">—</span>'}</td>
+      <td>${highlight(r["Primary Contact Name"], q)}<div class="muted">${escapeHTML(r["Primary Contact Title"])}</div></td>
+    </tr>
+  `;
+  if(!isOpen) return rowHTML;
+  const expandHTML = `
+    <tr class="expand-row" data-expand-for="${id}">
+      <td colspan="8">
+        <div class="expand-inner">
+          <div class="field full">
+            <div class="label">Identifier (GUID)</div>
+            <div class="value mono">${escapeHTML(r.Id)}</div>
+          </div>
+          <div class="field"><div class="label">Township</div><div class="value">${escapeHTML(r["Township Name"])}</div></div>
+          <div class="field half"><div class="label">Mailing Address</div><div class="value">${escapeHTML(r["Mailing Address"]) || "—"}</div></div>
+          <div class="field"><div class="label">Phone</div><div class="value">${r.Phone ? `<a href="${fmtPhoneLink(r.Phone)}">${escapeHTML(r.Phone)}</a>` : "—"}</div></div>
+          <div class="field"><div class="label">Fax</div><div class="value">${escapeHTML(r.Fax) || "—"}</div></div>
+          <div class="field"><div class="label">Website</div><div class="value">${r.Website ? `<a href="${urlify(r.Website)}" target="_blank" rel="noopener">${escapeHTML(r.Website)}</a>` : "—"}</div></div>
+          <div class="field"><div class="label">General Email</div><div class="value">${r["General Email"] ? `<a href="mailto:${r["General Email"]}">${escapeHTML(r["General Email"])}</a>` : "—"}</div></div>
+          <div class="field"><div class="label">Primary Contact</div><div class="value">${escapeHTML(r["Primary Contact Name"])}</div></div>
+          <div class="field"><div class="label">Title</div><div class="value">${escapeHTML(r["Primary Contact Title"])}</div></div>
+          <div class="field"><div class="label">Contact Email</div><div class="value">${r["Primary Contact Email"] ? `<a href="mailto:${r["Primary Contact Email"]}">${escapeHTML(r["Primary Contact Email"])}</a>` : "—"}</div></div>
+          <div class="actions">
+            ${r["Mailing Address"] ? `<a class="btn" href="${mapsUrl(r["Mailing Address"], r["Township Name"])}" target="_blank" rel="noopener">View in Google Maps ↗</a>` : ""}
+            ${r.Website ? `<a class="btn" href="${urlify(r.Website)}" target="_blank" rel="noopener">Visit website ↗</a>` : ""}
+            ${r.Phone ? `<a class="btn" href="${fmtPhoneLink(r.Phone)}">Call ${escapeHTML(r.Phone)}</a>` : ""}
+            ${r["Primary Contact Email"] ? `<a class="btn primary" href="mailto:${r["Primary Contact Email"]}">Email ${escapeHTML(r["Primary Contact Name"])}</a>` : ""}
+          </div>
+        </div>
+      </td>
+    </tr>
+  `;
+  return rowHTML + expandHTML;
+}
+
+// ---------- Events ----------
+$("#search").addEventListener("input", e => { state.query = e.target.value; render(); });
+$("#reset-btn").addEventListener("click", () => {
+  state.query = ""; state.filter = "all"; state.sortKey = "Township Name"; state.sortDir = 1;
+  state.expanded.clear();
+  $("#search").value = "";
+  render();
+});
+$$(".pill").forEach(p => p.addEventListener("click", () => {
+  state.filter = p.dataset.filter; render();
+}));
+$$("thead th").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.key;
+    if(state.sortKey === key) state.sortDir *= -1;
+    else { state.sortKey = key; state.sortDir = 1; }
+    render();
+  });
+});
+$("#tbody").addEventListener("click", e => {
+  const tr = e.target.closest("tr[data-id]");
+  if(!tr) return;
+  if(e.target.tagName === "A") return; // let links work
+  const id = tr.dataset.id;
+  if(state.expanded.has(id)) state.expanded.delete(id);
+  else state.expanded.add(id);
+  render();
+});
+document.addEventListener("keydown", e => {
+  if(e.key === "/" && document.activeElement.tagName !== "INPUT"){
+    e.preventDefault();
+    $("#search").focus();
+  }
+  if(e.key === "Escape" && document.activeElement === $("#search")){
+    $("#search").blur();
+  }
+});
+
+// Collapsible sections (mobile)
+$$(".collapse-toggle").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const section = btn.closest(".collapsible");
+    const open = section.classList.toggle("open");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+});
+// On mobile, start collapsed so the data is closer to the top
+function applyMobileDefaults(){
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  $$(".collapsible").forEach(section => {
+    if(isMobile){
+      section.classList.remove("open");
+      const btn = section.querySelector(".collapse-toggle");
+      if(btn) btn.setAttribute("aria-expanded", "false");
+    } else {
+      section.classList.add("open");
+      const btn = section.querySelector(".collapse-toggle");
+      if(btn) btn.setAttribute("aria-expanded", "true");
+    }
+  });
+}
+applyMobileDefaults();
+// re-evaluate when crossing the breakpoint
+window.matchMedia("(max-width: 720px)").addEventListener("change", applyMobileDefaults);
+
+// CSV export of currently visible (filtered + sorted) rows
+$("#export-btn").addEventListener("click", () => {
+  const rows = applyFilters();
+  const esc = v => `"${String(v ?? "").replace(/"/g,'""')}"`;
+  const csv = [COLUMNS.join(",")]
+    .concat(rows.map(r => COLUMNS.map(c => esc(r[c])).join(",")))
+    .join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Ashtabula_County_Townships.csv";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+});
+
+// Today
+const d = new Date();
+$("#today").textContent = d.toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" });
+
+render();
+</script>
+</body>
+</html>
