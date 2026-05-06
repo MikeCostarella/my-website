@@ -610,6 +610,35 @@
   }
   .detail-value a:hover { color: var(--rust-deep); }
 
+  .detail-value a.maps-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--paper);
+    background: var(--moss);
+    border: 1px solid var(--moss);
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--line);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+  }
+  .detail-value a.maps-link:hover {
+    background: var(--rust);
+    border-color: var(--rust);
+    color: var(--paper);
+  }
+  .detail-value a.maps-link:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--line);
+  }
+
   .detail-value.empty {
     color: var(--ink-soft);
     font-style: italic;
@@ -900,6 +929,7 @@
 
     const phoneLink = t.phone ? `<a href="tel:${t.phone.replace(/[^0-9+]/g, '')}">${escapeHtml(t.phone)}</a>` : '<span class="empty">— not on file —</span>';
     const emailLink = t.email ? `<a href="mailto:${escapeHtml(t.email)}">${escapeHtml(t.email)}</a>` : '<span class="empty">— not on file —</span>';
+    const mapsLink = t.physAddr ? `<br><a class="maps-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.physAddr)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(t.physAddr)} in Google Maps">↗ View on Google Maps</a>` : '';
 
     dialogInner.innerHTML = `
       <header class="dialog-header">
@@ -927,7 +957,7 @@
           <div class="section-heading">Administrative Address</div>
           <div class="detail-row">
             <div class="detail-key">Physical</div>
-            <div class="detail-value">${escapeHtml(t.physAddr) || '<span class="empty">— not on file —</span>'}</div>
+            <div class="detail-value">${escapeHtml(t.physAddr) || '<span class="empty">— not on file —</span>'}${mapsLink}</div>
           </div>
           <div class="detail-row">
             <div class="detail-key">Mailing</div>
