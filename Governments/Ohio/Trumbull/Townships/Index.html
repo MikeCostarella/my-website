@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trumbull County Townships — Civic Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f4ede0;
+    --paper-deep: #ebe1cf;
+    --ink: #1a1814;
+    --ink-soft: #4a4137;
+    --rust: #b14a2e;
+    --rust-deep: #8a3520;
+    --moss: #4a5d3a;
+    --gold: #c9a04a;
+    --line: #2a2620;
+    --shadow: rgba(26, 24, 20, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Paper texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(177, 74, 46, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(74, 93, 58, 0.04) 0%, transparent 40%);
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(26, 24, 20, 0.008) 2px, rgba(26, 24, 20, 0.008) 3px),
+      repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(26, 24, 20, 0.008) 2px, rgba(26, 24, 20, 0.008) 3px);
+    z-index: 1;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
+  }
+
+  /* === HEADER === */
+  .masthead {
+    border-top: 4px double var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 24px 0 28px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .seal {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+  }
+
+  .masthead-title {
+    text-align: center;
+  }
+
+  .masthead-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .masthead-title h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .masthead-title h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--rust);
+  }
+
+  .masthead-meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+
+  .masthead-meta strong {
+    color: var(--ink);
+    display: block;
+    font-weight: 600;
+  }
+
+  /* === DATELINE === */
+  .dateline {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .dateline .vol {
+    color: var(--rust);
+    font-weight: 600;
+  }
+
+  /* === INTRO === */
+  .intro {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 64px;
+    margin-bottom: 56px;
+    align-items: start;
+  }
+
+  .intro-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    border-top: 2px solid var(--rust);
+    padding-top: 12px;
+  }
+
+  .intro-text {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--ink);
+    font-variation-settings: "opsz" 144;
+  }
+
+  .intro-text .drop {
+    font-size: 64px;
+    float: left;
+    line-height: 0.85;
+    padding: 6px 8px 0 0;
+    font-weight: 800;
+    color: var(--rust);
+    font-style: italic;
+  }
+
+  /* === FILTER BAR === */
+  .filter-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px;
+  }
+
+  .filter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 220px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink-soft);
+    padding: 8px 4px;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-bottom-color: var(--rust);
+  }
+
+  .search-input::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.6;
+  }
+
+  .sort-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--line);
+  }
+
+  .sort-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-right: 1px solid var(--line);
+  }
+
+  .sort-btn:last-child { border-right: none; }
+
+  .sort-btn:hover { color: var(--ink); }
+
+  .sort-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .count-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .count-badge span { color: var(--rust); font-weight: 600; }
+
+  /* === GRID === */
+  .townships-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  .township-card {
+    background: var(--paper);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 24px 22px 22px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.25s ease, transform 0.25s ease;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 200px;
+    overflow: hidden;
+  }
+
+  .township-card:hover {
+    background: var(--paper-deep);
+  }
+
+  .township-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--rust);
+    transition: width 0.3s ease;
+  }
+
+  .township-card:hover::before { width: 100%; }
+
+  .township-card:focus-visible {
+    outline: none;
+    background: var(--paper-deep);
+  }
+  .township-card:focus-visible::before { width: 100%; }
+
+  .card-index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-soft);
+  }
+
+  .card-name {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .card-name em {
+    font-style: italic;
+    color: var(--rust);
+    font-weight: 400;
+  }
+
+  .card-area {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.3;
+  }
+
+  .card-stats {
+    margin-top: auto;
+    display: flex;
+    gap: 18px;
+    padding-top: 12px;
+    border-top: 1px dotted var(--ink-soft);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .card-arrow {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: all 0.25s ease;
+  }
+
+  .township-card:hover .card-arrow,
+  .township-card:focus-visible .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* === DIALOG === */
+  dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: min(720px, 92vw);
+    width: 100%;
+    max-height: 90vh;
+    color: inherit;
+  }
+
+  dialog::backdrop {
+    background: rgba(26, 24, 20, 0.6);
+    backdrop-filter: blur(3px);
+  }
+
+  dialog[open] {
+    animation: dialog-in 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+
+  @keyframes dialog-in {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .dialog-inner {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 80px rgba(26, 24, 20, 0.4);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .dialog-inner::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid var(--line);
+    pointer-events: none;
+  }
+
+  .dialog-header {
+    padding: 36px 40px 24px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .dialog-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 12px;
+  }
+
+  .dialog-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 4vw, 44px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .dialog-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--rust);
+  }
+
+  .dialog-subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  .dialog-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--ink);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dialog-close:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .dialog-body {
+    padding: 32px 40px 40px;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    margin-bottom: 32px;
+    border: 1px solid var(--line);
+  }
+
+  .stats-row .stat-block {
+    padding: 20px 24px;
+    border-right: 1px solid var(--line);
+  }
+  .stats-row .stat-block:last-child { border-right: none; }
+
+  .stat-block-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .stat-block-value {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .stat-block-unit {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-left: 4px;
+  }
+
+  .notes-block {
+    background: var(--paper-deep);
+    border-left: 3px solid var(--rust);
+    padding: 18px 22px;
+    margin-bottom: 32px;
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .notes-block::before {
+    content: '"';
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    line-height: 0;
+    color: var(--rust);
+    margin-right: 4px;
+    vertical-align: -16px;
+  }
+
+  .detail-section {
+    margin-bottom: 28px;
+  }
+
+  .section-heading {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    border-bottom: 1px solid var(--rust);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+
+  .detail-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--ink-soft);
+    font-size: 14px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+
+  .detail-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-top: 2px;
+  }
+
+  .detail-value {
+    font-family: 'Inter Tight', sans-serif;
+    color: var(--ink);
+    line-height: 1.45;
+    word-break: break-word;
+  }
+
+  .detail-value a {
+    color: var(--rust);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .detail-value a:hover { color: var(--rust-deep); }
+
+  .detail-value.empty {
+    color: var(--ink-soft);
+    font-style: italic;
+    opacity: 0.6;
+  }
+
+  .id-stamp {
+    margin-top: 32px;
+    padding: 14px 18px;
+    border: 1px dashed var(--ink-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    word-break: break-all;
+  }
+
+  .id-stamp strong {
+    color: var(--rust);
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* === FOOTER === */
+  .colophon {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px double var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 32px;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .colophon-center {
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .colophon-center .ornament {
+    color: var(--rust);
+    margin: 0 8px;
+  }
+
+  .colophon-right { text-align: right; }
+
+  .credit-name {
+    color: var(--rust);
+    font-weight: 600;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .container { padding: 32px 20px 64px; }
+    .masthead {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 16px;
+    }
+    .masthead-meta { text-align: center; }
+    .seal { margin: 0 auto; }
+    .intro { grid-template-columns: 1fr; gap: 16px; }
+    .dateline { flex-direction: column; gap: 4px; align-items: flex-start; }
+    .dialog-header, .dialog-body { padding: 24px 22px; }
+    .detail-row { grid-template-columns: 1fr; gap: 4px; }
+    .stats-row { grid-template-columns: 1fr; }
+    .stats-row .stat-block { border-right: none; border-bottom: 1px solid var(--line); }
+    .stats-row .stat-block:last-child { border-bottom: none; }
+    .colophon { grid-template-columns: 1fr; text-align: center; }
+    .colophon-right { text-align: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- MASTHEAD -->
+    <header class="masthead">
+      <svg class="seal" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#1a1814" stroke-width="0.5"/>
+        <circle cx="50" cy="50" r="30" fill="none" stroke="#b14a2e" stroke-width="1"/>
+        <text x="50" y="46" text-anchor="middle" font-family="Fraunces, serif" font-weight="800" font-size="14" fill="#1a1814" font-style="italic">T</text>
+        <text x="50" y="60" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="6" fill="#1a1814" letter-spacing="1">CO.</text>
+        <path d="M 50 12 L 52 16 L 50 14 L 48 16 Z" fill="#b14a2e"/>
+        <path d="M 50 88 L 52 84 L 50 86 L 48 84 Z" fill="#b14a2e"/>
+        <path d="M 12 50 L 16 48 L 14 50 L 16 52 Z" fill="#b14a2e"/>
+        <path d="M 88 50 L 84 48 L 86 50 L 84 52 Z" fill="#b14a2e"/>
+        <text x="50" y="78" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="3.5" fill="#4a4137" letter-spacing="0.5">EST. 1800</text>
+      </svg>
+
+      <div class="masthead-title">
+        <div class="masthead-eyebrow">A Civic Directory of the State of Ohio</div>
+        <h1>Trumbull County <em>Townships</em></h1>
+      </div>
+
+      <div class="masthead-meta">
+        <strong>No. XXV</strong>
+        Twenty-Five<br/>Civil Townships<br/>Northeast Ohio
+      </div>
+    </header>
+
+    <div class="dateline">
+      <span><span class="vol">Vol. I</span> &nbsp;·&nbsp; Northeast Ohio Almanac</span>
+      <span id="dateline-date">— · —</span>
+      <span>Edition I</span>
+    </div>
+
+    <!-- INTRO -->
+    <section class="intro">
+      <div class="intro-label">An Introduction</div>
+      <p class="intro-text">
+        <span class="drop">T</span>rumbull County, seated in Warren and bordered by the Pennsylvania line, is composed of twenty-five civil townships — each with its own character, its own fields and waters, its own quiet seat of governance. Click any township below to consult its full record.
+      </p>
+    </section>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <span class="filter-label">Search</span>
+      <input type="text" class="search-input" id="search" placeholder="filter by name or community…" aria-label="Search townships">
+      <span class="filter-label">Order</span>
+      <div class="sort-toggle" role="group" aria-label="Sort order">
+        <button class="sort-btn active" data-sort="alpha">A–Z</button>
+        <button class="sort-btn" data-sort="population">Population</button>
+        <button class="sort-btn" data-sort="area">Area</button>
+      </div>
+      <span class="count-badge"><span id="count">25</span> / 25 records</span>
+    </div>
+
+    <!-- GRID -->
+    <main class="townships-grid" id="grid"></main>
+
+    <!-- COLOPHON -->
+    <footer class="colophon">
+      <div class="colophon-left">
+        Last Updated &nbsp;·&nbsp; <span id="last-updated">—</span>
+      </div>
+      <div class="colophon-center">
+        Compiled &amp; curated by <span class="credit-name">Mike Costarella</span>
+        <span class="ornament">❦</span>
+      </div>
+      <div class="colophon-right">
+        Trumbull Co. &nbsp;·&nbsp; OH &nbsp;·&nbsp; USA
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- DIALOG -->
+  <dialog id="detail-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-inner" id="dialog-inner"></div>
+  </dialog>
+
+<script>
+  const TOWNSHIPS = [
+    {id:"76ded46f-236d-4603-a3f7-96fdcf44e590", name:"Bazetta Township", area:"Cortland (city seat)", sqMi:22.6, pop:10200, notes:"Home to Mosquito Lake reservoir", physAddr:"3372 State Route 5 N.E., Cortland, Ohio 44410", contactAddr:"3372 State Route 5 N.E., Cortland, OH 44410", phone:"(330) 637-8816", email:"dlongo@bazettatwp.org"},
+    {id:"7cd4c67b-ef70-49bf-bdfb-b04df35882ef", name:"Bloomfield Township", area:"Bloomfield Center", sqMi:35, pop:2900, notes:"Rural agricultural township", physAddr:"2063 Kinsman Rd. NW (State Route 87), North Bloomfield, OH 44450", contactAddr:"P.O. Box 34, North Bloomfield, OH 44450", phone:"(440) 685-4734", email:"bloomfieldtwpoh@gmail.com"},
+    {id:"ac7df9ba-883d-4f23-b5ec-fd3b43277607", name:"Braceville Township", area:"Braceville", sqMi:25.5, pop:2100, notes:"Located in southern Trumbull County", physAddr:"582 Newton Falls Braceville Rd, Newton Falls, OH 44444", contactAddr:"P.O. Box 582, Leavittsburg, OH 44430", phone:"(330) 872-0085", email:"bracevilletwp@gmail.com"},
+    {id:"08fed5d1-3992-4527-8573-9208bd6ea202", name:"Bristol Township", area:"Bristolville", sqMi:34.9, pop:4200, notes:"Rural township in western Trumbull County", physAddr:"1864 Greenville Road, Bristolville, OH 44402", contactAddr:"P.O. Box 254, Bristolville, OH 44402", phone:"(330) 889-2246", email:"fiscal@bristoltownshipohio.gov"},
+    {id:"8c453b9e-4cdf-4429-bc63-6c9d7f4a8ed6", name:"Brookfield Township", area:"Masury / Brookfield Center", sqMi:27.3, pop:8700, notes:"Borders Pennsylvania; includes Masury community", physAddr:"6844 Strimbu Drive, Brookfield, OH 44403", contactAddr:"6844 Strimbu Drive, Brookfield, OH 44403", phone:"(330) 448-4500", email:"brookfieldtwp@gmail.com"},
+    {id:"8a2b4169-0551-4347-a70c-9cb21cd05e99", name:"Champion Township", area:"Champion Heights", sqMi:25.1, pop:9500, notes:"Suburban township near Warren", physAddr:"240 Marshall Ave. N.W., Warren, OH 44483", contactAddr:"240 Marshall Ave. N.W., Warren, OH 44483", phone:"(330) 847-7690", email:"fiscaloffice@championtownship.org"},
+    {id:"5e7be1f9-49af-44fd-b194-dbe0271f5cc6", name:"Farmington Township", area:"Farmington", sqMi:35.8, pop:3100, notes:"Rural township in western Trumbull County", physAddr:"150 College St, W Farmington 44491.", contactAddr:"P.O. Box 81, West Farmington, OH 44491", phone:"(330) 889-3024 ext. 2", email:"farmingtonfiscal.trumbullco@gmail.com"},
+    {id:"676c925d-1b51-42bd-92e0-4576c06f238f", name:"Fowler Township", area:"Fowler", sqMi:25, pop:2360, notes:"Rural township in northern Trumbull County", physAddr:"4562 Wilson-Sharpsville Road Cortland Ohio 44410", contactAddr:"P.O. Box 174, Fowler, OH 44418", phone:"(330) 637-2653", email:"ccarr@fowlertownship.org"},
+    {id:"a8bb5849-4dbd-42bc-8181-5058e9fba8b0", name:"Greene Township", area:"Greeneville", sqMi:36.3, pop:2600, notes:"One of the larger townships by area", physAddr:"8955 State Route 46, North Bloomfield, OH 44450", contactAddr:"8964 State Route 46, North Bloomfield, OH 44450", phone:"(330) 646-7593", email:"greenetrustees@gmail.com"},
+    {id:"50d4c8c6-bd65-4be0-94b4-eb290ad18ce5", name:"Gustavus Township", area:"Gustavus Center", sqMi:35.2, pop:1900, notes:"Rural township in northeastern Trumbull County", physAddr:"4315 Kinsman Rd NE, Farmdale, OH 44417", contactAddr:"P.O. Box 14, Farmdale, OH 44417", phone:"(330) 246-0772", email:"gustavus_lhall@yahoo.com"},
+    {id:"bfc897d8-b36c-4632-a8cc-ce0b902be9c7", name:"Hartford Township", area:"Hartford", sqMi:25.1, pop:1861, notes:"Rural township in northeastern Trumbull County", physAddr:"6901 State Route 305, Hartford, OH 44424", contactAddr:"P.O. Box 116, Hartford, OH 44424", phone:"(330) 772-2211", email:"fiscal@hartfordtwp.org"},
+    {id:"3012f383-5207-4efd-944d-89aefb62a033", name:"Howland Township", area:"Howland Center / Warren area", sqMi:24.7, pop:19800, notes:"Populous suburban township bordering Warren", physAddr:"205 Niles-Cortland Road N.E., Warren, OH 44484", contactAddr:"205 Niles-Cortland Road N.E., Warren, OH 44484", phone:"(330) 856-2340", email:"JPantalone@howlandtownship.org"},
+    {id:"c902e1a6-548e-4634-a7b1-1e692deb9a53", name:"Hubbard Township", area:"Hubbard (city)", sqMi:18.2, pop:8100, notes:"Includes City of Hubbard; near Pennsylvania border", physAddr:"2600 Elmwood Drive Extension, Hubbard, OH 44425", contactAddr:"2600 Elmwood Drive, Hubbard, OH 44425", phone:"(330) 534-8477", email:"fiscalofficer@hubbardtwpohio.gov"},
+    {id:"1c7d8ecb-4d78-483c-861d-8ba03f058407", name:"Johnston Township", area:"Southington", sqMi:36.1, pop:2500, notes:"Rural township in southwestern Trumbull County", physAddr:"4177 Greenville Road, Cortland, OH 44410", contactAddr:"P.O. Box 693, Cortland, OH 44410", phone:"(330) 240-4115", email:"johnstontwptrumbull@gmail.com"},
+    {id:"148b7078-c953-48bc-beb4-375b4387c4e0", name:"Kinsman Township", area:"Kinsman", sqMi:35.5, pop:2300, notes:"Northwestern township near Grand River", physAddr:"7890 State Route 5, Kinsman, OH 44428", contactAddr:"P.O. Box 399, Kinsman, OH 44428", phone:"(330) 876-1040", email:"kinsmantwp@zoominternet.net"},
+    {id:"7f331340-46cf-4880-a4d1-3f61944af192", name:"Liberty Township", area:"Girard / Liberty area", sqMi:24.5, pop:23800, notes:"Most populous township; includes Girard and suburban areas", physAddr:"1315 Churchill-Hubbard Road, Youngstown, OH 44505", contactAddr:"1315 Churchill-Hubbard Road, Youngstown, OH 44505", phone:"(330) 759-1315", email:"mconnelly@libertytwp.com"},
+    {id:"4cc29380-ad3e-4b3b-ac4f-2c629bf3a29b", name:"Mecca Township", area:"Mecca Center", sqMi:36.4, pop:2100, notes:"Rural township in central Trumbull County", physAddr:"6333 OH-46, Cortland, OH 44410", contactAddr:"P.O. Box 567, Cortland, OH 44410", phone:"(330) 638-0363", email:"meccatwp@yahoo.com"},
+    {id:"eff231f5-160f-4d04-b95e-e4b455f267ae", name:"Mesopotamia Township", area:"Mesopotamia", sqMi:36, pop:1800, notes:"Features historic Amish community", physAddr:"8686 State Route 534, Mesopotamia, OH 44439", contactAddr:"P.O. Box 199, Mesopotamia, OH 44439", phone:"(440) 693-4023", email:"mespotwpohio@gmail.com"},
+    {id:"201d5f7a-ab0e-429f-b88c-58e89bed2cc7", name:"Newton Township", area:"Newton Falls (city)", sqMi:26.4, pop:8400, notes:"Includes City of Newton Falls on Mahoning River", physAddr:"4410 Newton Falls-Bailey Road, Newton Falls, OH 44444", contactAddr:"P.O. Box 298, Newton Falls, OH 44444", phone:"(330) 872-0003", email:"info@newtontwptc.org"},
+    {id:"1f39cf27-db84-416a-96ab-e54d2cfaeab0", name:"Southington Township", area:"Southington Center", sqMi:36.2, pop:2200, notes:"Rural township in southwest", physAddr:"3419 State Route 534, Southington, OH 44470", contactAddr:"P.O. Box 266, Southington, OH 44470", phone:"(330) 889-2551", email:"mhallsouthingtontwp@gmail.com"},
+    {id:"70f89ee6-e2f4-46f5-b087-b68ab3d74157", name:"Vernon Township", area:"Vernon Center", sqMi:36, pop:1600, notes:"Rural northwestern township near Grand River", physAddr:"6160 OH-7, Kinsman, OH 44428", contactAddr:"6915 B State Route 88, Kinsman, OH 44428", phone:"(330) 772-3013", email:"Vernon.twp.trumbull@gmail.com"},
+    {id:"c2cbb3c7-6b74-487c-a733-d81ee03b7064", name:"Vienna Township", area:"Vienna Center", sqMi:35.3, pop:14500, notes:"Growing suburban township near Youngstown metro", physAddr:"848 Youngstown Kingsville Rd NE Vienna, OH 44473", contactAddr:"P.O. Box 593, Vienna, OH 44473", phone:"(330) 394-2319", email:"hbrown@viennatownship.com"},
+    {id:"e5c9c0aa-5f6a-4079-b4fa-d8cc861c51a7", name:"Warren Township", area:"Warren (county seat)", sqMi:16, pop:38800, notes:"County seat and largest city; independent of townships", physAddr:"3765 West Market Street, Leavittsburg, OH 44430", contactAddr:"3765 West Market Street, Leavittsburg, OH 44430", phone:"(330) 898-2101", email:""},
+    {id:"4794c460-846f-4d78-abe2-f028609e7439", name:"Weathersfield Township", area:"Mineral Ridge / Weathersfield", sqMi:26.5, pop:8500, notes:"Suburban township south of Warren", physAddr:"1451 Prospect Street Mineral Ridge, OH 44440", contactAddr:"1451 Prospect Street, Mineral Ridge, OH 44440", phone:"(330) 652-6326", email:"mailbox@weathersfieldtwp.com"}
+  ];
+
+  // === Timestamps ===
+  const now = new Date();
+  const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
+  const timeOpts = { hour: 'numeric', minute: '2-digit', hour12: true };
+  const fullStamp = now.toLocaleDateString('en-US', dateOpts) + ' · ' + now.toLocaleTimeString('en-US', timeOpts);
+  document.getElementById('last-updated').textContent = fullStamp;
+  document.getElementById('dateline-date').textContent = now.toLocaleDateString('en-US', dateOpts).toUpperCase();
+
+  // === Helpers ===
+  const fmtNum = n => n.toLocaleString('en-US');
+  const fmtArea = n => Number(n).toFixed(1);
+  const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // Italicize "Township" in the name
+  const stylizeName = name => {
+    return escapeHtml(name).replace(/\bTownship\b/g, '<em>Township</em>');
+  };
+
+  // === Render Grid ===
+  const grid = document.getElementById('grid');
+  let currentSort = 'alpha';
+  let currentFilter = '';
+
+  function getSortedFiltered() {
+    const filter = currentFilter.toLowerCase().trim();
+    let list = TOWNSHIPS.filter(t =>
+      !filter ||
+      t.name.toLowerCase().includes(filter) ||
+      t.area.toLowerCase().includes(filter) ||
+      t.notes.toLowerCase().includes(filter)
+    );
+
+    if (currentSort === 'alpha') {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (currentSort === 'population') {
+      list.sort((a, b) => b.pop - a.pop);
+    } else if (currentSort === 'area') {
+      list.sort((a, b) => b.sqMi - a.sqMi);
+    }
+    return list;
+  }
+
+  function renderGrid() {
+    const list = getSortedFiltered();
+    document.getElementById('count').textContent = list.length;
+
+    if (list.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1/-1; padding: 64px 24px; text-align:center; border-right:1px solid var(--line); border-bottom:1px solid var(--line); font-family: 'Fraunces', serif; font-style: italic; color: var(--ink-soft); font-size: 18px;">
+          No townships match that query.
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map((t, i) => `
+      <button class="township-card" data-id="${t.id}" aria-label="View details for ${escapeHtml(t.name)}">
+        <div class="card-index">№ ${String(i + 1).padStart(2, '0')}</div>
+        <div class="card-name">${stylizeName(t.name)}</div>
+        <div class="card-area">${escapeHtml(t.area)}</div>
+        <div class="card-stats">
+          <div class="stat">
+            <div class="stat-value">${fmtNum(t.pop)}</div>
+            <div class="stat-label">Population</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">${fmtArea(t.sqMi)}</div>
+            <div class="stat-label">Sq. Miles</div>
+          </div>
+        </div>
+        <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    `).join('');
+
+    grid.querySelectorAll('.township-card').forEach(btn => {
+      btn.addEventListener('click', () => openDialog(btn.dataset.id));
+    });
+  }
+
+  // === Dialog ===
+  const dialog = document.getElementById('detail-dialog');
+  const dialogInner = document.getElementById('dialog-inner');
+
+  function openDialog(id) {
+    const t = TOWNSHIPS.find(x => x.id === id);
+    if (!t) return;
+
+    const phoneLink = t.phone ? `<a href="tel:${t.phone.replace(/[^0-9+]/g, '')}">${escapeHtml(t.phone)}</a>` : '<span class="empty">— not on file —</span>';
+    const emailLink = t.email ? `<a href="mailto:${escapeHtml(t.email)}">${escapeHtml(t.email)}</a>` : '<span class="empty">— not on file —</span>';
+
+    dialogInner.innerHTML = `
+      <header class="dialog-header">
+        <button class="dialog-close" aria-label="Close dialog" id="close-btn">×</button>
+        <div class="dialog-eyebrow">Record · Trumbull County, Ohio</div>
+        <h2 class="dialog-title" id="dialog-title">${stylizeName(t.name)}</h2>
+        <div class="dialog-subtitle">${escapeHtml(t.area)}</div>
+      </header>
+
+      <div class="dialog-body">
+        <div class="stats-row">
+          <div class="stat-block">
+            <div class="stat-block-label">Estimated Population</div>
+            <div class="stat-block-value">${fmtNum(t.pop)}<span class="stat-block-unit">residents · 2020</span></div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-block-label">Land Area</div>
+            <div class="stat-block-value">${fmtArea(t.sqMi)}<span class="stat-block-unit">square miles</span></div>
+          </div>
+        </div>
+
+        ${t.notes ? `<div class="notes-block">${escapeHtml(t.notes)}</div>` : ''}
+
+        <div class="detail-section">
+          <div class="section-heading">Administrative Address</div>
+          <div class="detail-row">
+            <div class="detail-key">Physical</div>
+            <div class="detail-value">${escapeHtml(t.physAddr) || '<span class="empty">— not on file —</span>'}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-key">Mailing</div>
+            <div class="detail-value">${escapeHtml(t.contactAddr) || '<span class="empty">— not on file —</span>'}</div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="section-heading">Contact</div>
+          <div class="detail-row">
+            <div class="detail-key">Telephone</div>
+            <div class="detail-value">${phoneLink}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-key">Electronic Mail</div>
+            <div class="detail-value">${emailLink}</div>
+          </div>
+        </div>
+
+        <div class="id-stamp">
+          <strong>Record Identifier</strong>
+          ${escapeHtml(t.id)}
+        </div>
+      </div>
+    `;
+
+    document.getElementById('close-btn').addEventListener('click', () => dialog.close());
+    dialog.showModal();
+  }
+
+  // Close on backdrop click
+  dialog.addEventListener('click', e => {
+    const rect = dialog.getBoundingClientRect();
+    const inside = e.clientX >= rect.left && e.clientX <= rect.right
+                && e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inside) dialog.close();
+  });
+
+  // === Filter / Sort wiring ===
+  document.getElementById('search').addEventListener('input', e => {
+    currentFilter = e.target.value;
+    renderGrid();
+  });
+
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSort = btn.dataset.sort;
+      renderGrid();
+    });
+  });
+
+  // Initial render
+  renderGrid();
+</script>
+</body>
+</html>
