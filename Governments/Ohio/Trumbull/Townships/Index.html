@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Municipalities of Trumbull County, Ohio</title>
+<title>Trumbull County Townships — Civic Directory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #f3ecdb;
-    --paper-warm: #ebe1c6;
-    --ink: #1d1a14;
-    --ink-soft: #4a4434;
-    --rule: #c8b98a;
-    --accent: #8a2014;       /* oxblood */
-    --accent-deep: #5e1409;
-    --gold: #b08a2c;
-    --shadow: rgba(50, 35, 10, 0.18);
+    --paper: #f4ede0;
+    --paper-deep: #ebe1cf;
+    --ink: #1a1814;
+    --ink-soft: #4a4137;
+    --rust: #b14a2e;
+    --rust-deep: #8a3520;
+    --moss: #4a5d3a;
+    --gold: #c9a04a;
+    --line: #2a2620;
+    --shadow: rgba(26, 24, 20, 0.12);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,817 +27,992 @@
     background: var(--paper);
     color: var(--ink);
     font-family: 'Inter Tight', sans-serif;
-    font-weight: 400;
-    line-height: 1.55;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Subtle paper grain */
+  /* Paper texture overlay */
   body::before {
-    content: "";
+    content: '';
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 1;
     background-image:
-      radial-gradient(rgba(120,90,40,0.04) 1px, transparent 1px),
-      radial-gradient(rgba(120,90,40,0.03) 1px, transparent 1px);
-    background-size: 3px 3px, 7px 7px;
-    background-position: 0 0, 1px 1px;
-    mix-blend-mode: multiply;
+      radial-gradient(circle at 20% 30%, rgba(177, 74, 46, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(74, 93, 58, 0.04) 0%, transparent 40%);
+    z-index: 0;
   }
 
-  .page {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 56px 40px 96px;
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(26, 24, 20, 0.008) 2px, rgba(26, 24, 20, 0.008) 3px),
+      repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(26, 24, 20, 0.008) 2px, rgba(26, 24, 20, 0.008) 3px);
+    z-index: 1;
+  }
+
+  .container {
     position: relative;
     z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
   }
 
-  /* ---------- Masthead ---------- */
-  header.masthead {
-    border-top: 4px double var(--ink);
-    border-bottom: 4px double var(--ink);
-    padding: 28px 0 22px;
-    text-align: center;
-    margin-bottom: 36px;
-    position: relative;
-  }
-
-  /* Mobile masthead toggle (hidden on desktop) */
-  .masthead-toggle {
-    display: none;
-    width: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 14px 8px;
-    font: inherit;
-    color: inherit;
+  /* === HEADER === */
+  .masthead {
+    border-top: 4px double var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 24px 0 28px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 32px;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    text-align: left;
   }
 
-  .masthead-toggle .toggle-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
-    flex: 1;
-  }
-
-  .masthead-toggle .toggle-title em {
-    font-style: italic;
-    font-weight: 500;
-    color: var(--accent);
-  }
-
-  .masthead-toggle .toggle-chevron {
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent);
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  .seal {
+    width: 72px;
+    height: 72px;
     flex-shrink: 0;
   }
 
-  .masthead-toggle .toggle-chevron svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .masthead-title {
+    text-align: center;
   }
 
-  .masthead.collapsed .masthead-toggle .toggle-chevron {
-    transform: rotate(-90deg);
-  }
-
-  .masthead-content {
-    overflow: hidden;
-    transition: max-height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
-                opacity 0.4s ease,
-                margin-top 0.4s ease;
-  }
-
-  .eyebrow {
+  .masthead-eyebrow {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.32em;
+    font-size: 10px;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--ink-soft);
-    margin-bottom: 14px;
+    margin-bottom: 6px;
   }
 
-  .eyebrow span.dot {
-    color: var(--accent);
-    margin: 0 10px;
-  }
-
-  h1.title {
+  .masthead-title h1 {
     font-family: 'Fraunces', serif;
-    font-weight: 900;
-    font-size: clamp(38px, 6vw, 68px);
-    line-height: 0.98;
+    font-weight: 800;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1;
     letter-spacing: -0.02em;
-    color: var(--ink);
+    font-variation-settings: "opsz" 144;
   }
 
-  h1.title em {
+  .masthead-title h1 em {
     font-style: italic;
-    font-weight: 500;
-    color: var(--accent);
+    font-weight: 400;
+    color: var(--rust);
   }
 
-  .subtitle {
-    margin-top: 18px;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 300;
-    font-size: 18px;
-    color: var(--ink-soft);
-    max-width: 640px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .meta-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 28px;
-    margin-top: 22px;
+  .masthead-meta {
+    text-align: right;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.18em;
+    font-size: 10px;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--ink-soft);
+    line-height: 1.7;
   }
 
-  .meta-row .num {
-    color: var(--accent);
-    font-weight: 500;
+  .masthead-meta strong {
+    color: var(--ink);
+    display: block;
+    font-weight: 600;
   }
 
-  /* ---------- Section labels ---------- */
-  .section-label {
+  /* === DATELINE === */
+  .dateline {
     display: flex;
+    justify-content: space-between;
     align-items: baseline;
-    gap: 18px;
-    margin: 40px 0 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .section-label .roman {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 500;
-    color: var(--accent);
-    font-size: 16px;
-  }
-
-  .section-label h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 22px;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-  }
-
-  .section-label .count {
-    margin-left: auto;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 48px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
     color: var(--ink-soft);
   }
 
-  /* ---------- Municipality entries ---------- */
-  .entries {
-    list-style: none;
+  .dateline .vol {
+    color: var(--rust);
+    font-weight: 600;
   }
 
-  .entry {
-    border-bottom: 1px solid var(--rule);
-    transition: background-color 0.4s ease;
-  }
-
-  .entry:hover {
-    background-color: rgba(176, 138, 44, 0.06);
-  }
-
-  .entry.open {
-    background-color: rgba(138, 32, 20, 0.04);
-  }
-
-  .entry-button {
-    width: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
+  /* === INTRO === */
+  .intro {
     display: grid;
-    grid-template-columns: 60px 1fr auto auto;
-    align-items: center;
-    gap: 24px;
-    padding: 22px 8px;
-    text-align: left;
-    color: inherit;
-    font: inherit;
+    grid-template-columns: 1fr 2fr;
+    gap: 64px;
+    margin-bottom: 56px;
+    align-items: start;
   }
 
-  .entry-num {
+  .intro-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--ink-soft);
-    letter-spacing: 0.1em;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    border-top: 2px solid var(--rust);
+    padding-top: 12px;
   }
 
-  .entry-name {
+  .intro-text {
     font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(22px, 3vw, 30px);
-    letter-spacing: -0.005em;
-    line-height: 1.1;
-    transition: color 0.3s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    font-size: 22px;
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--ink);
+    font-variation-settings: "opsz" 144;
   }
 
-  .entry:hover .entry-name {
-    color: var(--accent);
+  .intro-text .drop {
+    font-size: 64px;
+    float: left;
+    line-height: 0.85;
+    padding: 6px 8px 0 0;
+    font-weight: 800;
+    color: var(--rust);
+    font-style: italic;
   }
 
-  .entry-name .seat-mark {
-    display: inline-block;
-    margin-left: 10px;
+  /* === FILTER BAR === */
+  .filter-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px;
+  }
+
+  .filter-label {
     font-family: 'JetBrains Mono', monospace;
-    font-style: normal;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 0.2em;
-    color: var(--paper);
-    background: var(--accent);
-    padding: 3px 7px 2px;
-    vertical-align: middle;
-    transform: translateY(-3px);
-    border-radius: 1px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
   }
 
-  .entry-type {
+  .search-input {
+    flex: 1;
+    min-width: 220px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink-soft);
+    padding: 8px 4px;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-bottom-color: var(--rust);
+  }
+
+  .search-input::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.6;
+  }
+
+  .sort-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--line);
+  }
+
+  .sort-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-right: 1px solid var(--line);
+  }
+
+  .sort-btn:last-child { border-right: none; }
+
+  .sort-btn:hover { color: var(--ink); }
+
+  .sort-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .count-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .count-badge span { color: var(--rust); font-weight: 600; }
+
+  /* === GRID === */
+  .townships-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  .township-card {
+    background: var(--paper);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 24px 22px 22px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.25s ease, transform 0.25s ease;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 200px;
+    overflow: hidden;
+  }
+
+  .township-card:hover {
+    background: var(--paper-deep);
+  }
+
+  .township-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--rust);
+    transition: width 0.3s ease;
+  }
+
+  .township-card:hover::before { width: 100%; }
+
+  .township-card:focus-visible {
+    outline: none;
+    background: var(--paper-deep);
+  }
+  .township-card:focus-visible::before { width: 100%; }
+
+  .card-index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-soft);
+  }
+
+  .card-name {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .card-name em {
+    font-style: italic;
+    color: var(--rust);
+    font-weight: 400;
+  }
+
+  .card-area {
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-weight: 300;
     font-size: 14px;
     color: var(--ink-soft);
-    letter-spacing: 0.04em;
+    line-height: 1.3;
   }
 
-  .chevron {
-    width: 28px;
-    height: 28px;
+  .card-stats {
+    margin-top: auto;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    gap: 18px;
+    padding-top: 12px;
+    border-top: 1px dotted var(--ink-soft);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
     color: var(--ink-soft);
-    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.3s ease;
   }
 
-  .entry:hover .chevron { color: var(--accent); }
-  .entry.open .chevron { transform: rotate(180deg); color: var(--accent); }
-
-  .chevron svg {
-    width: 18px;
-    height: 18px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* Detail panel (inline expanding) */
-  .entry-detail {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .entry.open .entry-detail {
-    max-height: 1000px;
-  }
-
-  .detail-inner {
-    padding: 8px 8px 36px 84px;
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 40px;
+  .card-arrow {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    width: 24px;
+    height: 24px;
     opacity: 0;
-    transform: translateY(-8px);
-    transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+    transform: translateX(-6px);
+    transition: all 0.25s ease;
   }
 
-  .entry.open .detail-inner {
+  .township-card:hover .card-arrow,
+  .township-card:focus-visible .card-arrow {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 
-  .detail-block .block-label {
+  /* === DIALOG === */
+  dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: min(720px, 92vw);
+    width: 100%;
+    max-height: 90vh;
+    color: inherit;
+  }
+
+  dialog::backdrop {
+    background: rgba(26, 24, 20, 0.6);
+    backdrop-filter: blur(3px);
+  }
+
+  dialog[open] {
+    animation: dialog-in 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+
+  @keyframes dialog-in {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .dialog-inner {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 80px rgba(26, 24, 20, 0.4);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .dialog-inner::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid var(--line);
+    pointer-events: none;
+  }
+
+  .dialog-header {
+    padding: 36px 40px 24px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .dialog-eyebrow {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--rule);
+    color: var(--rust);
+    margin-bottom: 12px;
   }
 
-  .detail-block.bio p {
+  .dialog-title {
     font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 4vw, 44px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .dialog-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--rust);
+  }
+
+  .dialog-subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  .dialog-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 16px;
-    line-height: 1.65;
     color: var(--ink);
-    font-weight: 300;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .detail-block.bio p + p { margin-top: 12px; }
-
-  .detail-block.bio .drop {
-    float: left;
-    font-family: 'Fraunces', serif;
-    font-weight: 900;
-    font-size: 56px;
-    line-height: 0.85;
-    margin: 6px 8px 0 0;
-    color: var(--accent);
+  .dialog-close:hover {
+    background: var(--ink);
+    color: var(--paper);
   }
 
-  dl.contact {
+  .dialog-body {
+    padding: 32px 40px 40px;
+  }
+
+  .stats-row {
     display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: 16px;
-    row-gap: 8px;
-    font-size: 13.5px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    margin-bottom: 32px;
+    border: 1px solid var(--line);
   }
 
-  dl.contact dt {
+  .stats-row .stat-block {
+    padding: 20px 24px;
+    border-right: 1px solid var(--line);
+  }
+  .stats-row .stat-block:last-child { border-right: none; }
+
+  .stat-block-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .stat-block-value {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .stat-block-unit {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-left: 4px;
+  }
+
+  .notes-block {
+    background: var(--paper-deep);
+    border-left: 3px solid var(--rust);
+    padding: 18px 22px;
+    margin-bottom: 32px;
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .notes-block::before {
+    content: '"';
+    font-family: 'Fraunces', serif;
+    font-size: 48px;
+    line-height: 0;
+    color: var(--rust);
+    margin-right: 4px;
+    vertical-align: -16px;
+  }
+
+  .detail-section {
+    margin-bottom: 28px;
+  }
+
+  .section-heading {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    border-bottom: 1px solid var(--rust);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+
+  .detail-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--ink-soft);
+    font-size: 14px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+
+  .detail-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--ink-soft);
-    padding-top: 3px;
+    padding-top: 2px;
   }
 
-  dl.contact dd {
+  .detail-value {
+    font-family: 'Inter Tight', sans-serif;
     color: var(--ink);
-    font-weight: 400;
+    line-height: 1.45;
+    word-break: break-word;
   }
 
-  dl.contact a {
-    color: var(--ink);
-    text-decoration: none;
-    border-bottom: 1px solid var(--rule);
-    transition: color 0.2s, border-color 0.2s;
+  .detail-value a {
+    color: var(--rust);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
   }
+  .detail-value a:hover { color: var(--rust-deep); }
 
-  dl.contact a:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-  }
-
-  /* ---------- Map link button ---------- */
-  .map-link {
+  .detail-value a.maps-link {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 16px;
-    padding: 9px 16px 9px 14px;
-    background: var(--paper-warm);
-    color: var(--ink);
+    gap: 6px;
+    margin-top: 10px;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     text-decoration: none;
-    border: 1px solid var(--ink);
+    color: var(--paper);
+    background: var(--moss);
+    border: 1px solid var(--moss);
     border-radius: 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    box-shadow: 3px 3px 0 var(--ink);
-    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
-                box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
-                background 0.18s ease,
-                color 0.18s ease;
-    position: relative;
-    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--line);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
   }
-
-  .map-link:hover,
-  .map-link:focus-visible {
-    background: var(--accent);
+  .detail-value a.maps-link:hover {
+    background: var(--rust);
+    border-color: var(--rust);
     color: var(--paper);
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 var(--ink);
-    outline: none;
+  }
+  .detail-value a.maps-link:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--line);
   }
 
-  .map-link:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 var(--ink);
-  }
-
-  .map-link .pin {
-    width: 13px;
-    height: 13px;
-    flex-shrink: 0;
-    fill: var(--accent);
-    transition: fill 0.18s ease;
-  }
-
-  .map-link:hover .pin,
-  .map-link:focus-visible .pin {
-    fill: var(--paper);
-  }
-
-  .map-link .arrow {
-    margin-left: 2px;
-    font-size: 12px;
-    line-height: 1;
-    color: var(--accent);
-    transition: color 0.18s ease, transform 0.18s ease;
-  }
-
-  .map-link:hover .arrow,
-  .map-link:focus-visible .arrow {
-    color: var(--paper);
-    transform: translate(2px, -2px);
-  }
-
-  .stats-strip {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    border-top: 1px solid var(--rule);
-    margin-top: 8px;
-    padding-top: 16px;
-  }
-
-  .stat .stat-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+  .detail-value.empty {
     color: var(--ink-soft);
-    margin-bottom: 4px;
-  }
-
-  .stat .stat-value {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 22px;
-    color: var(--ink);
-    letter-spacing: -0.01em;
-  }
-
-  .stat .stat-value .unit {
-    font-size: 11px;
-    font-weight: 400;
     font-style: italic;
-    color: var(--ink-soft);
-    margin-left: 3px;
+    opacity: 0.6;
   }
 
-  /* ---------- Footer ---------- */
-  footer.colophon {
-    margin-top: 64px;
-    padding-top: 24px;
-    border-top: 4px double var(--ink);
-    text-align: center;
+  .id-stamp {
+    margin-top: 32px;
+    padding: 14px 18px;
+    border: 1px dashed var(--ink-soft);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    word-break: break-all;
+  }
+
+  .id-stamp strong {
+    color: var(--rust);
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* === FOOTER === */
+  .colophon {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 4px double var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 32px;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--ink-soft);
-    line-height: 2;
   }
 
-  footer.colophon .ornament {
-    color: var(--accent);
-    margin: 0 12px;
-    font-style: normal;
-  }
-
-  /* ---------- Decorative ornament ---------- */
-  .ornament-row {
+  .colophon-center {
     text-align: center;
-    margin: 18px 0 0;
-    color: var(--gold);
-    letter-spacing: 0.4em;
-    font-size: 12px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 16px;
+    color: var(--ink);
   }
 
-  /* ---------- Responsive ---------- */
-  @media (max-width: 720px) {
-    .page { padding: 32px 22px 60px; }
+  .colophon-center .ornament {
+    color: var(--rust);
+    margin: 0 8px;
+  }
 
-    /* Show toggle and enable collapse on mobile */
-    header.masthead {
-      padding: 0;
-      margin-bottom: 24px;
-      text-align: left;
-    }
+  .colophon-right { text-align: right; }
 
-    .masthead-toggle {
-      display: flex;
-    }
+  .credit-name {
+    color: var(--rust);
+    font-weight: 600;
+  }
 
-    .masthead-content {
-      max-height: 800px;
-      opacity: 1;
-      padding: 0 8px 22px;
-    }
-
-    .masthead.collapsed .masthead-content {
-      max-height: 0;
-      opacity: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-
-    h1.title { font-size: 32px; }
-    .meta-row { flex-direction: column; gap: 8px; align-items: flex-start; }
-
-    .entry-button {
-      grid-template-columns: 36px 1fr 28px;
-      gap: 14px;
-    }
-    .entry-type { display: none; }
-    .detail-inner {
-      padding: 8px 0 28px 0;
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .container { padding: 32px 20px 64px; }
+    .masthead {
       grid-template-columns: 1fr;
-      gap: 24px;
+      text-align: center;
+      gap: 16px;
     }
-    .stats-strip { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .stat .stat-value { font-size: 18px; }
+    .masthead-meta { text-align: center; }
+    .seal { margin: 0 auto; }
+    .intro { grid-template-columns: 1fr; gap: 16px; }
+    .dateline { flex-direction: column; gap: 4px; align-items: flex-start; }
+    .dialog-header, .dialog-body { padding: 24px 22px; }
+    .detail-row { grid-template-columns: 1fr; gap: 4px; }
+    .stats-row { grid-template-columns: 1fr; }
+    .stats-row .stat-block { border-right: none; border-bottom: 1px solid var(--line); }
+    .stats-row .stat-block:last-child { border-bottom: none; }
+    .colophon { grid-template-columns: 1fr; text-align: center; }
+    .colophon-right { text-align: center; }
   }
 
-  /* ---------- Initial reveal animation ---------- */
-  .entry {
-    opacity: 0;
-    transform: translateY(8px);
-    animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  }
-
-  @keyframes rise {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Focus styles for keyboard users */
-  .entry-button:focus { outline: none; }
-  .entry-button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: -4px;
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>
 </head>
 <body>
+  <div class="container">
 
-<div class="page">
+    <!-- MASTHEAD -->
+    <header class="masthead">
+      <svg class="seal" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#1a1814" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#1a1814" stroke-width="0.5"/>
+        <circle cx="50" cy="50" r="30" fill="none" stroke="#b14a2e" stroke-width="1"/>
+        <text x="50" y="46" text-anchor="middle" font-family="Fraunces, serif" font-weight="800" font-size="14" fill="#1a1814" font-style="italic">T</text>
+        <text x="50" y="60" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="6" fill="#1a1814" letter-spacing="1">CO.</text>
+        <path d="M 50 12 L 52 16 L 50 14 L 48 16 Z" fill="#b14a2e"/>
+        <path d="M 50 88 L 52 84 L 50 86 L 48 84 Z" fill="#b14a2e"/>
+        <path d="M 12 50 L 16 48 L 14 50 L 16 52 Z" fill="#b14a2e"/>
+        <path d="M 88 50 L 84 48 L 86 50 L 84 52 Z" fill="#b14a2e"/>
+        <text x="50" y="78" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="3.5" fill="#4a4137" letter-spacing="0.5">EST. 1800</text>
+      </svg>
 
-  <header class="masthead">
-    <div class="eyebrow">
-      Established MDCCC <span class="dot">✦</span> Connecticut Western Reserve <span class="dot">✦</span> N.E. Ohio
+      <div class="masthead-title">
+        <div class="masthead-eyebrow">A Civic Directory of the State of Ohio</div>
+        <h1>Trumbull County <em>Townships</em></h1>
+      </div>
+
+      <div class="masthead-meta">
+        <strong>No. XXV</strong>
+        Twenty-Five<br/>Civil Townships<br/>Northeast Ohio
+      </div>
+    </header>
+
+    <div class="dateline">
+      <span><span class="vol">Vol. I</span> &nbsp;·&nbsp; Northeast Ohio Almanac</span>
+      <span id="dateline-date">— · —</span>
+      <span>Edition I</span>
     </div>
-    <h1 class="title">The Municipalities of <em>Trumbull County</em></h1>
-    <p class="subtitle">A register of the eleven incorporated cities and villages comprising the only perfectly square county in the State of Ohio.</p>
-    <div class="meta-row">
-      <div><span class="num">11</span> &nbsp;Municipalities</div>
-      <div><span class="num">5</span> &nbsp;Cities</div>
-      <div><span class="num">6</span> &nbsp;Villages</div>
+
+    <!-- INTRO -->
+    <section class="intro">
+      <div class="intro-label">An Introduction</div>
+      <p class="intro-text">
+        <span class="drop">T</span>rumbull County, seated in Warren and bordered by the Pennsylvania line, is composed of twenty-five civil townships — each with its own character, its own fields and waters, its own quiet seat of governance. Click any township below to consult its full record.
+      </p>
+    </section>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <span class="filter-label">Search</span>
+      <input type="text" class="search-input" id="search" placeholder="filter by name or community…" aria-label="Search townships">
+      <span class="filter-label">Order</span>
+      <div class="sort-toggle" role="group" aria-label="Sort order">
+        <button class="sort-btn active" data-sort="alpha">A–Z</button>
+        <button class="sort-btn" data-sort="population">Population</button>
+        <button class="sort-btn" data-sort="area">Area</button>
+      </div>
+      <span class="count-badge"><span id="count">25</span> / 25 records</span>
     </div>
-    <div class="ornament-row">❦ ❦ ❦</div>
-  </header>
 
-  <!-- Cities -->
-  <div class="section-label">
-    <span class="roman">I.</span>
-    <h2>Cities</h2>
-    <span class="count">N = 5</span>
+    <!-- GRID -->
+    <main class="townships-grid" id="grid"></main>
+
+    <!-- COLOPHON -->
+    <footer class="colophon">
+      <div class="colophon-left">
+        Last Updated &nbsp;·&nbsp; <span id="last-updated">—</span>
+      </div>
+      <div class="colophon-center">
+        Compiled &amp; curated by <span class="credit-name">Mike Costarella</span>
+        <span class="ornament">❦</span>
+      </div>
+      <div class="colophon-right">
+        Trumbull Co. &nbsp;·&nbsp; OH &nbsp;·&nbsp; USA
+      </div>
+    </footer>
+
   </div>
-  <ul class="entries" id="cities-list"></ul>
 
-  <!-- Villages -->
-  <div class="section-label">
-    <span class="roman">II.</span>
-    <h2>Villages</h2>
-    <span class="count">N = 6</span>
-  </div>
-  <ul class="entries" id="villages-list"></ul>
-
-  <footer class="colophon">
-    Compiled from the 2026 Directory of Trumbull County Officials
-    <br/>
-    Trumbull County Planning Commission <span class="ornament">✦</span> Warren, Ohio
-  </footer>
-</div>
+  <!-- DIALOG -->
+  <dialog id="detail-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-inner" id="dialog-inner"></div>
+  </dialog>
 
 <script>
-const data = [
-  {
-    name: "Warren", type: "City", seat: true, founded: 1798, pop2020: 39201, areaMi2: 16.16,
-    mayor: "William \u201CDoug\u201D Franklin",
-    address: "391 Mahoning Avenue NW",
-    city: "Warren", zip: "44483",
-    phone: "(330) 841-2601", fax: "(330) 841-2676",
-    email: "dfranklin@warren.org", website: "www.warren.org",
-    bio: "Founded in 1798 by Ephraim Quinby on the banks of the Mahoning River, Warren served as the original seat of the Connecticut Western Reserve before becoming the county seat of Trumbull County in 1801. Today it remains the largest city in the county and a principal city of the Mahoning Valley."
-  },
-  {
-    name: "Niles", type: "City", seat: false, founded: 1806, pop2020: 18443, areaMi2: 8.48,
-    mayor: "Steven Mientkiewicz",
-    address: "34 West State Street",
-    city: "Niles", zip: "44446",
-    phone: "(330) 544-9000", fax: "(330) 349-4906",
-    email: "smientkiewicz@thecityofniles.com", website: "www.thecityofniles.com",
-    bio: "Settled in 1806, Niles grew as an iron and steel town in the nineteenth century and is the birthplace of William McKinley, the twenty-fifth President of the United States. The National McKinley Birthplace Memorial stands at the heart of the community."
-  },
-  {
-    name: "Girard", type: "City", seat: false, founded: 1893, pop2020: 9603, areaMi2: 4.55,
-    mayor: "Mark Zuppo",
-    address: "100 W. Main Street",
-    city: "Girard", zip: "44420",
-    phone: "(330) 545-3306", fax: "(330) 539-7270",
-    email: "mzuppo@cityofgirardoh.gov", website: "www.cityofgirardoh.gov",
-    bio: "Named for the French banker Stephen Girard, the city was incorporated as a village in 1893 and became a city in the early twentieth century. Girard rose with the steel and iron mills of the Mahoning Valley and retains a tightly knit residential character."
-  },
-  {
-    name: "Hubbard", type: "City", seat: false, founded: 1868, pop2020: 7636, areaMi2: 4.13,
-    mayor: "Benjamin A. Kyle",
-    address: "220 West Liberty Street",
-    city: "Hubbard", zip: "44425",
-    phone: "(330) 534-3090", fax: "(330) 534-8441",
-    email: "b.kyle@cityofhubbard-oh.gov", website: "www.cityofhubbard-oh.gov",
-    bio: "Incorporated as a village in 1868 and elevated to city status in 1957, Hubbard sits on the Pennsylvania border and was once a center of the regional coal industry. Its compact downtown and tree-lined neighborhoods preserve a small-town New England character."
-  },
-  {
-    name: "Cortland", type: "City", seat: false, founded: 1873, pop2020: 7105, areaMi2: 4.25,
-    mayor: "Jim Bradley",
-    address: "400 N. High Street",
-    city: "Cortland", zip: "44410",
-    phone: "(330) 637-3916", fax: "(330) 637-4778",
-    email: "admin@cortlandoh.gov", website: "www.cortlandoh.gov",
-    bio: "Originally known as Baconsburg, Cortland incorporated in 1873 and was renamed for Cortland, New York. It lies along the eastern shore of Mosquito Creek Lake and the surrounding state park, and is known for its lakeside character."
-  },
-  {
-    name: "Newton Falls", type: "Village", seat: false, founded: 1875, pop2020: 4557, areaMi2: 2.31,
-    mayor: "David Hanson",
-    address: "612 W. Broad Street",
-    city: "Newton Falls", zip: "44444",
-    phone: "(330) 872-0806", fax: "(330) 872-0544",
-    email: "citymanager@newtonfallsoh.gov", website: "www.ci.newtonfalls.oh.us",
-    bio: "Incorporated in 1875 at the confluence of the east and west branches of the Mahoning River, Newton Falls is best known for its 44444 ZIP code and its covered wooden bridge, one of the few remaining of its kind in Ohio."
-  },
-  {
-    name: "Lordstown", type: "Village", seat: false, founded: 1975, pop2020: 3332, areaMi2: 23.14,
-    mayor: "Jackie Woodward",
-    address: "1455 Salt Springs Road",
-    city: "Warren", zip: "44481",
-    phone: "(330) 824-2507", fax: "(330) 824-3703",
-    email: "mayor@lordstownvillage.com", website: "www.lordstown.com",
-    bio: "Lordstown Township nearly entirely incorporated as a village in 1975 to consolidate local governance around the General Motors assembly plant. Today the former GM facility houses Foxconn and Ultium Cells, sustaining the village\u2019s industrial legacy."
-  },
-  {
-    name: "McDonald", type: "Village", seat: false, founded: 1918, pop2020: 3172, areaMi2: 1.40,
-    mayor: "Ray Lewis",
-    address: "451 Ohio Avenue",
-    city: "McDonald", zip: "44437",
-    phone: "(330) 530-5472", fax: "(330) 530-4320",
-    email: "officemanager@mcdonaldvillageoh.gov", website: "www.mcdonaldvillage.com",
-    bio: "Named for the Carnegie Steel executive Thomas McDonald, the village was incorporated in 1918 to serve workers of the nearby steel works. It retains a planned company-town grid with a strong civic identity centered on its public schools."
-  },
-  {
-    name: "West Farmington", type: "Village", seat: false, founded: 1837, pop2020: 543, areaMi2: 0.41,
-    mayor: "Shirley L. McIntosh",
-    address: "251 Fourth Street",
-    city: "West Farmington", zip: "44491",
-    phone: "(330) 889-2699", fax: "(330) 889-3330",
-    email: "wfvillagefiscal@gmail.com", website: "",
-    bio: "One of the older communities in the county, West Farmington was incorporated in 1837. It surrounds the historic campus of what is now Western Reserve Eldercare and remains a quiet residential village in the rural northwest of the county."
-  },
-  {
-    name: "Orangeville", type: "Village", seat: false, founded: 1874, pop2020: 174, areaMi2: 0.20,
-    mayor: "Ruth E. Bennett",
-    address: "8276 High Street, Burghill",
-    city: "Burghill", zip: "44404",
-    phone: "(330) 772-3552", fax: "(330) 772-2600",
-    email: "mayorruthe@aol.com", website: "",
-    bio: "Settled along the Pennsylvania state line in the early nineteenth century and incorporated in 1874, Orangeville is a small village whose historic homes, set among rolling hills, evoke the agrarian character of the eastern Reserve."
-  },
-  {
-    name: "Yankee Lake", type: "Village", seat: false, founded: 1932, pop2020: 75, areaMi2: 0.32,
-    mayor: "John A. Jurko",
-    address: "1800 State Route 7 NE, Brookfield",
-    city: "Brookfield", zip: "44403",
-    phone: "(330) 288-0201", fax: "(330) 288-0221",
-    email: "dagrossmancpa@yahoo.com", website: "",
-    bio: "The smallest municipality in Trumbull County by population, Yankee Lake was incorporated in 1932 around its namesake recreational lake. With fewer than one hundred residents, it remains one of the most diminutive incorporated places in the State of Ohio."
+  const TOWNSHIPS = [
+    {id:"76ded46f-236d-4603-a3f7-96fdcf44e590", name:"Bazetta Township", area:"Cortland (city seat)", sqMi:22.6, pop:10200, notes:"Home to Mosquito Lake reservoir", physAddr:"3372 State Route 5 N.E., Cortland, Ohio 44410", contactAddr:"3372 State Route 5 N.E., Cortland, OH 44410", phone:"(330) 637-8816", email:"dlongo@bazettatwp.org"},
+    {id:"7cd4c67b-ef70-49bf-bdfb-b04df35882ef", name:"Bloomfield Township", area:"Bloomfield Center", sqMi:35, pop:2900, notes:"Rural agricultural township", physAddr:"2063 Kinsman Rd. NW (State Route 87), North Bloomfield, OH 44450", contactAddr:"P.O. Box 34, North Bloomfield, OH 44450", phone:"(440) 685-4734", email:"bloomfieldtwpoh@gmail.com"},
+    {id:"ac7df9ba-883d-4f23-b5ec-fd3b43277607", name:"Braceville Township", area:"Braceville", sqMi:25.5, pop:2100, notes:"Located in southern Trumbull County", physAddr:"582 Newton Falls Braceville Rd, Newton Falls, OH 44444", contactAddr:"P.O. Box 582, Leavittsburg, OH 44430", phone:"(330) 872-0085", email:"bracevilletwp@gmail.com"},
+    {id:"08fed5d1-3992-4527-8573-9208bd6ea202", name:"Bristol Township", area:"Bristolville", sqMi:34.9, pop:4200, notes:"Rural township in western Trumbull County", physAddr:"1864 Greenville Road, Bristolville, OH 44402", contactAddr:"P.O. Box 254, Bristolville, OH 44402", phone:"(330) 889-2246", email:"fiscal@bristoltownshipohio.gov"},
+    {id:"8c453b9e-4cdf-4429-bc63-6c9d7f4a8ed6", name:"Brookfield Township", area:"Masury / Brookfield Center", sqMi:27.3, pop:8700, notes:"Borders Pennsylvania; includes Masury community", physAddr:"6844 Strimbu Drive, Brookfield, OH 44403", contactAddr:"6844 Strimbu Drive, Brookfield, OH 44403", phone:"(330) 448-4500", email:"brookfieldtwp@gmail.com"},
+    {id:"8a2b4169-0551-4347-a70c-9cb21cd05e99", name:"Champion Township", area:"Champion Heights", sqMi:25.1, pop:9500, notes:"Suburban township near Warren", physAddr:"240 Marshall Ave. N.W., Warren, OH 44483", contactAddr:"240 Marshall Ave. N.W., Warren, OH 44483", phone:"(330) 847-7690", email:"fiscaloffice@championtownship.org"},
+    {id:"5e7be1f9-49af-44fd-b194-dbe0271f5cc6", name:"Farmington Township", area:"Farmington", sqMi:35.8, pop:3100, notes:"Rural township in western Trumbull County", physAddr:"150 College St, W Farmington 44491.", contactAddr:"P.O. Box 81, West Farmington, OH 44491", phone:"(330) 889-3024 ext. 2", email:"farmingtonfiscal.trumbullco@gmail.com"},
+    {id:"676c925d-1b51-42bd-92e0-4576c06f238f", name:"Fowler Township", area:"Fowler", sqMi:25, pop:2360, notes:"Rural township in northern Trumbull County", physAddr:"4562 Wilson-Sharpsville Road Cortland Ohio 44410", contactAddr:"P.O. Box 174, Fowler, OH 44418", phone:"(330) 637-2653", email:"ccarr@fowlertownship.org"},
+    {id:"a8bb5849-4dbd-42bc-8181-5058e9fba8b0", name:"Greene Township", area:"Greeneville", sqMi:36.3, pop:2600, notes:"One of the larger townships by area", physAddr:"8955 State Route 46, North Bloomfield, OH 44450", contactAddr:"8964 State Route 46, North Bloomfield, OH 44450", phone:"(330) 646-7593", email:"greenetrustees@gmail.com"},
+    {id:"50d4c8c6-bd65-4be0-94b4-eb290ad18ce5", name:"Gustavus Township", area:"Gustavus Center", sqMi:35.2, pop:1900, notes:"Rural township in northeastern Trumbull County", physAddr:"4315 Kinsman Rd NE, Farmdale, OH 44417", contactAddr:"P.O. Box 14, Farmdale, OH 44417", phone:"(330) 246-0772", email:"gustavus_lhall@yahoo.com"},
+    {id:"bfc897d8-b36c-4632-a8cc-ce0b902be9c7", name:"Hartford Township", area:"Hartford", sqMi:25.1, pop:1861, notes:"Rural township in northeastern Trumbull County", physAddr:"6901 State Route 305, Hartford, OH 44424", contactAddr:"P.O. Box 116, Hartford, OH 44424", phone:"(330) 772-2211", email:"fiscal@hartfordtwp.org"},
+    {id:"3012f383-5207-4efd-944d-89aefb62a033", name:"Howland Township", area:"Howland Center / Warren area", sqMi:24.7, pop:19800, notes:"Populous suburban township bordering Warren", physAddr:"205 Niles-Cortland Road N.E., Warren, OH 44484", contactAddr:"205 Niles-Cortland Road N.E., Warren, OH 44484", phone:"(330) 856-2340", email:"JPantalone@howlandtownship.org"},
+    {id:"c902e1a6-548e-4634-a7b1-1e692deb9a53", name:"Hubbard Township", area:"Hubbard (city)", sqMi:18.2, pop:8100, notes:"Includes City of Hubbard; near Pennsylvania border", physAddr:"2600 Elmwood Drive Extension, Hubbard, OH 44425", contactAddr:"2600 Elmwood Drive, Hubbard, OH 44425", phone:"(330) 534-8477", email:"fiscalofficer@hubbardtwpohio.gov"},
+    {id:"1c7d8ecb-4d78-483c-861d-8ba03f058407", name:"Johnston Township", area:"Southington", sqMi:36.1, pop:2500, notes:"Rural township in southwestern Trumbull County", physAddr:"4177 Greenville Road, Cortland, OH 44410", contactAddr:"P.O. Box 693, Cortland, OH 44410", phone:"(330) 240-4115", email:"johnstontwptrumbull@gmail.com"},
+    {id:"148b7078-c953-48bc-beb4-375b4387c4e0", name:"Kinsman Township", area:"Kinsman", sqMi:35.5, pop:2300, notes:"Northwestern township near Grand River", physAddr:"7890 State Route 5, Kinsman, OH 44428", contactAddr:"P.O. Box 399, Kinsman, OH 44428", phone:"(330) 876-1040", email:"kinsmantwp@zoominternet.net"},
+    {id:"7f331340-46cf-4880-a4d1-3f61944af192", name:"Liberty Township", area:"Girard / Liberty area", sqMi:24.5, pop:23800, notes:"Most populous township; includes Girard and suburban areas", physAddr:"1315 Churchill-Hubbard Road, Youngstown, OH 44505", contactAddr:"1315 Churchill-Hubbard Road, Youngstown, OH 44505", phone:"(330) 759-1315", email:"mconnelly@libertytwp.com"},
+    {id:"4cc29380-ad3e-4b3b-ac4f-2c629bf3a29b", name:"Mecca Township", area:"Mecca Center", sqMi:36.4, pop:2100, notes:"Rural township in central Trumbull County", physAddr:"6333 OH-46, Cortland, OH 44410", contactAddr:"P.O. Box 567, Cortland, OH 44410", phone:"(330) 638-0363", email:"meccatwp@yahoo.com"},
+    {id:"eff231f5-160f-4d04-b95e-e4b455f267ae", name:"Mesopotamia Township", area:"Mesopotamia", sqMi:36, pop:1800, notes:"Features historic Amish community", physAddr:"8686 State Route 534, Mesopotamia, OH 44439", contactAddr:"P.O. Box 199, Mesopotamia, OH 44439", phone:"(440) 693-4023", email:"mespotwpohio@gmail.com"},
+    {id:"201d5f7a-ab0e-429f-b88c-58e89bed2cc7", name:"Newton Township", area:"Newton Falls (city)", sqMi:26.4, pop:8400, notes:"Includes City of Newton Falls on Mahoning River", physAddr:"4410 Newton Falls-Bailey Road, Newton Falls, OH 44444", contactAddr:"P.O. Box 298, Newton Falls, OH 44444", phone:"(330) 872-0003", email:"info@newtontwptc.org"},
+    {id:"1f39cf27-db84-416a-96ab-e54d2cfaeab0", name:"Southington Township", area:"Southington Center", sqMi:36.2, pop:2200, notes:"Rural township in southwest", physAddr:"3419 State Route 534, Southington, OH 44470", contactAddr:"P.O. Box 266, Southington, OH 44470", phone:"(330) 889-2551", email:"mhallsouthingtontwp@gmail.com"},
+    {id:"70f89ee6-e2f4-46f5-b087-b68ab3d74157", name:"Vernon Township", area:"Vernon Center", sqMi:36, pop:1600, notes:"Rural northwestern township near Grand River", physAddr:"6160 OH-7, Kinsman, OH 44428", contactAddr:"6915 B State Route 88, Kinsman, OH 44428", phone:"(330) 772-3013", email:"Vernon.twp.trumbull@gmail.com"},
+    {id:"c2cbb3c7-6b74-487c-a733-d81ee03b7064", name:"Vienna Township", area:"Vienna Center", sqMi:35.3, pop:14500, notes:"Growing suburban township near Youngstown metro", physAddr:"848 Youngstown Kingsville Rd NE Vienna, OH 44473", contactAddr:"P.O. Box 593, Vienna, OH 44473", phone:"(330) 394-2319", email:"hbrown@viennatownship.com"},
+    {id:"e5c9c0aa-5f6a-4079-b4fa-d8cc861c51a7", name:"Warren Township", area:"Warren (county seat)", sqMi:16, pop:38800, notes:"County seat and largest city; independent of townships", physAddr:"3765 West Market Street, Leavittsburg, OH 44430", contactAddr:"3765 West Market Street, Leavittsburg, OH 44430", phone:"(330) 898-2101", email:""},
+    {id:"4794c460-846f-4d78-abe2-f028609e7439", name:"Weathersfield Township", area:"Mineral Ridge / Weathersfield", sqMi:26.5, pop:8500, notes:"Suburban township south of Warren", physAddr:"1451 Prospect Street Mineral Ridge, OH 44440", contactAddr:"1451 Prospect Street, Mineral Ridge, OH 44440", phone:"(330) 652-6326", email:"mailbox@weathersfieldtwp.com"}
+  ];
+
+  // === Timestamps ===
+  const now = new Date();
+  const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
+  const timeOpts = { hour: 'numeric', minute: '2-digit', hour12: true };
+  const fullStamp = now.toLocaleDateString('en-US', dateOpts) + ' · ' + now.toLocaleTimeString('en-US', timeOpts);
+  document.getElementById('last-updated').textContent = fullStamp;
+  document.getElementById('dateline-date').textContent = now.toLocaleDateString('en-US', dateOpts).toUpperCase();
+
+  // === Helpers ===
+  const fmtNum = n => n.toLocaleString('en-US');
+  const fmtArea = n => Number(n).toFixed(1);
+  const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // Italicize "Township" in the name
+  const stylizeName = name => {
+    return escapeHtml(name).replace(/\bTownship\b/g, '<em>Township</em>');
+  };
+
+  // === Render Grid ===
+  const grid = document.getElementById('grid');
+  let currentSort = 'alpha';
+  let currentFilter = '';
+
+  function getSortedFiltered() {
+    const filter = currentFilter.toLowerCase().trim();
+    let list = TOWNSHIPS.filter(t =>
+      !filter ||
+      t.name.toLowerCase().includes(filter) ||
+      t.area.toLowerCase().includes(filter) ||
+      t.notes.toLowerCase().includes(filter)
+    );
+
+    if (currentSort === 'alpha') {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (currentSort === 'population') {
+      list.sort((a, b) => b.pop - a.pop);
+    } else if (currentSort === 'area') {
+      list.sort((a, b) => b.sqMi - a.sqMi);
+    }
+    return list;
   }
-];
 
-const chevronSVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  function renderGrid() {
+    const list = getSortedFiltered();
+    document.getElementById('count').textContent = list.length;
 
-function fmt(n) { return n.toLocaleString('en-US'); }
+    if (list.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1/-1; padding: 64px 24px; text-align:center; border-right:1px solid var(--line); border-bottom:1px solid var(--line); font-family: 'Fraunces', serif; font-style: italic; color: var(--ink-soft); font-size: 18px;">
+          No townships match that query.
+        </div>`;
+      return;
+    }
 
-function renderEntry(m, index) {
-  const li = document.createElement('li');
-  li.className = 'entry';
-  li.style.animationDelay = (60 + index * 50) + 'ms';
-
-  const seatMark = m.seat ? '<span class="seat-mark">County Seat</span>' : '';
-  const websiteRow = m.website
-    ? `<dt>Web</dt><dd><a href="https://${m.website}" target="_blank" rel="noopener">${m.website}</a></dd>`
-    : '';
-
-  const mapsQuery = encodeURIComponent(`${m.address}, ${m.city}, Ohio ${m.zip}`);
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
-
-  li.innerHTML = `
-    <button class="entry-button" aria-expanded="false">
-      <span class="entry-num">№ ${String(index + 1).padStart(2, '0')}</span>
-      <span class="entry-name">${m.name}${seatMark}</span>
-      <span class="entry-type">${m.type}</span>
-      <span class="chevron" aria-hidden="true">${chevronSVG}</span>
-    </button>
-    <div class="entry-detail" role="region">
-      <div class="detail-inner">
-        <div class="detail-block bio">
-          <div class="block-label">Of the Place</div>
-          <p><span class="drop">${m.bio.charAt(0).toUpperCase()}</span>${m.bio.slice(1)}</p>
-        </div>
-        <div class="detail-block">
-          <div class="block-label">Office &amp; Correspondence</div>
-          <dl class="contact">
-            <dt>Mayor</dt><dd>${m.mayor}</dd>
-            <dt>Hall</dt><dd>${m.address}<br/>${m.city}, Ohio ${m.zip}</dd>
-            <dt>Tel.</dt><dd><a href="tel:${m.phone.replace(/[^0-9]/g,'')}">${m.phone}</a></dd>
-            <dt>Fax</dt><dd>${m.fax}</dd>
-            <dt>Email</dt><dd><a href="mailto:${m.email}">${m.email}</a></dd>
-            ${websiteRow}
-          </dl>
-          <a class="map-link" href="${mapsUrl}" target="_blank" rel="noopener" aria-label="Open ${m.name} city hall in Google Maps">
-            <svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
-            <span>View on Google Maps</span>
-            <span class="arrow" aria-hidden="true">↗</span>
-          </a>
-        </div>
-        <div class="stats-strip">
+    grid.innerHTML = list.map((t, i) => `
+      <button class="township-card" data-id="${t.id}" aria-label="View details for ${escapeHtml(t.name)}">
+        <div class="card-index">№ ${String(i + 1).padStart(2, '0')}</div>
+        <div class="card-name">${stylizeName(t.name)}</div>
+        <div class="card-area">${escapeHtml(t.area)}</div>
+        <div class="card-stats">
           <div class="stat">
+            <div class="stat-value">${fmtNum(t.pop)}</div>
             <div class="stat-label">Population</div>
-            <div class="stat-value">${fmt(m.pop2020)}<span class="unit">2020 census</span></div>
           </div>
           <div class="stat">
-            <div class="stat-label">Established</div>
-            <div class="stat-value">${m.founded}</div>
+            <div class="stat-value">${fmtArea(t.sqMi)}</div>
+            <div class="stat-label">Sq. Miles</div>
           </div>
-          <div class="stat">
-            <div class="stat-label">Area</div>
-            <div class="stat-value">${m.areaMi2.toFixed(2)}<span class="unit">sq mi</span></div>
+        </div>
+        <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    `).join('');
+
+    grid.querySelectorAll('.township-card').forEach(btn => {
+      btn.addEventListener('click', () => openDialog(btn.dataset.id));
+    });
+  }
+
+  // === Dialog ===
+  const dialog = document.getElementById('detail-dialog');
+  const dialogInner = document.getElementById('dialog-inner');
+
+  function openDialog(id) {
+    const t = TOWNSHIPS.find(x => x.id === id);
+    if (!t) return;
+
+    const phoneLink = t.phone ? `<a href="tel:${t.phone.replace(/[^0-9+]/g, '')}">${escapeHtml(t.phone)}</a>` : '<span class="empty">— not on file —</span>';
+    const emailLink = t.email ? `<a href="mailto:${escapeHtml(t.email)}">${escapeHtml(t.email)}</a>` : '<span class="empty">— not on file —</span>';
+    const mapsLink = t.physAddr ? `<br><a class="maps-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.physAddr)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(t.physAddr)} in Google Maps">↗ View on Google Maps</a>` : '';
+
+    dialogInner.innerHTML = `
+      <header class="dialog-header">
+        <button class="dialog-close" aria-label="Close dialog" id="close-btn">×</button>
+        <div class="dialog-eyebrow">Record · Trumbull County, Ohio</div>
+        <h2 class="dialog-title" id="dialog-title">${stylizeName(t.name)}</h2>
+        <div class="dialog-subtitle">${escapeHtml(t.area)}</div>
+      </header>
+
+      <div class="dialog-body">
+        <div class="stats-row">
+          <div class="stat-block">
+            <div class="stat-block-label">Estimated Population</div>
+            <div class="stat-block-value">${fmtNum(t.pop)}<span class="stat-block-unit">residents · 2020</span></div>
           </div>
+          <div class="stat-block">
+            <div class="stat-block-label">Land Area</div>
+            <div class="stat-block-value">${fmtArea(t.sqMi)}<span class="stat-block-unit">square miles</span></div>
+          </div>
+        </div>
+
+        ${t.notes ? `<div class="notes-block">${escapeHtml(t.notes)}</div>` : ''}
+
+        <div class="detail-section">
+          <div class="section-heading">Administrative Address</div>
+          <div class="detail-row">
+            <div class="detail-key">Physical</div>
+            <div class="detail-value">${escapeHtml(t.physAddr) || '<span class="empty">— not on file —</span>'}${mapsLink}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-key">Mailing</div>
+            <div class="detail-value">${escapeHtml(t.contactAddr) || '<span class="empty">— not on file —</span>'}</div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="section-heading">Contact</div>
+          <div class="detail-row">
+            <div class="detail-key">Telephone</div>
+            <div class="detail-value">${phoneLink}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-key">Electronic Mail</div>
+            <div class="detail-value">${emailLink}</div>
+          </div>
+        </div>
+
+        <div class="id-stamp">
+          <strong>Record Identifier</strong>
+          ${escapeHtml(t.id)}
         </div>
       </div>
-    </div>
-  `;
+    `;
 
-  const button = li.querySelector('.entry-button');
-  button.addEventListener('click', () => {
-    const wasOpen = li.classList.contains('open');
-    // close any other open entries
-    document.querySelectorAll('.entry.open').forEach(el => {
-      el.classList.remove('open');
-      el.querySelector('.entry-button').setAttribute('aria-expanded', 'false');
-    });
-    if (!wasOpen) {
-      li.classList.add('open');
-      button.setAttribute('aria-expanded', 'true');
-    }
+    document.getElementById('close-btn').addEventListener('click', () => dialog.close());
+    dialog.showModal();
+  }
+
+  // Close on backdrop click
+  dialog.addEventListener('click', e => {
+    const rect = dialog.getBoundingClientRect();
+    const inside = e.clientX >= rect.left && e.clientX <= rect.right
+                && e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inside) dialog.close();
   });
 
-  return li;
-}
+  // === Filter / Sort wiring ===
+  document.getElementById('search').addEventListener('input', e => {
+    currentFilter = e.target.value;
+    renderGrid();
+  });
 
-const cities = data.filter(d => d.type === 'City');
-const villages = data.filter(d => d.type === 'Village');
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSort = btn.dataset.sort;
+      renderGrid();
+    });
+  });
 
-const citiesList = document.getElementById('cities-list');
-const villagesList = document.getElementById('villages-list');
-
-cities.forEach((m, i) => citiesList.appendChild(renderEntry(m, i)));
-villages.forEach((m, i) => villagesList.appendChild(renderEntry(m, cities.length + i)));
+  // Initial render
+  renderGrid();
 </script>
 </body>
 </html>

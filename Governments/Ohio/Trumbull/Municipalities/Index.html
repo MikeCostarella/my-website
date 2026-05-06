@@ -328,7 +328,7 @@
   }
 
   .entry.open .entry-detail {
-    max-height: 800px;
+    max-height: 1000px;
   }
 
   .detail-inner {
@@ -409,6 +409,72 @@
   dl.contact a:hover {
     color: var(--accent);
     border-color: var(--accent);
+  }
+
+  /* ---------- Map link button ---------- */
+  .map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 9px 16px 9px 14px;
+    background: var(--paper-warm);
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+                background 0.18s ease,
+                color 0.18s ease;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .map-link:hover,
+  .map-link:focus-visible {
+    background: var(--accent);
+    color: var(--paper);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--ink);
+    outline: none;
+  }
+
+  .map-link:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+
+  .map-link .pin {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    fill: var(--accent);
+    transition: fill 0.18s ease;
+  }
+
+  .map-link:hover .pin,
+  .map-link:focus-visible .pin {
+    fill: var(--paper);
+  }
+
+  .map-link .arrow {
+    margin-left: 2px;
+    font-size: 12px;
+    line-height: 1;
+    color: var(--accent);
+    transition: color 0.18s ease, transform 0.18s ease;
+  }
+
+  .map-link:hover .arrow,
+  .map-link:focus-visible .arrow {
+    color: var(--paper);
+    transform: translate(2px, -2px);
   }
 
   .stats-strip {
@@ -588,7 +654,7 @@ const data = [
     city: "Warren", zip: "44483",
     phone: "(330) 841-2601", fax: "(330) 841-2676",
     email: "dfranklin@warren.org", website: "www.warren.org",
-    bio: "ounded in 1798 by Ephraim Quinby on the banks of the Mahoning River, Warren served as the original seat of the Connecticut Western Reserve before becoming the county seat of Trumbull County in 1801. Today it remains the largest city in the county and a principal city of the Mahoning Valley."
+    bio: "Founded in 1798 by Ephraim Quinby on the banks of the Mahoning River, Warren served as the original seat of the Connecticut Western Reserve before becoming the county seat of Trumbull County in 1801. Today it remains the largest city in the county and a principal city of the Mahoning Valley."
   },
   {
     name: "Niles", type: "City", seat: false, founded: 1806, pop2020: 18443, areaMi2: 8.48,
@@ -597,7 +663,7 @@ const data = [
     city: "Niles", zip: "44446",
     phone: "(330) 544-9000", fax: "(330) 349-4906",
     email: "smientkiewicz@thecityofniles.com", website: "www.thecityofniles.com",
-    bio: "ettled in 1806, Niles grew as an iron and steel town in the nineteenth century and is the birthplace of William McKinley, the twenty-fifth President of the United States. The National McKinley Birthplace Memorial stands at the heart of the community."
+    bio: "Settled in 1806, Niles grew as an iron and steel town in the nineteenth century and is the birthplace of William McKinley, the twenty-fifth President of the United States. The National McKinley Birthplace Memorial stands at the heart of the community."
   },
   {
     name: "Girard", type: "City", seat: false, founded: 1893, pop2020: 9603, areaMi2: 4.55,
@@ -606,7 +672,7 @@ const data = [
     city: "Girard", zip: "44420",
     phone: "(330) 545-3306", fax: "(330) 539-7270",
     email: "mzuppo@cityofgirardoh.gov", website: "www.cityofgirardoh.gov",
-    bio: "amed for the French banker Stephen Girard, the city was incorporated as a village in 1893 and became a city in the early twentieth century. Girard rose with the steel and iron mills of the Mahoning Valley and retains a tightly knit residential character."
+    bio: "Named for the French banker Stephen Girard, the city was incorporated as a village in 1893 and became a city in the early twentieth century. Girard rose with the steel and iron mills of the Mahoning Valley and retains a tightly knit residential character."
   },
   {
     name: "Hubbard", type: "City", seat: false, founded: 1868, pop2020: 7636, areaMi2: 4.13,
@@ -615,7 +681,7 @@ const data = [
     city: "Hubbard", zip: "44425",
     phone: "(330) 534-3090", fax: "(330) 534-8441",
     email: "b.kyle@cityofhubbard-oh.gov", website: "www.cityofhubbard-oh.gov",
-    bio: "ncorporated as a village in 1868 and elevated to city status in 1957, Hubbard sits on the Pennsylvania border and was once a center of the regional coal industry. Its compact downtown and tree-lined neighborhoods preserve a small-town New England character."
+    bio: "Incorporated as a village in 1868 and elevated to city status in 1957, Hubbard sits on the Pennsylvania border and was once a center of the regional coal industry. Its compact downtown and tree-lined neighborhoods preserve a small-town New England character."
   },
   {
     name: "Cortland", type: "City", seat: false, founded: 1873, pop2020: 7105, areaMi2: 4.25,
@@ -624,7 +690,7 @@ const data = [
     city: "Cortland", zip: "44410",
     phone: "(330) 637-3916", fax: "(330) 637-4778",
     email: "admin@cortlandoh.gov", website: "www.cortlandoh.gov",
-    bio: "riginally known as Baconsburg, Cortland incorporated in 1873 and was renamed for Cortland, New York. It lies along the eastern shore of Mosquito Creek Lake and the surrounding state park, and is known for its lakeside character."
+    bio: "Originally known as Baconsburg, Cortland incorporated in 1873 and was renamed for Cortland, New York. It lies along the eastern shore of Mosquito Creek Lake and the surrounding state park, and is known for its lakeside character."
   },
   {
     name: "Newton Falls", type: "Village", seat: false, founded: 1875, pop2020: 4557, areaMi2: 2.31,
@@ -633,7 +699,7 @@ const data = [
     city: "Newton Falls", zip: "44444",
     phone: "(330) 872-0806", fax: "(330) 872-0544",
     email: "citymanager@newtonfallsoh.gov", website: "www.ci.newtonfalls.oh.us",
-    bio: "ncorporated in 1875 at the confluence of the east and west branches of the Mahoning River, Newton Falls is best known for its 44444 ZIP code and its covered wooden bridge, one of the few remaining of its kind in Ohio."
+    bio: "Incorporated in 1875 at the confluence of the east and west branches of the Mahoning River, Newton Falls is best known for its 44444 ZIP code and its covered wooden bridge, one of the few remaining of its kind in Ohio."
   },
   {
     name: "Lordstown", type: "Village", seat: false, founded: 1975, pop2020: 3332, areaMi2: 23.14,
@@ -642,7 +708,7 @@ const data = [
     city: "Warren", zip: "44481",
     phone: "(330) 824-2507", fax: "(330) 824-3703",
     email: "mayor@lordstownvillage.com", website: "www.lordstown.com",
-    bio: "ordstown Township nearly entirely incorporated as a village in 1975 to consolidate local governance around the General Motors assembly plant. Today the former GM facility houses Foxconn and Ultium Cells, sustaining the village\u2019s industrial legacy."
+    bio: "Lordstown Township nearly entirely incorporated as a village in 1975 to consolidate local governance around the General Motors assembly plant. Today the former GM facility houses Foxconn and Ultium Cells, sustaining the village\u2019s industrial legacy."
   },
   {
     name: "McDonald", type: "Village", seat: false, founded: 1918, pop2020: 3172, areaMi2: 1.40,
@@ -651,7 +717,7 @@ const data = [
     city: "McDonald", zip: "44437",
     phone: "(330) 530-5472", fax: "(330) 530-4320",
     email: "officemanager@mcdonaldvillageoh.gov", website: "www.mcdonaldvillage.com",
-    bio: "amed for the Carnegie Steel executive Thomas McDonald, the village was incorporated in 1918 to serve workers of the nearby steel works. It retains a planned company-town grid with a strong civic identity centered on its public schools."
+    bio: "Named for the Carnegie Steel executive Thomas McDonald, the village was incorporated in 1918 to serve workers of the nearby steel works. It retains a planned company-town grid with a strong civic identity centered on its public schools."
   },
   {
     name: "West Farmington", type: "Village", seat: false, founded: 1837, pop2020: 543, areaMi2: 0.41,
@@ -660,7 +726,7 @@ const data = [
     city: "West Farmington", zip: "44491",
     phone: "(330) 889-2699", fax: "(330) 889-3330",
     email: "wfvillagefiscal@gmail.com", website: "",
-    bio: "ne of the older communities in the county, West Farmington was incorporated in 1837. It surrounds the historic campus of what is now Western Reserve Eldercare and remains a quiet residential village in the rural northwest of the county."
+    bio: "One of the older communities in the county, West Farmington was incorporated in 1837. It surrounds the historic campus of what is now Western Reserve Eldercare and remains a quiet residential village in the rural northwest of the county."
   },
   {
     name: "Orangeville", type: "Village", seat: false, founded: 1874, pop2020: 174, areaMi2: 0.20,
@@ -669,7 +735,7 @@ const data = [
     city: "Burghill", zip: "44404",
     phone: "(330) 772-3552", fax: "(330) 772-2600",
     email: "mayorruthe@aol.com", website: "",
-    bio: "settled along the Pennsylvania state line in the early nineteenth century and incorporated in 1874, Orangeville is a small village whose historic homes, set among rolling hills, evoke the agrarian character of the eastern Reserve."
+    bio: "Settled along the Pennsylvania state line in the early nineteenth century and incorporated in 1874, Orangeville is a small village whose historic homes, set among rolling hills, evoke the agrarian character of the eastern Reserve."
   },
   {
     name: "Yankee Lake", type: "Village", seat: false, founded: 1932, pop2020: 75, areaMi2: 0.32,
@@ -678,7 +744,7 @@ const data = [
     city: "Brookfield", zip: "44403",
     phone: "(330) 288-0201", fax: "(330) 288-0221",
     email: "dagrossmancpa@yahoo.com", website: "",
-    bio: "he smallest municipality in Trumbull County by population, Yankee Lake was incorporated in 1932 around its namesake recreational lake. With fewer than one hundred residents, it remains one of the most diminutive incorporated places in the State of Ohio."
+    bio: "The smallest municipality in Trumbull County by population, Yankee Lake was incorporated in 1932 around its namesake recreational lake. With fewer than one hundred residents, it remains one of the most diminutive incorporated places in the State of Ohio."
   }
 ];
 
@@ -696,6 +762,9 @@ function renderEntry(m, index) {
     ? `<dt>Web</dt><dd><a href="https://${m.website}" target="_blank" rel="noopener">${m.website}</a></dd>`
     : '';
 
+  const mapsQuery = encodeURIComponent(`${m.address}, ${m.city}, Ohio ${m.zip}`);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+
   li.innerHTML = `
     <button class="entry-button" aria-expanded="false">
       <span class="entry-num">№ ${String(index + 1).padStart(2, '0')}</span>
@@ -707,7 +776,7 @@ function renderEntry(m, index) {
       <div class="detail-inner">
         <div class="detail-block bio">
           <div class="block-label">Of the Place</div>
-          <p><span class="drop">${m.bio.charAt(0).toUpperCase()}</span>${m.bio}</p>
+          <p><span class="drop">${m.bio.charAt(0).toUpperCase()}</span>${m.bio.slice(1)}</p>
         </div>
         <div class="detail-block">
           <div class="block-label">Office &amp; Correspondence</div>
@@ -719,6 +788,11 @@ function renderEntry(m, index) {
             <dt>Email</dt><dd><a href="mailto:${m.email}">${m.email}</a></dd>
             ${websiteRow}
           </dl>
+          <a class="map-link" href="${mapsUrl}" target="_blank" rel="noopener" aria-label="Open ${m.name} city hall in Google Maps">
+            <svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+            <span>View on Google Maps</span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
         </div>
         <div class="stats-strip">
           <div class="stat">
