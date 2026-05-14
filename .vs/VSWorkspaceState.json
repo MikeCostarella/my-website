@@ -1,13 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\AddressPoints",
-    "\\Governments",
-    "\\Governments\\Ohio",
-    "\\Governments\\Ohio\\Trumbull",
-    "\\Governments\\Ohio\\Trumbull\\Girard",
-    "\\Governments\\Ohio\\Trumbull\\Girard\\RentalsReport"
+    "\\Governments\\Ohio\\Mahoning\\Municipalities"
   ],
-  "SelectedNode": "\\Governments\\Ohio\\Trumbull\\Girard\\RentalsReport",
+  "SelectedNode": "\\Governments",
   "PreviewInSolutionExplorer": false
 }

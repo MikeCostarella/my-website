@@ -399,6 +399,89 @@
   }
   .filter-toggle.open .chev { transform: rotate(180deg); }
 
+  /* ============ Poverty layer toggle and legend ============ */
+  .poverty-toggle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 500;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.02em;
+  }
+  .poverty-toggle:hover { background: var(--bg); }
+  .poverty-toggle[aria-pressed="true"] {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+  }
+  .poverty-toggle .dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    background: linear-gradient(135deg, #FEE5D9 0%, #A50F15 100%);
+    display: inline-block;
+  }
+
+  .poverty-legend {
+    position: absolute;
+    bottom: 50px;
+    right: 12px;
+    z-index: 500;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    display: none;
+    max-width: 200px;
+  }
+  .poverty-legend.visible { display: block; }
+  .poverty-legend h4 {
+    margin: 0 0 8px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--navy);
+  }
+  .poverty-legend .pl-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 3px 0;
+  }
+  .poverty-legend .pl-swatch {
+    width: 16px; height: 12px;
+    border: 1px solid rgba(0,0,0,0.15);
+    flex-shrink: 0;
+  }
+  .poverty-legend .pl-note {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule-soft);
+    color: var(--ink-soft);
+    font-size: 0.66rem;
+    line-height: 1.35;
+  }
+
+  @media (max-width: 720px) {
+    .poverty-toggle { top: 8px; right: 8px; font-size: 0.72rem; padding: 6px 9px; }
+    .poverty-legend { bottom: 90px; right: 8px; font-size: 0.68rem; padding: 10px 11px; }
+  }
+
   .filter-panel {
     background: rgba(255,255,255,0.97);
     backdrop-filter: blur(8px);
@@ -903,6 +986,23 @@
 
       <div id="map"></div>
 
+      <button class="poverty-toggle" id="poverty-toggle" aria-pressed="false" aria-label="Toggle poverty rate overlay">
+        <span class="dot"></span>
+        <span>Poverty rate</span>
+      </button>
+
+      <div class="poverty-legend" id="poverty-legend" aria-hidden="true">
+        <h4>Poverty rate by area</h4>
+        <div class="pl-row"><span class="pl-swatch" style="background:#A50F15"></span><span>&gt; 25%  (very high)</span></div>
+        <div class="pl-row"><span class="pl-swatch" style="background:#DE2D26"></span><span>20 – 25%  (high)</span></div>
+        <div class="pl-row"><span class="pl-swatch" style="background:#FB6A4A"></span><span>16 – 20%  (elevated)</span></div>
+        <div class="pl-row"><span class="pl-swatch" style="background:#FCAE91"></span><span>12 – 16%  (moderate)</span></div>
+        <div class="pl-row"><span class="pl-swatch" style="background:#FEE5D9"></span><span>8 – 12%  (low)</span></div>
+        <div class="pl-row"><span class="pl-swatch" style="background:#FFF7F3"></span><span>&lt; 8%  (very low)</span></div>
+        <div class="pl-row"><span class="pl-swatch" style="background:#E8E4DA"></span><span>No data</span></div>
+        <div class="pl-note">ACS 5-yr estimates. Township figures are remainder-of-township where a city/village/CDP is carved out.</div>
+      </div>
+
       <div class="no-results" id="no-results">
         <strong>No matches</strong>
         <p>Try clearing search or filters.</p>
@@ -1097,6 +1197,116 @@ if (leafletAvailable) {
   layerGroup = L.layerGroup().addTo(map);
 
   /* ====================================================================
+     POVERTY DATA LAYER
+     --------------------------------------------------------------------
+     Source: Trumbull_County_OH_Poverty_by_Area.xlsx (ACS 5-yr estimates).
+     Keys here match the GIS feature `NAME` field (UPPERCASE, no suffix).
+     The choropleth is drawn into a dedicated pane sitting BETWEEN the
+     basemap (z=200) and the existing township outlines (z=350), so the
+     dashed/solid borders and labels still read clearly on top of the
+     colored fills.
+     Two caveats baked into the data:
+       (1) Townships that contain a carved-out city/village/CDP use the
+           "remainder" rate from the spreadsheet (e.g., Hubbard Twp.
+           remainder excludes Hubbard city). The GIS township polygon
+           is the FULL township including the carve-out — there's no
+           perfect way to depict this in a single fill. We use the
+           remainder rate and flag it in the tooltip.
+       (2) Howland Center, Mineral Ridge, Masury are Census-Designated
+           Places (CDPs), not incorporated. They aren't in the GIS muni
+           or township layers as separate polygons, so their rates show
+           up only via the parent township remainder.
+     ==================================================================== */
+  const POVERTY_DATA = {
+    /* Cities */
+    'WARREN':           { rate: 0.319, tier: '>25%',   label: 'Warren (city)',           note: 'County seat; highest poverty rate in the county.' },
+    'NILES':            { rate: 0.162, tier: '16-20%', label: 'Niles (city)',            note: 'Moderately elevated; Niles City Schools.' },
+    'GIRARD':           { rate: 0.199, tier: '16-20%', label: 'Girard (city)',           note: 'Carved out of Liberty Twp.; among the highest-poverty cities in the county.' },
+    'NEWTON FALLS':     { rate: 0.200, tier: '20-25%', label: 'Newton Falls (city)',     note: 'Newton Falls Schools — lower-income district.' },
+    'CORTLAND':         { rate: 0.090, tier: '8-12%',  label: 'Cortland (city)',         note: 'Higher-income; Lakeview Schools.' },
+    'HUBBARD':          { rate: 0.069, tier: '<8%',    label: 'Hubbard (city)',          note: 'Lower poverty than the surrounding township.' },
+    /* Villages */
+    'LORDSTOWN':        { rate: 0.081, tier: '8-12%',  label: 'Lordstown (village)',     note: 'Industrial — GM / Foxconn / Ultium.' },
+    'MCDONALD':         { rate: 0.038, tier: '<8%',    label: 'McDonald (village)',      note: 'Lowest poverty rate in the county; former U.S. Steel company town.' },
+    'WEST FARMINGTON':  { rate: 0.167, tier: '16-20%', label: 'West Farmington (village)', note: 'Inside Farmington Twp.; wide ±14% MOE (small pop).' },
+    'ORANGEVILLE':      { rate: 0.044, tier: '<8%',    label: 'Orangeville (village)',   note: 'Tiny village on PA border; very wide MOE.' },
+    /* Townships — remainder rates where a city/village has been carved out */
+    'LIBERTY':          { rate: 0.245, tier: '20-25%', label: 'Liberty Twp.',            note: 'Remainder excluding Girard city.', remainder: true },
+    'BROOKFIELD':       { rate: 0.165, tier: '16-20%', label: 'Brookfield Twp.',        note: 'Brookfield Local Schools; includes Masury CDP.' },
+    'WEATHERSFIELD':    { rate: 0.120, tier: '12-16%', label: 'Weathersfield Twp.',     note: 'Remainder excluding Mineral Ridge & McDonald.', remainder: true },
+    'HUBBARD TOWNSHIP': { rate: 0.099, tier: '8-12%',  label: 'Hubbard Twp.',           note: 'Remainder excluding Hubbard city.', remainder: true },
+    'VERNON':           { rate: 0.135, tier: '12-16%', label: 'Vernon Twp.',            note: 'Remainder excluding Orangeville village.', remainder: true },
+    'FARMINGTON':       { rate: 0.105, tier: '8-12%',  label: 'Farmington Twp.',        note: 'Remainder excluding West Farmington village.', remainder: true },
+    'WARREN TOWNSHIP':  { rate: 0.130, tier: '12-16%', label: 'Warren Twp.',            note: 'Distinct from Warren city.' },
+    'HOWLAND':          { rate: 0.100, tier: '8-12%',  label: 'Howland Twp.',           note: 'Higher-income suburb; Howland Center CDP (rate 7%) sits inside.' },
+    'CHAMPION':         { rate: 0.105, tier: '8-12%',  label: 'Champion Twp.',          note: 'Champion Schools; Mercy Health ER planned.' },
+    'BAZETTA':          { rate: 0.100, tier: '8-12%',  label: 'Bazetta Twp.',           note: 'Lakeview Schools; Cortland surrounds.' },
+    'VIENNA':           { rate: 0.115, tier: '8-12%',  label: 'Vienna Twp.',            note: 'Includes Youngstown-Warren Regional Airport.' },
+    'KINSMAN':          { rate: 0.145, tier: '12-16%', label: 'Kinsman Twp.',           note: 'Rural NE township; FQHC service area.' },
+    'BRISTOL':          { rate: 0.138, tier: '12-16%', label: 'Bristol Twp.',           note: 'Includes Bristolville; Bristol Local Schools.' },
+    'BLOOMFIELD':       { rate: 0.135, tier: '12-16%', label: 'Bloomfield Twp.',        note: 'Rural.' },
+    'BRACEVILLE':       { rate: 0.130, tier: '12-16%', label: 'Braceville Twp.',        note: 'Rural / mixed.' },
+    'HARTFORD':         { rate: 0.115, tier: '8-12%',  label: 'Hartford Twp.',          note: 'Rural.' },
+    'NEWTON':           { rate: 0.115, tier: '8-12%',  label: 'Newton Twp.',            note: 'Surrounds Newton Falls.' },
+    'MECCA':            { rate: 0.112, tier: '8-12%',  label: 'Mecca Twp.',             note: 'Includes part of Mosquito Lake area.' },
+    'GUSTAVUS':         { rate: 0.110, tier: '8-12%',  label: 'Gustavus Twp.',          note: 'Rural.' },
+    'SOUTHINGTON':      { rate: 0.110, tier: '8-12%',  label: 'Southington Twp.',       note: 'Rural.' },
+    'FOWLER':           { rate: 0.105, tier: '8-12%',  label: 'Fowler Twp.',            note: 'Rural.' },
+    'GREENE':           { rate: 0.102, tier: '8-12%',  label: 'Greene Twp.',            note: 'Rural.' },
+    'MESOPOTAMIA':      { rate: 0.098, tier: '8-12%',  label: 'Mesopotamia Twp.',       note: 'Rural; includes Amish community.' },
+    'JOHNSTON':         { rate: 0.095, tier: '8-12%',  label: 'Johnston Twp.',          note: 'Rural.' }
+  };
+
+  /* Color ramp — ColorBrewer Reds, 6 steps. Light = low poverty, dark = high. */
+  function povertyColor(rate) {
+    if (rate == null) return '#E8E4DA';      /* "no data" gray */
+    if (rate > 0.25)  return '#A50F15';
+    if (rate >= 0.20) return '#DE2D26';
+    if (rate >= 0.16) return '#FB6A4A';
+    if (rate >= 0.12) return '#FCAE91';
+    if (rate >= 0.08) return '#FEE5D9';
+    return '#FFF7F3';
+  }
+
+  /* Look up a poverty record from a GIS feature NAME (e.g. "WARREN CITY",
+     "HUBBARD TOWNSHIP", "GIRARD CITY"). We strip the CITY/VILLAGE suffix
+     and try a couple of fallbacks for the city/township name collisions
+     (Warren, Hubbard, Hubbard Township). */
+  function povertyLookup(rawName, kind) {
+    if (!rawName) return null;
+    const upper = rawName.toUpperCase().trim();
+    /* Direct hit (e.g. "WARREN TOWNSHIP" vs "WARREN") */
+    if (POVERTY_DATA[upper]) return POVERTY_DATA[upper];
+    /* Strip suffix and retry */
+    const stripped = upper.replace(/\s+(CITY|VILLAGE|TOWNSHIP)\s*$/i, '').trim();
+    if (POVERTY_DATA[stripped]) return POVERTY_DATA[stripped];
+    return null;
+  }
+
+  /* Pane for the choropleth fills. Sits ABOVE tiles (200) but BELOW the
+     township/muni outline panes (350/360) so the borders stay sharp. */
+  const povertyPane = map.createPane('poverty');
+  povertyPane.style.zIndex = 340;
+  povertyPane.style.pointerEvents = 'none';   /* fills don't intercept clicks */
+
+  /* Visibility toggle — start hidden. */
+  let povertyLayerVisible = false;
+  const povertyFillLayers = [];   /* collected as boundaries load in */
+
+  function setPovertyVisible(on) {
+    povertyLayerVisible = on;
+    povertyPane.style.display = on ? '' : 'none';
+    document.getElementById('poverty-toggle').setAttribute('aria-pressed', on ? 'true' : 'false');
+    document.getElementById('poverty-legend').classList.toggle('visible', on);
+    document.getElementById('poverty-legend').setAttribute('aria-hidden', on ? 'false' : 'true');
+  }
+  setPovertyVisible(false);
+
+  document.getElementById('poverty-toggle').addEventListener('click', () => {
+    setPovertyVisible(!povertyLayerVisible);
+  });
+
+  /* ====================================================================
      Township and municipality boundaries
      Source: Trumbull County GIS (webgis.co.trumbull.oh.us)
      Layer 109 = Townships (25 unincorporated townships of Trumbull County)
@@ -1170,6 +1380,37 @@ if (leafletAvailable) {
     .then(r => r.ok ? r.json() : null)
     .then(geo => {
       if (!geo || !geo.features) return;
+
+      /* CHOROPLETH FILL — separate L.geoJSON in the 'poverty' pane.
+         We render this BEFORE the outline so it sits visually below. */
+      L.geoJSON(geo, {
+        pane: 'poverty',
+        style: feature => {
+          const rec = povertyLookup(feature.properties && feature.properties.NAME, 'township');
+          return {
+            color: 'transparent',
+            weight: 0,
+            fillColor: povertyColor(rec ? rec.rate : null),
+            fillOpacity: 0.65
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          povertyFillLayers.push(layer);
+          const name = feature.properties && feature.properties.NAME;
+          const rec = povertyLookup(name, 'township');
+          if (rec) {
+            const pct = (rec.rate * 100).toFixed(1) + '%';
+            const remainderTag = rec.remainder ? ' <em style="opacity:.7">(remainder)</em>' : '';
+            layer.bindTooltip(
+              `<strong>${rec.label}</strong>${remainderTag}<br>` +
+              `Poverty rate: <strong>${pct}</strong> (${rec.tier})<br>` +
+              `<span style="opacity:.8">${rec.note}</span>`,
+              { sticky: true, className: 'boundary-tooltip', direction: 'top' }
+            );
+          }
+        }
+      }).addTo(map);
+
       L.geoJSON(geo, {
         pane: 'townships',
         style: {
@@ -1207,6 +1448,37 @@ if (leafletAvailable) {
     .then(r => r.ok ? r.json() : null)
     .then(geo => {
       if (!geo || !geo.features) return;
+
+      /* Muni choropleth fill — drawn in same 'poverty' pane but later,
+         so it paints OVER the township fill. This is the right visual
+         order: cities/villages are spatial holes in the townships. */
+      L.geoJSON(geo, {
+        pane: 'poverty',
+        style: feature => {
+          const rec = povertyLookup(feature.properties && feature.properties.NAME, 'muni');
+          return {
+            color: 'transparent',
+            weight: 0,
+            fillColor: povertyColor(rec ? rec.rate : null),
+            fillOpacity: 0.7
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          povertyFillLayers.push(layer);
+          const name = feature.properties && feature.properties.NAME;
+          const rec = povertyLookup(name, 'muni');
+          if (rec) {
+            const pct = (rec.rate * 100).toFixed(1) + '%';
+            layer.bindTooltip(
+              `<strong>${rec.label}</strong><br>` +
+              `Poverty rate: <strong>${pct}</strong> (${rec.tier})<br>` +
+              `<span style="opacity:.8">${rec.note}</span>`,
+              { sticky: true, className: 'boundary-tooltip', direction: 'top' }
+            );
+          }
+        }
+      }).addTo(map);
+
       L.geoJSON(geo, {
         pane: 'munis',
         style: {
