@@ -443,22 +443,63 @@
     background: white;
     border: 1px solid var(--rule);
     border-radius: 6px;
-    padding: 12px 14px;
+    /* Padding moved into header and body so they can collapse cleanly */
+    padding: 0;
     font-family: 'Inter', sans-serif;
     font-size: 0.72rem;
     color: var(--ink);
     box-shadow: var(--shadow);
     display: none;
     max-width: 220px;
+    overflow: hidden;
   }
   .poverty-legend.visible { display: block; }
-  .poverty-legend h4 {
-    margin: 0 0 8px;
+
+  /* Header row — clickable to collapse/expand. The chevron rotates 180°
+     when collapsed. */
+  .poverty-legend .pl-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border: none;
+    background: white;
+    cursor: pointer;
     font-family: 'Fraunces', Georgia, serif;
     font-weight: 500;
     font-size: 0.85rem;
     color: var(--navy);
+    text-align: left;
+    border-radius: 6px 6px 0 0;
   }
+  .poverty-legend .pl-header:hover { background: var(--bg); }
+  .poverty-legend .pl-title { flex: 1; }
+  .poverty-legend .pl-chev {
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+    color: var(--ink-soft);
+    transition: transform 0.18s ease;
+  }
+  /* When collapsed, rotate chevron so the "v" points right (closed state)
+     by flipping it 90° counter-clockwise via -90°. */
+  .poverty-legend .pl-header[aria-expanded="false"] .pl-chev {
+    transform: rotate(-90deg);
+  }
+  /* Body — the swatches and footnote. Collapsed = hidden. */
+  .poverty-legend .pl-body {
+    padding: 0 14px 12px;
+    overflow: hidden;
+    /* When the header reports collapsed, hide via display rather than
+       max-height; the legend's contents are short enough that an
+       animated collapse would feel laggy compared to a snap. The
+       chevron's transform IS animated for polish. */
+  }
+  .poverty-legend.collapsed .pl-body { display: none; }
+  /* When collapsed, the header's bottom radius matches the legend's */
+  .poverty-legend.collapsed .pl-header { border-radius: 6px; }
+
   .poverty-legend .pl-row {
     display: flex;
     align-items: center;
@@ -481,7 +522,9 @@
 
   @media (max-width: 720px) {
     .poverty-toggle { top: 56px; left: 8px; font-size: 0.72rem; padding: 6px 9px; }
-    .poverty-legend { bottom: 24px; left: 8px; font-size: 0.68rem; padding: 10px 11px; }
+    .poverty-legend { bottom: 24px; left: 8px; font-size: 0.68rem; }
+    .poverty-legend .pl-header { padding: 8px 10px; font-size: 0.78rem; }
+    .poverty-legend .pl-body { padding: 0 11px 10px; }
   }
 
   /* ============ Tract layer + detail dialog ============ */
@@ -1271,15 +1314,22 @@
       </button>
 
       <div class="poverty-legend" id="poverty-legend" aria-hidden="true">
-        <h4>Poverty rate by area</h4>
-        <div class="pl-row"><span class="pl-swatch" style="background:#A50F15"></span><span>&gt; 25%  (very high)</span></div>
-        <div class="pl-row"><span class="pl-swatch" style="background:#DE2D26"></span><span>20 – 25%  (high)</span></div>
-        <div class="pl-row"><span class="pl-swatch" style="background:#FB6A4A"></span><span>16 – 20%  (elevated)</span></div>
-        <div class="pl-row"><span class="pl-swatch" style="background:#FCAE91"></span><span>12 – 16%  (moderate)</span></div>
-        <div class="pl-row"><span class="pl-swatch" style="background:#FEE5D9"></span><span>8 – 12%  (low)</span></div>
-        <div class="pl-row"><span class="pl-swatch" style="background:#FFF7F3"></span><span>&lt; 8%  (very low)</span></div>
-        <div class="pl-row"><span class="pl-swatch" style="background:#E8E4DA"></span><span>No data</span></div>
-        <div class="pl-note">ACS 5-yr estimates. Township figures are remainder-of-township where a city/village/CDP is carved out.</div>
+        <button class="pl-header" id="poverty-legend-toggle" aria-expanded="true" aria-controls="poverty-legend-body">
+          <span class="pl-title">Poverty rate by area</span>
+          <svg class="pl-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="pl-body" id="poverty-legend-body">
+          <div class="pl-row"><span class="pl-swatch" style="background:#A50F15"></span><span>&gt; 25%  (very high)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#DE2D26"></span><span>20 – 25%  (high)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#FB6A4A"></span><span>16 – 20%  (elevated)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#FCAE91"></span><span>12 – 16%  (moderate)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#FEE5D9"></span><span>8 – 12%  (low)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#FFF7F3"></span><span>&lt; 8%  (very low)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#E8E4DA"></span><span>No data</span></div>
+          <div class="pl-note">ACS 5-yr estimates. Township figures are remainder-of-township where a city/village/CDP is carved out.</div>
+        </div>
       </div>
 
       <div class="no-results" id="no-results">
@@ -1611,6 +1661,41 @@ if (leafletAvailable) {
 
   document.getElementById('poverty-toggle').addEventListener('click', () => {
     setPovertyVisible(!povertyLayerVisible);
+  });
+
+  /* ====================================================================
+     Legend collapse/expand
+     --------------------------------------------------------------------
+     The poverty legend takes up a fair chunk of vertical space (7 color
+     rows + a footnote). On a phone that's a meaningful share of the
+     viewport — enough to obscure facility markers in the southern half
+     of the county. So on mobile we start the legend collapsed; users
+     tap the header to expand it. On desktop it stays expanded by
+     default since there's plenty of room.
+
+     We check viewport width at init time. If the user resizes the
+     window or rotates their device later, we don't auto-recollapse —
+     that would be jarring if they've manually expanded it. The
+     toggle is purely manual after first paint. */
+  const povertyLegendEl = document.getElementById('poverty-legend');
+  const povertyLegendToggle = document.getElementById('poverty-legend-toggle');
+
+  function setLegendCollapsed(collapsed) {
+    povertyLegendEl.classList.toggle('collapsed', collapsed);
+    povertyLegendToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+
+  /* Initial state: collapsed on mobile (matches the CSS breakpoint at
+     720px), expanded on desktop. */
+  const MOBILE_BREAKPOINT = 720;
+  const startCollapsed = window.matchMedia
+    ? window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
+    : window.innerWidth <= MOBILE_BREAKPOINT;
+  setLegendCollapsed(startCollapsed);
+
+  povertyLegendToggle.addEventListener('click', () => {
+    const isCollapsed = povertyLegendEl.classList.contains('collapsed');
+    setLegendCollapsed(!isCollapsed);
   });
 
   /* ====================================================================
