@@ -1262,7 +1262,7 @@
     </div>
     <div class="meta">
       <div class="credit">Created by <strong>Costarella Innovations, LLC</strong></div>
-      <div class="updated">Updated May 15, 2026 at 7:52 AM EDT</div>
+      <div class="updated">Updated May 15, 2026 at 10:34 AM EDT</div>
       <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
     </div>
   </header>
@@ -1824,12 +1824,16 @@ if (leafletAvailable) {
       L.geoJSON(geo, {
         pane: 'townships',
         style: {
-          color: '#7A7264',
-          weight: 1,
-          opacity: 0.45,
+          /* Townships sit in the middle of the visual hierarchy:
+             dashed so they read as distinct from the solid muni
+             borders, but heavier and darker than before so they stay
+             visible against the choropleth's darker reds. */
+          color: '#3A342B',
+          weight: 1.4,
+          opacity: 0.7,
           fillColor: '#000',
           fillOpacity: 0,
-          dashArray: '3,4'
+          dashArray: '5,5'
         },
         onEachFeature: (feature, layer) => {
           const name = feature.properties && feature.properties.NAME;
@@ -1892,9 +1896,16 @@ if (leafletAvailable) {
       L.geoJSON(geo, {
         pane: 'munis',
         style: {
-          color: '#3F4A5F',
-          weight: 1.4,
-          opacity: 0.75,
+          /* Cities/villages get the BOLDEST stroke in the visual
+             hierarchy. With the poverty layer on, the tract boundaries
+             (lighter, thinner) and township outlines (dashed) would
+             otherwise compete with them visually. Deep navy + weight
+             2.2 makes municipal boundaries clearly the dominant
+             political-boundary layer regardless of what choropleth
+             tier is underneath. */
+          color: '#15294A',
+          weight: 2.2,
+          opacity: 0.95,
           fillColor: '#1F3A5F',
           fillOpacity: 0.025
         },
@@ -1975,13 +1986,18 @@ if (leafletAvailable) {
 
   function tractFillStyle(rate, isSelected) {
     /* rate is a PERCENTAGE (e.g. 21.5 for 21.5%). povertyColor expects
-       a DECIMAL (e.g. 0.215). Convert here. */
+       a DECIMAL (e.g. 0.215). Convert here.
+       Tract outlines are deliberately LIGHT and THIN — they're the
+       finest grain of geography on the map. City/village outlines
+       (bold navy) and township outlines (darker dashed) sit on top
+       of these in the visual hierarchy so political boundaries always
+       read as a separate layer from the analytical tract divisions. */
     const decimalRate = rate == null ? null : rate / 100;
     return {
       pane: 'tracts',
-      color: isSelected ? '#15294A' : '#3F4A5F',
-      weight: isSelected ? 2.5 : 0.8,
-      opacity: isSelected ? 1 : 0.55,
+      color: isSelected ? '#15294A' : '#8A8B92',
+      weight: isSelected ? 2.5 : 0.6,
+      opacity: isSelected ? 1 : 0.45,
       fillColor: povertyColor(decimalRate),
       fillOpacity: 0.55
     };
