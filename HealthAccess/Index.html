@@ -1138,38 +1138,57 @@
      This is the technique most major data-journalism choropleths use
      (NYT, FT, Bloomberg, Reuters) to keep labels floating on top of
      colored regions. */
-  /* ============ Reference labels — dark & defined ============
-     The Esri "Light Gray Reference" tile renders place names and road
-     labels in a thin gray font that disappears against the choropleth
-     colors. We apply CSS filters to darken and sharpen the labels and
-     wrap them in a soft white halo so they stay readable on both light
-     and dark tier backgrounds.
-
-       1. `contrast(2.2)`           — pulls gray text toward pure black
-                                      and pushes the transparent edges
-                                      toward fully transparent
-       2. `brightness(0.5)`         — darkens what's left, deepening the
-                                      gray-to-black conversion
-       3. `drop-shadow(white, 1px)` — tight white halo around every
-                                      character so dark labels remain
-                                      readable on the dark red tiers
-       4. Two more drop-shadows     — additional soft white glow to
-                                      reinforce the halo without
-                                      blurring the text edges
-
-     Stacked drop-shadows compound: each one shadows the OUTPUT of the
-     previous, so three small white shadows produce a halo about 3px
-     wide on each side — enough to fight the choropleth without making
-     the labels look bubbly. */
-  .leaflet-pane.leaflet-referenceLabels-pane,
-  .reference-labels-tile {
-    filter:
-      contrast(2.2)
-      brightness(0.5)
-      drop-shadow(0 0 1px white)
-      drop-shadow(0 0 1px white)
-      drop-shadow(0 0 1px white);
+  /* ============ "You are here" marker ============
+     Custom divIcon for the user's current location. A small navy dot
+     with a pulsing soft ring around it, styled to be visible without
+     competing with the facility markers. Sits in the default markerPane
+     so it stacks correctly with facility icons. */
+  .user-location-marker {
+    position: relative;
+    width: 18px;
+    height: 18px;
   }
+  .user-location-marker .ulm-dot {
+    position: absolute;
+    inset: 4px;
+    background: var(--navy);
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(21,41,74,0.5);
+    z-index: 2;
+  }
+  .user-location-marker .ulm-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--navy);
+    opacity: 0.35;
+    z-index: 1;
+    animation: ulm-pulse 2.2s ease-out infinite;
+    transform-origin: center;
+  }
+  @keyframes ulm-pulse {
+    0%   { transform: scale(0.5); opacity: 0.45; }
+    70%  { transform: scale(1.8); opacity: 0;    }
+    100% { transform: scale(1.8); opacity: 0;    }
+  }
+  /* Respect user motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .user-location-marker .ulm-pulse { animation: none; opacity: 0.25; }
+  }
+  .user-location-tooltip {
+    background: var(--navy);
+    color: white;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+  }
+  .user-location-tooltip::before { border-top-color: var(--navy) !important; }
 </style>
 </head>
 <body>
@@ -1460,38 +1479,27 @@ if (leafletAvailable) {
   ).addTo(map);
 
   /* ====================================================================
-     REFERENCE LABELS OVERLAY
+     PLACE-NAME LABEL STRATEGY
      --------------------------------------------------------------------
-     A second Esri tile layer containing ONLY road outlines and place
-     labels — no fill. We render it in a pane that sits ABOVE the
-     choropleth fills but BELOW the markers. This is the standard
-     cartographic pattern for choropleths: keep the colors saturated
-     while preserving wayfinding (street names, town labels, water
-     features) on top of them.
+     We previously added an Esri "Light Gray Reference" tile here as a
+     labels-on-top overlay to fight visibility against the choropleth
+     colors. It duplicated our existing GIS-based muni/township labels
+     (e.g. "MCDONALD" from GIS and "McDonald" from the Esri tile would
+     appear side-by-side). We've removed it. The existing GIS labels
+     (.muni-label, .township-label) already carry a white text-shadow
+     halo and stay readable through the choropleth colors. Road labels
+     baked into the base tile layer handle road wayfinding.
 
-     The "Reference" companion to Light_Gray_Base is purpose-built for
-     this — transparent background with crisp anti-aliased labels.
-
-     Only attached to the map when the poverty layer is on; when poverty
-     is off the original gray base reads cleanly without the extra label
-     density. */
+     This pane is preserved in case we want to bring back a labels-only
+     overlay later — but no layer is attached to it. */
   const labelsPane = map.createPane('referenceLabels');
-  labelsPane.style.zIndex = 400;  /* above choropleth (340), tracts (345),
-                                     township/muni outlines (350/360), and
-                                     boundary labels (370); below markers (600) */
-  labelsPane.style.pointerEvents = 'none';  /* never grab clicks */
+  labelsPane.style.zIndex = 400;
+  labelsPane.style.pointerEvents = 'none';
 
-  const referenceLabelsLayer = L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
-    {
-      pane: 'referenceLabels',
-      className: 'reference-labels-tile',  /* CSS hook for the brightness filter */
-      maxZoom: 16,
-      attribution: '',  /* attribution already on base layer */
-      crossOrigin: true,
-      opacity: 1.0
-    }
-  );
+  /* Stub: the layer object exists so the poverty toggle code below
+     can keep its add/remove logic without errors, but it's never
+     actually attached to the map. */
+  const referenceLabelsLayer = L.layerGroup();
 
   layerGroup = L.layerGroup().addTo(map);
 
@@ -1922,11 +1930,22 @@ if (leafletAvailable) {
 
         /* Tracts cover the entire county at finer resolution than the muni/twp
            choropleth, so the muni fills underneath would just bleed through
-           and confuse the colors. Hide them. They remain in the layer tree
-           as a fallback in case tracts ever fail to load, but won't render. */
+           and confuse the colors. Hide them completely — both fill AND stroke.
+           Setting `stroke: false` is belt-and-suspenders to ensure Leaflet
+           doesn't render any phantom polygon edges (which can happen with
+           MultiPolygon features under certain renderer conditions). They
+           remain in the layer tree as a fallback in case tracts ever fail
+           to load, but won't render visually. */
         povertyFillLayers.forEach(layer => {
           if (layer.setStyle) {
-            layer.setStyle({ fillOpacity: 0 });
+            layer.setStyle({
+              fillOpacity: 0,
+              fill: false,
+              stroke: false,
+              weight: 0,
+              opacity: 0,
+              color: 'transparent'
+            });
           }
         });
 
@@ -2167,6 +2186,126 @@ if (leafletAvailable) {
       closeTractDialog();
     }
   });
+
+  /* ====================================================================
+     GEOLOCATION — "open on user's location"
+     --------------------------------------------------------------------
+     Auto-prompts for location on page load. If the user grants permission
+     and their coordinates fall within the greater Mahoning Valley region
+     (Trumbull County plus a buffer south into Mahoning County, where
+     Youngstown straddles the county line and many Trumbull-facility
+     users actually live), we pan to their location at a neighborhood-
+     level zoom and drop a "you are here" marker.
+
+     If they deny, the browser doesn't support geolocation, the request
+     times out, or they're outside the regional bounds entirely (e.g.
+     looking at this map from Cleveland or Pittsburgh), we silently keep
+     the default Warren-centered view — no intrusive error messages.
+
+     Region bbox covers Trumbull County PLUS a ~10-mile buffer south
+     into Mahoning County to capture Youngstown-area residents:
+       lat 40.95 to 41.50  (about 38 miles north-south)
+       lng -81.05 to -80.45 (about 32 miles east-west)
+     Trumbull's actual extent is ~41.18-41.46 N, -80.97 to -80.50 W;
+     we extend 0.23° south (~16mi) so a user in Youngstown (41.10) or
+     even Boardman (41.03) gets located, and 0.05° in each other
+     direction for slop. Outside this region we don't bother — looking
+     at a Trumbull map from Akron or Pittsburgh doesn't benefit from
+     zooming to your house.
+
+     Timeout is 8 seconds — enough for a reluctant GPS fix but short
+     enough that users with location services disabled don't sit
+     watching a permission prompt do nothing. */
+  const LOCATE_BBOX = {
+    minLat: 40.95, maxLat: 41.50,
+    minLng: -81.05, maxLng: -80.45
+  };
+
+  function isInRegion(lat, lng) {
+    return lat >= LOCATE_BBOX.minLat && lat <= LOCATE_BBOX.maxLat
+        && lng >= LOCATE_BBOX.minLng && lng <= LOCATE_BBOX.maxLng;
+  }
+
+  function tryGeolocateUser() {
+    if (!('geolocation' in navigator)) return;  /* no API available */
+
+    navigator.geolocation.getCurrentPosition(
+      /* SUCCESS */
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        if (!isInRegion(lat, lng)) {
+          /* User is somewhere far away — keep county overview, do nothing */
+          return;
+        }
+
+        /* Drop a "you are here" marker. The divIcon has a navy dot
+           and a pulsing soft ring; CSS handles the animation. */
+        const userIcon = L.divIcon({
+          className: '',
+          html: '<div class="user-location-marker"><div class="ulm-pulse"></div><div class="ulm-dot"></div></div>',
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+          tooltipAnchor: [0, -8]
+        });
+        const userMarker = L.marker([lat, lng], {
+          icon: userIcon,
+          zIndexOffset: 1000,  /* float above facility markers */
+          keyboard: false,
+          interactive: true,
+          alt: 'Your approximate location'
+        }).bindTooltip('You are here', {
+          className: 'user-location-tooltip',
+          direction: 'top',
+          offset: [0, -4],
+          permanent: false
+        });
+        userMarker.addTo(map);
+
+        /* Pan to user location at a zoom that depends on whether they're
+           inside Trumbull County proper or in the buffer zone:
+             - Inside Trumbull: zoom 13 (neighborhood — they can see
+               nearby facilities directly)
+             - In buffer (e.g. Youngstown city center, Boardman): zoom
+               11 (wider view that keeps Trumbull's facilities visible
+               to the north of their location, since most of the data
+               they care about is up there)
+           The "inside Trumbull" check uses a slightly loose southern
+           bound (41.15 instead of the strict county line at ~41.18) so
+           residents of southern-edge communities like Girard (~41.17)
+           and Liberty Twp. don't get pushed into the wider zoom level
+           when they're genuinely in the county.
+           Use flyTo for a smooth transition. */
+        const inTrumbullProper = lat >= 41.15 && lat <= 41.48
+                              && lng >= -81.00 && lng <= -80.48;
+        const targetZoom = inTrumbullProper ? 13 : 11;
+        map.flyTo([lat, lng], targetZoom, {
+          duration: 1.2,
+          easeLinearity: 0.25
+        });
+      },
+      /* ERROR */
+      (err) => {
+        /* Codes:
+             1 = PERMISSION_DENIED  — user said no
+             2 = POSITION_UNAVAILABLE — GPS/wifi positioning failed
+             3 = TIMEOUT             — took too long
+           In every case the right behavior is the same: keep the
+           Warren-centered default view, don't bother the user with
+           an error message. */
+      },
+      /* OPTIONS */
+      {
+        enableHighAccuracy: false,  /* desktop wifi-positioning is fine */
+        timeout: 8000,
+        maximumAge: 5 * 60 * 1000   /* cached position up to 5 min old is OK */
+      }
+    );
+  }
+
+  /* Kick off geolocation request once the initial map render is done,
+     so the permission prompt doesn't compete with the first paint. */
+  setTimeout(tryGeolocateUser, 400);
 
 } else {
   document.getElementById('map').innerHTML =
