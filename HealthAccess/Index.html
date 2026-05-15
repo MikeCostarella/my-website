@@ -1182,56 +1182,74 @@
      (NYT, FT, Bloomberg, Reuters) to keep labels floating on top of
      colored regions. */
   /* ============ "You are here" marker ============
-     Custom divIcon for the user's current location. A small navy dot
-     with a pulsing soft ring around it, styled to be visible without
-     competing with the facility markers. Sits in the default markerPane
-     so it stacks correctly with facility icons. */
+     Custom divIcon for the user's current location. A bright cyan dot
+     with a pulsing ring around it. Designed to be visible regardless
+     of what's underneath — basemap, choropleth fill, or any tier of
+     the poverty color ramp (all of which are red/orange/cream). Cyan
+     was chosen specifically because it's the complementary color to
+     the reds in the choropleth, so it never blends in.
+     Sits in the default markerPane and uses zIndexOffset:1000 so it
+     stacks above facility markers. */
   .user-location-marker {
     position: relative;
-    width: 18px;
-    height: 18px;
+    width: 28px;
+    height: 28px;
   }
   .user-location-marker .ulm-dot {
     position: absolute;
-    inset: 4px;
-    background: var(--navy);
-    border: 2px solid white;
+    inset: 7px;
+    background: #00B7E5;            /* bright cyan — pops against reds */
+    border: 3px solid white;
     border-radius: 50%;
-    box-shadow: 0 1px 4px rgba(21,41,74,0.5);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.4),    /* thin outer ring for definition */
+      0 2px 6px rgba(0,0,0,0.4);    /* drop shadow for depth */
     z-index: 2;
   }
   .user-location-marker .ulm-pulse {
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: var(--navy);
-    opacity: 0.35;
+    background: #00B7E5;
+    opacity: 0.45;
     z-index: 1;
-    animation: ulm-pulse 2.2s ease-out infinite;
+    animation: ulm-pulse 2s ease-out infinite;
     transform-origin: center;
   }
+  /* Second pulse offset in time for a richer effect */
+  .user-location-marker .ulm-pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #00B7E5;
+    opacity: 0.55;
+    animation: ulm-pulse 2s ease-out infinite;
+    animation-delay: 1s;
+  }
   @keyframes ulm-pulse {
-    0%   { transform: scale(0.5); opacity: 0.45; }
-    70%  { transform: scale(1.8); opacity: 0;    }
-    100% { transform: scale(1.8); opacity: 0;    }
+    0%   { transform: scale(0.4); opacity: 0.6; }
+    80%  { transform: scale(2.2); opacity: 0;   }
+    100% { transform: scale(2.2); opacity: 0;   }
   }
   /* Respect user motion preferences */
   @media (prefers-reduced-motion: reduce) {
-    .user-location-marker .ulm-pulse { animation: none; opacity: 0.25; }
+    .user-location-marker .ulm-pulse,
+    .user-location-marker .ulm-pulse::after { animation: none; opacity: 0.3; }
   }
   .user-location-tooltip {
-    background: var(--navy);
+    background: #00658A;            /* darker cyan for the tooltip pill */
     color: white;
     border: none;
     font-family: 'Inter', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: 0.74rem;
+    font-weight: 700;
     letter-spacing: 0.04em;
-    padding: 4px 8px;
+    padding: 5px 10px;
     border-radius: 4px;
     box-shadow: var(--shadow);
   }
-  .user-location-tooltip::before { border-top-color: var(--navy) !important; }
+  .user-location-tooltip::before { border-top-color: #00658A !important; }
 </style>
 </head>
 <body>
@@ -2324,14 +2342,16 @@ if (leafletAvailable) {
           return;
         }
 
-        /* Drop a "you are here" marker. The divIcon has a navy dot
-           and a pulsing soft ring; CSS handles the animation. */
+        /* Drop a "you are here" marker. The divIcon has a cyan dot
+           with two staggered pulse rings; CSS handles the animation.
+           Tooltip is permanent (always visible) so the user can never
+           miss where they are on the map. */
         const userIcon = L.divIcon({
           className: '',
           html: '<div class="user-location-marker"><div class="ulm-pulse"></div><div class="ulm-dot"></div></div>',
-          iconSize: [18, 18],
-          iconAnchor: [9, 9],
-          tooltipAnchor: [0, -8]
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+          tooltipAnchor: [0, -12]
         });
         const userMarker = L.marker([lat, lng], {
           icon: userIcon,
@@ -2343,7 +2363,7 @@ if (leafletAvailable) {
           className: 'user-location-tooltip',
           direction: 'top',
           offset: [0, -4],
-          permanent: false
+          permanent: true          /* always visible — don't hide on mouseout */
         });
         userMarker.addTo(map);
 
