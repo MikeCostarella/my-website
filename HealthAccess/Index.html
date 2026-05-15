@@ -402,8 +402,9 @@
   /* ============ Poverty layer toggle and legend ============ */
   .poverty-toggle {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    /* Below the toolbar (search bar + filter button stack), left side */
+    top: 64px;
+    left: 12px;
     z-index: 500;
     background: white;
     border: 1px solid var(--rule);
@@ -435,8 +436,9 @@
 
   .poverty-legend {
     position: absolute;
-    bottom: 50px;
-    right: 12px;
+    /* Bottom-left, above the Leaflet attribution strip */
+    bottom: 28px;
+    left: 12px;
     z-index: 500;
     background: white;
     border: 1px solid var(--rule);
@@ -447,7 +449,7 @@
     color: var(--ink);
     box-shadow: var(--shadow);
     display: none;
-    max-width: 200px;
+    max-width: 220px;
   }
   .poverty-legend.visible { display: block; }
   .poverty-legend h4 {
@@ -478,8 +480,213 @@
   }
 
   @media (max-width: 720px) {
-    .poverty-toggle { top: 8px; right: 8px; font-size: 0.72rem; padding: 6px 9px; }
-    .poverty-legend { bottom: 90px; right: 8px; font-size: 0.68rem; padding: 10px 11px; }
+    .poverty-toggle { top: 56px; left: 8px; font-size: 0.72rem; padding: 6px 9px; }
+    .poverty-legend { bottom: 24px; left: 8px; font-size: 0.68rem; padding: 10px 11px; }
+  }
+
+  /* ============ Tract layer + detail dialog ============ */
+  .tract-dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(21,41,74,0.45);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 9000;
+    padding: 40px 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tract-dialog-backdrop.open { display: flex; }
+  .tract-dialog {
+    background: var(--bg-card);
+    border-radius: 8px;
+    max-width: 620px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    border-top: 4px solid var(--gold);
+    overflow: hidden;
+    position: relative;
+  }
+  .tract-dialog header {
+    background: var(--navy);
+    color: white;
+    padding: 18px 24px 14px;
+    border-bottom: none;
+    display: block;
+  }
+  .tract-dialog .td-eyebrow {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--gold-soft);
+    margin: 0 0 4px;
+  }
+  .tract-dialog h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 1.4rem;
+    margin: 0 0 2px;
+    letter-spacing: -0.01em;
+  }
+  .tract-dialog .td-sub {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.78);
+    margin: 0;
+  }
+  .tract-dialog .td-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 0;
+  }
+  .tract-dialog .td-close:hover { background: rgba(255,255,255,0.15); }
+  .tract-dialog .td-close svg { width: 16px; height: 16px; }
+
+  .tract-dialog .td-body { padding: 18px 24px 22px; }
+  .tract-dialog .td-headline {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border-radius: 6px;
+    margin: 0 0 18px;
+    border-left: 4px solid var(--gold);
+  }
+  .tract-dialog .td-headline .big {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .tract-dialog .td-headline .moe {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+  .tract-dialog .td-headline .tier-chip {
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: white;
+  }
+  .tract-dialog .td-section {
+    margin: 0 0 16px;
+  }
+  .tract-dialog .td-section h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 0.92rem;
+    color: var(--navy);
+    margin: 0 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .tract-dialog .td-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 18px;
+  }
+  .tract-dialog .td-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px dotted var(--rule-soft);
+    font-size: 0.82rem;
+  }
+  .tract-dialog .td-row .label { color: var(--ink-soft); }
+  .tract-dialog .td-row .val {
+    font-weight: 600;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .tract-dialog .td-row .val .pop {
+    color: var(--ink-soft);
+    font-weight: 400;
+    font-size: 0.74rem;
+    margin-left: 4px;
+  }
+  .tract-dialog .td-row.bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    border-bottom: none;
+    padding: 6px 0 2px;
+  }
+  .tract-dialog .td-row.bar .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.82rem;
+  }
+  .tract-dialog .td-bar-track {
+    background: var(--rule-soft);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .tract-dialog .td-bar-fill {
+    height: 100%;
+    background: var(--navy);
+    border-radius: 3px;
+  }
+  .tract-dialog .td-footnote {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+  .tract-dialog .td-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  .tract-dialog .td-actions button {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .tract-dialog .td-actions button:hover {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+  }
+
+  /* Hover/select state on tract polygons */
+  .tract-poly-highlight {
+    stroke: var(--navy) !important;
+    stroke-width: 2.5 !important;
+    stroke-opacity: 1 !important;
+  }
+
+  @media (max-width: 720px) {
+    .tract-dialog-backdrop { padding: 16px 8px; }
+    .tract-dialog header { padding: 16px 18px 12px; }
+    .tract-dialog .td-body { padding: 16px 18px 18px; }
+    .tract-dialog h2 { font-size: 1.2rem; }
+    .tract-dialog .td-headline .big { font-size: 1.8rem; }
+    .tract-dialog .td-grid { grid-template-columns: 1fr; gap: 0; }
   }
 
   .filter-panel {
@@ -910,6 +1117,59 @@
     outline: 2px solid var(--gold);
     outline-offset: 2px;
   }
+
+  /* ============ Reference labels — data-journalism style ============
+     The Esri "Light Gray Reference" tile renders place names and road
+     labels in a thin gray font that disappears over the darker tiers of
+     the poverty choropleth. We apply CSS filters to the entire pane:
+
+       1. `invert(1)`           — flips dark gray text to light gray
+       2. `brightness(1.6)`     — pushes the light gray toward pure white
+       3. `contrast(1.3)`       — sharpens edges so the text reads crisp
+       4. `drop-shadow(...)`    — adds a soft dark halo underneath so the
+                                  white labels stay legible over the
+                                  lightest tier colors (FEE5D9, FFF7F3)
+                                  and the gray basemap
+
+     The filter applies to the whole raster tile (we can't selectively
+     style the text inside it), but the tile is mostly transparent
+     pixels — only the labels and thin road lines are affected.
+
+     This is the technique most major data-journalism choropleths use
+     (NYT, FT, Bloomberg, Reuters) to keep labels floating on top of
+     colored regions. */
+  /* ============ Reference labels — dark & defined ============
+     The Esri "Light Gray Reference" tile renders place names and road
+     labels in a thin gray font that disappears against the choropleth
+     colors. We apply CSS filters to darken and sharpen the labels and
+     wrap them in a soft white halo so they stay readable on both light
+     and dark tier backgrounds.
+
+       1. `contrast(2.2)`           — pulls gray text toward pure black
+                                      and pushes the transparent edges
+                                      toward fully transparent
+       2. `brightness(0.5)`         — darkens what's left, deepening the
+                                      gray-to-black conversion
+       3. `drop-shadow(white, 1px)` — tight white halo around every
+                                      character so dark labels remain
+                                      readable on the dark red tiers
+       4. Two more drop-shadows     — additional soft white glow to
+                                      reinforce the halo without
+                                      blurring the text edges
+
+     Stacked drop-shadows compound: each one shadows the OUTPUT of the
+     previous, so three small white shadows produce a halo about 3px
+     wide on each side — enough to fight the choropleth without making
+     the labels look bubbly. */
+  .leaflet-pane.leaflet-referenceLabels-pane,
+  .reference-labels-tile {
+    filter:
+      contrast(2.2)
+      brightness(0.5)
+      drop-shadow(0 0 1px white)
+      drop-shadow(0 0 1px white)
+      drop-shadow(0 0 1px white);
+  }
 </style>
 </head>
 <body>
@@ -922,7 +1182,7 @@
     </div>
     <div class="meta">
       <div class="credit">Created by <strong>Costarella Innovations, LLC</strong></div>
-      <div class="updated">Updated April 28, 2026 at 12:11 PM EDT</div>
+      <div class="updated">Updated May 14, 2026 at 8:59 PM EDT</div>
       <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
     </div>
   </header>
@@ -1014,6 +1274,11 @@
 <!-- Modal -->
 <div class="modal-backdrop" id="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal" id="modal"></div>
+</div>
+
+<!-- Tract detail dialog -->
+<div class="tract-dialog-backdrop" id="tract-backdrop" role="dialog" aria-modal="true" aria-labelledby="tract-title" aria-hidden="true">
+  <div class="tract-dialog" id="tract-dialog"></div>
 </div>
 
 <script>
@@ -1193,6 +1458,40 @@ if (leafletAvailable) {
       crossOrigin: true
     }
   ).addTo(map);
+
+  /* ====================================================================
+     REFERENCE LABELS OVERLAY
+     --------------------------------------------------------------------
+     A second Esri tile layer containing ONLY road outlines and place
+     labels — no fill. We render it in a pane that sits ABOVE the
+     choropleth fills but BELOW the markers. This is the standard
+     cartographic pattern for choropleths: keep the colors saturated
+     while preserving wayfinding (street names, town labels, water
+     features) on top of them.
+
+     The "Reference" companion to Light_Gray_Base is purpose-built for
+     this — transparent background with crisp anti-aliased labels.
+
+     Only attached to the map when the poverty layer is on; when poverty
+     is off the original gray base reads cleanly without the extra label
+     density. */
+  const labelsPane = map.createPane('referenceLabels');
+  labelsPane.style.zIndex = 400;  /* above choropleth (340), tracts (345),
+                                     township/muni outlines (350/360), and
+                                     boundary labels (370); below markers (600) */
+  labelsPane.style.pointerEvents = 'none';  /* never grab clicks */
+
+  const referenceLabelsLayer = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+    {
+      pane: 'referenceLabels',
+      className: 'reference-labels-tile',  /* CSS hook for the brightness filter */
+      maxZoom: 16,
+      attribution: '',  /* attribution already on base layer */
+      crossOrigin: true,
+      opacity: 1.0
+    }
+  );
 
   layerGroup = L.layerGroup().addTo(map);
 
@@ -1515,6 +1814,360 @@ if (leafletAvailable) {
       updateBoundaryLabels();
     })
     .catch(() => { /* silent fallback */ });
+
+  /* ====================================================================
+     CENSUS TRACT LAYER + DETAIL DIALOG
+     --------------------------------------------------------------------
+     Source: ACS 2019-2023 5-Year Estimates, Table S1701
+             (Poverty Status in the Past 12 Months), filtered to 54
+             census tracts in Trumbull County (FIPS 39155).
+     Geometry: Census TIGERweb Generalized_ACS2024 service (500K scale
+               for fast loading; falls back to precise Tracts_Blocks
+               layer 0 if generalized is unavailable).
+     Behavior:
+       • Tract polygons render in the SAME 'poverty' pane as the muni
+         choropleth, drawn AFTER munis so they paint on top. They are
+         only visible when the poverty layer is toggled on.
+       • Polygons ARE clickable (pane pointerEvents enabled only on the
+         tract layer, not on the fills).
+       • Click → modal dialog with full ACS S1701 breakdown.
+       • Tract data is embedded inline (no API key, no network beyond
+         the one-time TIGERweb GeoJSON fetch).
+     ==================================================================== */
+  const TRACT_DATA = {"39155920300":{"tract":"9203","total_pop":2869,"total_below":616,"total_pct":21.5,"total_pct_moe":11.4,"under_18_pop":566,"under_18_below":263,"under_18_pct":46.5,"under_18_pct_moe":22.7,"age_18_64_pop":1619,"age_18_64_below":315,"age_18_64_pct":19.5,"age_18_64_pct_moe":11.2,"age_65_plus_pop":684,"age_65_plus_below":38,"age_65_plus_pct":5.6,"age_65_plus_pct_moe":5.8,"male_pop":1420,"male_below":125,"male_pct":8.8,"male_pct_moe":6.4,"female_pop":1449,"female_below":491,"female_pct":33.9,"female_pct_moe":16.9,"white_pop":2308,"white_below":359,"white_pct":15.6,"white_pct_moe":10.3,"black_pop":515,"black_below":248,"black_pct":48.2,"black_pct_moe":35.0,"hispanic_pop":9,"hispanic_below":9,"hispanic_pct":100.0,"hispanic_pct_moe":100.0,"less_hs_pop":251,"less_hs_below":108,"less_hs_pct":43.0,"less_hs_pct_moe":34.5,"hs_grad_pop":695,"hs_grad_below":116,"hs_grad_pct":16.7,"hs_grad_pct_moe":16.3,"some_college_pop":489,"some_college_below":36,"some_college_pct":7.4,"some_college_pct_moe":6.4,"bachelors_plus_pop":637,"bachelors_plus_below":34,"bachelors_plus_pct":5.3,"bachelors_plus_pct_moe":7.1,"employed_pop":1254,"employed_below":126,"employed_pct":10.0,"employed_pct_moe":9.9,"unemployed_pop":27,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":61.3,"below_50pct_pop":237,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1277,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155920300","tract_display":"9203"},"39155920400":{"tract":"9204","total_pop":2397,"total_below":274,"total_pct":11.4,"total_pct_moe":4.8,"under_18_pop":702,"under_18_below":40,"under_18_pct":5.7,"under_18_pct_moe":6.7,"age_18_64_pop":1450,"age_18_64_below":211,"age_18_64_pct":14.6,"age_18_64_pct_moe":6.5,"age_65_plus_pop":245,"age_65_plus_below":23,"age_65_plus_pct":9.4,"age_65_plus_pct_moe":9.7,"male_pop":1285,"male_below":204,"male_pct":15.9,"male_pct_moe":7.0,"female_pop":1112,"female_below":70,"female_pct":6.3,"female_pct_moe":5.2,"white_pop":1942,"white_below":242,"white_pct":12.5,"white_pct_moe":4.9,"black_pop":250,"black_below":21,"black_pct":8.4,"black_pct_moe":15.8,"hispanic_pop":55,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":43.0,"less_hs_pop":301,"less_hs_below":103,"less_hs_pct":34.2,"less_hs_pct_moe":31.6,"hs_grad_pop":566,"hs_grad_below":38,"hs_grad_pct":6.7,"hs_grad_pct_moe":7.4,"some_college_pop":443,"some_college_below":29,"some_college_pct":6.5,"some_college_pct_moe":6.9,"bachelors_plus_pop":73,"bachelors_plus_below":5,"bachelors_plus_pct":6.8,"bachelors_plus_pct_moe":14.5,"employed_pop":871,"employed_below":53,"employed_pct":6.1,"employed_pct_moe":5.0,"unemployed_pop":90,"unemployed_below":54,"unemployed_pct":60.0,"unemployed_pct_moe":34.3,"below_50pct_pop":173,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1706,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155920400","tract_display":"9204"},"39155920700":{"tract":"9207","total_pop":2669,"total_below":1182,"total_pct":44.3,"total_pct_moe":14.9,"under_18_pop":665,"under_18_below":587,"under_18_pct":88.3,"under_18_pct_moe":14.1,"age_18_64_pop":1370,"age_18_64_below":439,"age_18_64_pct":32.0,"age_18_64_pct_moe":16.5,"age_65_plus_pop":634,"age_65_plus_below":156,"age_65_plus_pct":24.6,"age_65_plus_pct_moe":16.8,"male_pop":1387,"male_below":672,"male_pct":48.4,"male_pct_moe":17.0,"female_pop":1282,"female_below":510,"female_pct":39.8,"female_pct_moe":14.0,"white_pop":1641,"white_below":588,"white_pct":35.8,"white_pct_moe":14.1,"black_pop":648,"black_below":439,"black_pct":67.7,"black_pct_moe":21.7,"hispanic_pop":277,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":12.6,"less_hs_pop":339,"less_hs_below":36,"less_hs_pct":10.6,"less_hs_pct_moe":16.1,"hs_grad_pop":1029,"hs_grad_below":405,"hs_grad_pct":39.4,"hs_grad_pct_moe":18.3,"some_college_pop":343,"some_college_below":121,"some_college_pct":35.3,"some_college_pct_moe":18.4,"bachelors_plus_pop":104,"bachelors_plus_below":14,"bachelors_plus_pct":13.5,"bachelors_plus_pct_moe":19.8,"employed_pop":901,"employed_below":115,"employed_pct":12.8,"employed_pct_moe":13.0,"unemployed_pop":56,"unemployed_below":48,"unemployed_pct":85.7,"unemployed_pct_moe":27.4,"below_50pct_pop":374,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1678,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155920700","tract_display":"9207"},"39155920800":{"tract":"9208","total_pop":2243,"total_below":968,"total_pct":43.2,"total_pct_moe":14.7,"under_18_pop":489,"under_18_below":367,"under_18_pct":75.1,"under_18_pct_moe":24.3,"age_18_64_pop":1485,"age_18_64_below":575,"age_18_64_pct":38.7,"age_18_64_pct_moe":13.0,"age_65_plus_pop":269,"age_65_plus_below":26,"age_65_plus_pct":9.7,"age_65_plus_pct_moe":9.8,"male_pop":1152,"male_below":481,"male_pct":41.8,"male_pct_moe":13.1,"female_pop":1091,"female_below":487,"female_pct":44.6,"female_pct_moe":20.3,"white_pop":1635,"white_below":618,"white_pct":37.8,"white_pct_moe":15.4,"black_pop":374,"black_below":324,"black_pct":86.6,"black_pct_moe":19.6,"hispanic_pop":0,"hispanic_below":0,"hispanic_pct":null,"hispanic_pct_moe":null,"less_hs_pop":368,"less_hs_below":121,"less_hs_pct":32.9,"less_hs_pct_moe":21.3,"hs_grad_pop":710,"hs_grad_below":254,"hs_grad_pct":35.8,"hs_grad_pct_moe":14.4,"some_college_pop":329,"some_college_below":109,"some_college_pct":33.1,"some_college_pct_moe":20.1,"bachelors_plus_pop":103,"bachelors_plus_below":14,"bachelors_plus_pct":13.6,"bachelors_plus_pct_moe":23.6,"employed_pop":643,"employed_below":206,"employed_pct":32.0,"employed_pct_moe":13.2,"unemployed_pop":35,"unemployed_below":2,"unemployed_pct":5.7,"unemployed_pct_moe":17.3,"below_50pct_pop":217,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1718,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155920800","tract_display":"9208"},"39155920900":{"tract":"9209","total_pop":2953,"total_below":874,"total_pct":29.6,"total_pct_moe":12.1,"under_18_pop":622,"under_18_below":338,"under_18_pct":54.3,"under_18_pct_moe":26.5,"age_18_64_pop":1833,"age_18_64_below":440,"age_18_64_pct":24.0,"age_18_64_pct_moe":10.1,"age_65_plus_pop":498,"age_65_plus_below":96,"age_65_plus_pct":19.3,"age_65_plus_pct_moe":14.3,"male_pop":1346,"male_below":386,"male_pct":28.7,"male_pct_moe":12.1,"female_pop":1607,"female_below":488,"female_pct":30.4,"female_pct_moe":13.5,"white_pop":1437,"white_below":104,"white_pct":7.2,"white_pct_moe":4.1,"black_pop":1401,"black_below":725,"black_pct":51.7,"black_pct_moe":18.1,"hispanic_pop":176,"hispanic_below":38,"hispanic_pct":21.6,"hispanic_pct_moe":33.1,"less_hs_pop":308,"less_hs_below":121,"less_hs_pct":39.3,"less_hs_pct_moe":25.1,"hs_grad_pop":861,"hs_grad_below":191,"hs_grad_pct":22.2,"hs_grad_pct_moe":13.8,"some_college_pop":504,"some_college_below":103,"some_college_pct":20.4,"some_college_pct_moe":10.6,"bachelors_plus_pop":285,"bachelors_plus_below":46,"bachelors_plus_pct":16.1,"bachelors_plus_pct_moe":14.4,"employed_pop":1209,"employed_below":79,"employed_pct":6.5,"employed_pct_moe":4.5,"unemployed_pop":30,"unemployed_below":9,"unemployed_pct":30.0,"unemployed_pct_moe":46.4,"below_50pct_pop":723,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1599,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155920900","tract_display":"9209"},"39155921000":{"tract":"9210","total_pop":5248,"total_below":1434,"total_pct":27.3,"total_pct_moe":11.7,"under_18_pop":931,"under_18_below":275,"under_18_pct":29.5,"under_18_pct_moe":24.7,"age_18_64_pop":3185,"age_18_64_below":1037,"age_18_64_pct":32.6,"age_18_64_pct_moe":14.1,"age_65_plus_pop":1132,"age_65_plus_below":122,"age_65_plus_pct":10.8,"age_65_plus_pct_moe":6.0,"male_pop":2275,"male_below":493,"male_pct":21.7,"male_pct_moe":11.9,"female_pop":2973,"female_below":941,"female_pct":31.7,"female_pct_moe":14.7,"white_pop":3249,"white_below":944,"white_pct":29.1,"white_pct_moe":14.2,"black_pop":1768,"black_below":411,"black_pct":23.2,"black_pct_moe":18.6,"hispanic_pop":0,"hispanic_below":0,"hispanic_pct":null,"hispanic_pct_moe":null,"less_hs_pop":599,"less_hs_below":137,"less_hs_pct":22.9,"less_hs_pct_moe":18.7,"hs_grad_pop":1571,"hs_grad_below":415,"hs_grad_pct":26.4,"hs_grad_pct_moe":11.0,"some_college_pop":751,"some_college_below":166,"some_college_pct":22.1,"some_college_pct_moe":15.6,"bachelors_plus_pop":942,"bachelors_plus_below":386,"bachelors_plus_pct":41.0,"bachelors_plus_pct_moe":28.2,"employed_pop":2086,"employed_below":240,"employed_pct":11.5,"employed_pct_moe":8.3,"unemployed_pop":329,"unemployed_below":186,"unemployed_pct":56.5,"unemployed_pct_moe":31.5,"below_50pct_pop":473,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":2477,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155921000","tract_display":"9210"},"39155921100":{"tract":"9211","total_pop":3544,"total_below":1237,"total_pct":34.9,"total_pct_moe":8.7,"under_18_pop":606,"under_18_below":274,"under_18_pct":45.2,"under_18_pct_moe":25.9,"age_18_64_pop":2213,"age_18_64_below":728,"age_18_64_pct":32.9,"age_18_64_pct_moe":9.4,"age_65_plus_pop":725,"age_65_plus_below":235,"age_65_plus_pct":32.4,"age_65_plus_pct_moe":17.7,"male_pop":1899,"male_below":552,"male_pct":29.1,"male_pct_moe":9.2,"female_pop":1645,"female_below":685,"female_pct":41.6,"female_pct_moe":12.2,"white_pop":2604,"white_below":659,"white_pct":25.3,"white_pct_moe":8.9,"black_pop":529,"black_below":239,"black_pct":45.2,"black_pct_moe":28.5,"hispanic_pop":66,"hispanic_below":66,"hispanic_pct":100.0,"hispanic_pct_moe":39.2,"less_hs_pop":289,"less_hs_below":80,"less_hs_pct":27.7,"less_hs_pct_moe":20.1,"hs_grad_pop":1610,"hs_grad_below":435,"hs_grad_pct":27.0,"hs_grad_pct_moe":9.3,"some_college_pop":488,"some_college_below":207,"some_college_pct":42.4,"some_college_pct_moe":20.1,"bachelors_plus_pop":241,"bachelors_plus_below":98,"bachelors_plus_pct":40.7,"bachelors_plus_pct_moe":31.1,"employed_pop":1283,"employed_below":212,"employed_pct":16.5,"employed_pct_moe":8.8,"unemployed_pop":195,"unemployed_below":91,"unemployed_pct":46.7,"unemployed_pct_moe":37.1,"below_50pct_pop":494,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":2123,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155921100","tract_display":"9211"},"39155921200":{"tract":"9212","total_pop":1712,"total_below":517,"total_pct":30.2,"total_pct_moe":12.3,"under_18_pop":596,"under_18_below":289,"under_18_pct":48.5,"under_18_pct_moe":17.6,"age_18_64_pop":828,"age_18_64_below":205,"age_18_64_pct":24.8,"age_18_64_pct_moe":12.3,"age_65_plus_pop":288,"age_65_plus_below":23,"age_65_plus_pct":8.0,"age_65_plus_pct_moe":5.5,"male_pop":972,"male_below":248,"male_pct":25.5,"male_pct_moe":11.7,"female_pop":740,"female_below":269,"female_pct":36.4,"female_pct_moe":15.1,"white_pop":1201,"white_below":143,"white_pct":11.9,"white_pct_moe":6.6,"black_pop":493,"black_below":370,"black_pct":75.1,"black_pct_moe":21.9,"hispanic_pop":133,"hispanic_below":109,"hispanic_pct":82.0,"hispanic_pct_moe":19.8,"less_hs_pop":75,"less_hs_below":40,"less_hs_pct":53.3,"less_hs_pct_moe":25.7,"hs_grad_pop":456,"hs_grad_below":38,"hs_grad_pct":8.3,"hs_grad_pct_moe":5.9,"some_college_pop":296,"some_college_below":70,"some_college_pct":23.6,"some_college_pct_moe":15.9,"bachelors_plus_pop":131,"bachelors_plus_below":23,"bachelors_plus_pct":17.6,"bachelors_plus_pct_moe":20.3,"employed_pop":596,"employed_below":58,"employed_pct":9.7,"employed_pct_moe":8.8,"unemployed_pop":3,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":100.0,"below_50pct_pop":409,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":820,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155921200","tract_display":"9212"},"39155921300":{"tract":"9213","total_pop":2192,"total_below":653,"total_pct":29.8,"total_pct_moe":14.1,"under_18_pop":431,"under_18_below":140,"under_18_pct":32.5,"under_18_pct_moe":25.5,"age_18_64_pop":1340,"age_18_64_below":468,"age_18_64_pct":34.9,"age_18_64_pct_moe":16.5,"age_65_plus_pop":421,"age_65_plus_below":45,"age_65_plus_pct":10.7,"age_65_plus_pct_moe":7.9,"male_pop":1004,"male_below":327,"male_pct":32.6,"male_pct_moe":14.7,"female_pop":1188,"female_below":326,"female_pct":27.4,"female_pct_moe":15.2,"white_pop":1542,"white_below":394,"white_pct":25.6,"white_pct_moe":14.4,"black_pop":149,"black_below":0,"black_pct":0.0,"black_pct_moe":22.0,"hispanic_pop":272,"hispanic_below":224,"hispanic_pct":82.4,"hispanic_pct_moe":32.1,"less_hs_pop":275,"less_hs_below":170,"less_hs_pct":61.8,"less_hs_pct_moe":32.3,"hs_grad_pop":642,"hs_grad_below":128,"hs_grad_pct":19.9,"hs_grad_pct_moe":16.7,"some_college_pop":333,"some_college_below":65,"some_college_pct":19.5,"some_college_pct_moe":23.5,"bachelors_plus_pop":285,"bachelors_plus_below":38,"bachelors_plus_pct":13.3,"bachelors_plus_pct_moe":15.8,"employed_pop":1013,"employed_below":270,"employed_pct":26.7,"employed_pct_moe":17.0,"unemployed_pop":22,"unemployed_below":6,"unemployed_pct":27.3,"unemployed_pct_moe":50.8,"below_50pct_pop":119,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1277,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155921300","tract_display":"9213"},"39155921400":{"tract":"9214","total_pop":3219,"total_below":355,"total_pct":11.0,"total_pct_moe":5.3,"under_18_pop":489,"under_18_below":75,"under_18_pct":15.3,"under_18_pct_moe":23.1,"age_18_64_pop":1723,"age_18_64_below":166,"age_18_64_pct":9.6,"age_18_64_pct_moe":4.5,"age_65_plus_pop":1007,"age_65_plus_below":114,"age_65_plus_pct":11.3,"age_65_plus_pct_moe":5.8,"male_pop":1562,"male_below":181,"male_pct":11.6,"male_pct_moe":6.5,"female_pop":1657,"female_below":174,"female_pct":10.5,"female_pct_moe":6.0,"white_pop":2542,"white_below":203,"white_pct":8.0,"white_pct_moe":3.8,"black_pop":289,"black_below":152,"black_pct":52.6,"black_pct_moe":38.0,"hispanic_pop":233,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":14.8,"less_hs_pop":167,"less_hs_below":48,"less_hs_pct":28.7,"less_hs_pct_moe":26.2,"hs_grad_pop":877,"hs_grad_below":128,"hs_grad_pct":14.6,"hs_grad_pct_moe":8.1,"some_college_pop":746,"some_college_below":51,"some_college_pct":6.8,"some_college_pct_moe":4.7,"bachelors_plus_pop":695,"bachelors_plus_below":26,"bachelors_plus_pct":3.7,"bachelors_plus_pct_moe":4.1,"employed_pop":1373,"employed_below":89,"employed_pct":6.5,"employed_pct_moe":4.7,"unemployed_pop":52,"unemployed_below":23,"unemployed_pct":44.2,"unemployed_pct_moe":40.8,"below_50pct_pop":115,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":903,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155921400","tract_display":"9214"},"39155921500":{"tract":"9215","total_pop":5911,"total_below":597,"total_pct":10.1,"total_pct_moe":4.6,"under_18_pop":1191,"under_18_below":79,"under_18_pct":6.6,"under_18_pct_moe":6.9,"age_18_64_pop":3395,"age_18_64_below":397,"age_18_64_pct":11.7,"age_18_64_pct_moe":6.9,"age_65_plus_pop":1325,"age_65_plus_below":121,"age_65_plus_pct":9.1,"age_65_plus_pct_moe":9.0,"male_pop":2685,"male_below":263,"male_pct":9.8,"male_pct_moe":6.6,"female_pop":3226,"female_below":334,"female_pct":10.4,"female_pct_moe":4.9,"white_pop":4927,"white_below":397,"white_pct":8.1,"white_pct_moe":4.5,"black_pop":414,"black_below":2,"black_pct":0.5,"black_pct_moe":1.5,"hispanic_pop":254,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":13.7,"less_hs_pop":237,"less_hs_below":137,"less_hs_pct":57.8,"less_hs_pct_moe":33.2,"hs_grad_pop":1635,"hs_grad_below":60,"hs_grad_pct":3.7,"hs_grad_pct_moe":3.4,"some_college_pop":1782,"some_college_below":244,"some_college_pct":13.7,"some_college_pct_moe":10.9,"bachelors_plus_pop":829,"bachelors_plus_below":33,"bachelors_plus_pct":4.0,"bachelors_plus_pct_moe":4.6,"employed_pop":2258,"employed_below":164,"employed_pct":7.3,"employed_pct_moe":5.6,"unemployed_pop":199,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":17.1,"below_50pct_pop":194,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1561,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155921500","tract_display":"9215"},"39155921600":{"tract":"9216","total_pop":3499,"total_below":1364,"total_pct":39.0,"total_pct_moe":10.1,"under_18_pop":935,"under_18_below":618,"under_18_pct":66.1,"under_18_pct_moe":18.7,"age_18_64_pop":1962,"age_18_64_below":655,"age_18_64_pct":33.4,"age_18_64_pct_moe":9.3,"age_65_plus_pop":602,"age_65_plus_below":91,"age_65_plus_pct":15.1,"age_65_plus_pct_moe":8.8,"male_pop":1498,"male_below":501,"male_pct":33.4,"male_pct_moe":13.0,"female_pop":2001,"female_below":863,"female_pct":43.1,"female_pct_moe":11.4,"white_pop":2469,"white_below":896,"white_pct":36.3,"white_pct_moe":10.1,"black_pop":806,"black_below":286,"black_pct":35.5,"black_pct_moe":29.0,"hispanic_pop":42,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":49.2,"less_hs_pop":288,"less_hs_below":98,"less_hs_pct":34.0,"less_hs_pct_moe":20.8,"hs_grad_pop":1404,"hs_grad_below":447,"hs_grad_pct":31.8,"hs_grad_pct_moe":11.4,"some_college_pop":430,"some_college_below":90,"some_college_pct":20.9,"some_college_pct_moe":17.4,"bachelors_plus_pop":271,"bachelors_plus_below":20,"bachelors_plus_pct":7.4,"bachelors_plus_pct_moe":10.4,"employed_pop":1229,"employed_below":144,"employed_pct":11.7,"employed_pct_moe":6.1,"unemployed_pop":60,"unemployed_below":45,"unemployed_pct":75.0,"unemployed_pct_moe":37.8,"below_50pct_pop":824,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1966,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155921600","tract_display":"9216"},"39155930101":{"tract":"9301.01","total_pop":2767,"total_below":175,"total_pct":6.3,"total_pct_moe":4.4,"under_18_pop":462,"under_18_below":63,"under_18_pct":13.6,"under_18_pct_moe":13.1,"age_18_64_pop":1413,"age_18_64_below":94,"age_18_64_pct":6.7,"age_18_64_pct_moe":4.5,"age_65_plus_pop":892,"age_65_plus_below":18,"age_65_plus_pct":2.0,"age_65_plus_pct_moe":3.2,"male_pop":1356,"male_below":47,"male_pct":3.5,"male_pct_moe":3.0,"female_pop":1411,"female_below":128,"female_pct":9.1,"female_pct_moe":7.2,"white_pop":2620,"white_below":175,"white_pct":6.7,"white_pct_moe":4.7,"black_pop":23,"black_below":0,"black_pct":0.0,"black_pct_moe":66.4,"hispanic_pop":0,"hispanic_below":0,"hispanic_pct":null,"hispanic_pct_moe":null,"less_hs_pop":214,"less_hs_below":10,"less_hs_pct":4.7,"less_hs_pct_moe":10.3,"hs_grad_pop":1144,"hs_grad_below":43,"hs_grad_pct":3.8,"hs_grad_pct_moe":3.5,"some_college_pop":447,"some_college_below":28,"some_college_pct":6.3,"some_college_pct_moe":7.1,"bachelors_plus_pop":335,"bachelors_plus_below":31,"bachelors_plus_pct":9.3,"bachelors_plus_pct_moe":11.7,"employed_pop":1173,"employed_below":84,"employed_pct":7.2,"employed_pct_moe":5.4,"unemployed_pop":17,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":77.3,"below_50pct_pop":55,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":747,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930101","tract_display":"9301.01"},"39155930102":{"tract":"9301.02","total_pop":2312,"total_below":384,"total_pct":16.6,"total_pct_moe":13.1,"under_18_pop":582,"under_18_below":164,"under_18_pct":28.2,"under_18_pct_moe":28.1,"age_18_64_pop":1316,"age_18_64_below":189,"age_18_64_pct":14.4,"age_18_64_pct_moe":10.6,"age_65_plus_pop":414,"age_65_plus_below":31,"age_65_plus_pct":7.5,"age_65_plus_pct_moe":5.8,"male_pop":1210,"male_below":153,"male_pct":12.6,"male_pct_moe":11.0,"female_pop":1102,"female_below":231,"female_pct":21.0,"female_pct_moe":15.9,"white_pop":2231,"white_below":384,"white_pct":17.2,"white_pct_moe":13.4,"black_pop":18,"black_below":0,"black_pct":0.0,"black_pct_moe":75.1,"hispanic_pop":6,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":100.0,"less_hs_pop":117,"less_hs_below":53,"less_hs_pct":45.3,"less_hs_pct_moe":38.3,"hs_grad_pop":693,"hs_grad_below":115,"hs_grad_pct":16.6,"hs_grad_pct_moe":11.4,"some_college_pop":402,"some_college_below":33,"some_college_pct":8.2,"some_college_pct_moe":8.3,"bachelors_plus_pop":305,"bachelors_plus_below":2,"bachelors_plus_pct":0.7,"bachelors_plus_pct_moe":1.8,"employed_pop":931,"employed_below":44,"employed_pct":4.7,"employed_pct_moe":5.3,"unemployed_pop":26,"unemployed_below":4,"unemployed_pct":15.4,"unemployed_pct_moe":26.4,"below_50pct_pop":59,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":895,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930102","tract_display":"9301.02"},"39155930200":{"tract":"9302","total_pop":2764,"total_below":556,"total_pct":20.1,"total_pct_moe":8.4,"under_18_pop":617,"under_18_below":217,"under_18_pct":35.2,"under_18_pct_moe":18.0,"age_18_64_pop":1497,"age_18_64_below":295,"age_18_64_pct":19.7,"age_18_64_pct_moe":8.3,"age_65_plus_pop":650,"age_65_plus_below":44,"age_65_plus_pct":6.8,"age_65_plus_pct_moe":6.4,"male_pop":1512,"male_below":279,"male_pct":18.5,"male_pct_moe":7.5,"female_pop":1252,"female_below":277,"female_pct":22.1,"female_pct_moe":11.3,"white_pop":2688,"white_below":556,"white_pct":20.7,"white_pct_moe":8.6,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":24,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":65.0,"less_hs_pop":304,"less_hs_below":67,"less_hs_pct":22.0,"less_hs_pct_moe":18.6,"hs_grad_pop":1027,"hs_grad_below":119,"hs_grad_pct":11.6,"hs_grad_pct_moe":6.6,"some_college_pop":404,"some_college_below":91,"some_college_pct":22.5,"some_college_pct_moe":13.5,"bachelors_plus_pop":219,"bachelors_plus_below":0,"bachelors_plus_pct":0.0,"bachelors_plus_pct_moe":15.7,"employed_pop":1150,"employed_below":35,"employed_pct":3.0,"employed_pct_moe":2.3,"unemployed_pop":42,"unemployed_below":28,"unemployed_pct":66.7,"unemployed_pct_moe":49.8,"below_50pct_pop":316,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1022,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930200","tract_display":"9302"},"39155930300":{"tract":"9303","total_pop":2948,"total_below":408,"total_pct":13.8,"total_pct_moe":7.0,"under_18_pop":640,"under_18_below":127,"under_18_pct":19.8,"under_18_pct_moe":15.8,"age_18_64_pop":1643,"age_18_64_below":222,"age_18_64_pct":13.5,"age_18_64_pct_moe":8.7,"age_65_plus_pop":665,"age_65_plus_below":59,"age_65_plus_pct":8.9,"age_65_plus_pct_moe":7.6,"male_pop":1519,"male_below":184,"male_pct":12.1,"male_pct_moe":6.7,"female_pop":1429,"female_below":224,"female_pct":15.7,"female_pct_moe":8.7,"white_pop":2886,"white_below":386,"white_pct":13.4,"white_pct_moe":6.9,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":25,"hispanic_below":18,"hispanic_pct":72.0,"hispanic_pct_moe":54.5,"less_hs_pop":192,"less_hs_below":20,"less_hs_pct":10.4,"less_hs_pct_moe":16.4,"hs_grad_pop":1183,"hs_grad_below":105,"hs_grad_pct":8.9,"hs_grad_pct_moe":6.5,"some_college_pop":583,"some_college_below":108,"some_college_pct":18.5,"some_college_pct_moe":11.9,"bachelors_plus_pop":246,"bachelors_plus_below":24,"bachelors_plus_pct":9.8,"bachelors_plus_pct_moe":12.6,"employed_pop":1223,"employed_below":19,"employed_pct":1.6,"employed_pct_moe":1.9,"unemployed_pop":86,"unemployed_below":69,"unemployed_pct":80.2,"unemployed_pct_moe":22.8,"below_50pct_pop":282,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1335,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930300","tract_display":"9303"},"39155930400":{"tract":"9304","total_pop":4061,"total_below":777,"total_pct":19.1,"total_pct_moe":10.8,"under_18_pop":969,"under_18_below":349,"under_18_pct":36.0,"under_18_pct_moe":23.3,"age_18_64_pop":2392,"age_18_64_below":377,"age_18_64_pct":15.8,"age_18_64_pct_moe":7.7,"age_65_plus_pop":700,"age_65_plus_below":51,"age_65_plus_pct":7.3,"age_65_plus_pct_moe":5.5,"male_pop":2034,"male_below":378,"male_pct":18.6,"male_pct_moe":9.9,"female_pop":2027,"female_below":399,"female_pct":19.7,"female_pct_moe":12.7,"white_pop":3740,"white_below":544,"white_pct":14.5,"white_pct_moe":6.9,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":12,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":92.0,"less_hs_pop":514,"less_hs_below":44,"less_hs_pct":8.6,"less_hs_pct_moe":9.6,"hs_grad_pop":1061,"hs_grad_below":154,"hs_grad_pct":14.5,"hs_grad_pct_moe":7.6,"some_college_pop":726,"some_college_below":171,"some_college_pct":23.6,"some_college_pct_moe":15.3,"bachelors_plus_pop":458,"bachelors_plus_below":55,"bachelors_plus_pct":12.0,"bachelors_plus_pct_moe":10.2,"employed_pop":1853,"employed_below":184,"employed_pct":9.9,"employed_pct_moe":6.6,"unemployed_pop":48,"unemployed_below":8,"unemployed_pct":16.7,"unemployed_pct_moe":28.7,"below_50pct_pop":203,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1458,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930400","tract_display":"9304"},"39155930500":{"tract":"9305","total_pop":6360,"total_below":1510,"total_pct":23.7,"total_pct_moe":9.0,"under_18_pop":2501,"under_18_below":845,"under_18_pct":33.8,"under_18_pct_moe":14.7,"age_18_64_pop":3245,"age_18_64_below":585,"age_18_64_pct":18.0,"age_18_64_pct_moe":8.4,"age_65_plus_pop":614,"age_65_plus_below":80,"age_65_plus_pct":13.0,"age_65_plus_pct_moe":8.3,"male_pop":3276,"male_below":675,"male_pct":20.6,"male_pct_moe":8.4,"female_pop":3084,"female_below":835,"female_pct":27.1,"female_pct_moe":10.1,"white_pop":6291,"white_below":1497,"white_pct":23.8,"white_pct_moe":9.1,"black_pop":26,"black_below":13,"black_pct":50.0,"black_pct_moe":50.0,"hispanic_pop":56,"hispanic_below":38,"hispanic_pct":67.9,"hispanic_pct_moe":52.0,"less_hs_pop":1757,"less_hs_below":485,"less_hs_pct":27.6,"less_hs_pct_moe":13.1,"hs_grad_pop":792,"hs_grad_below":90,"hs_grad_pct":11.4,"hs_grad_pct_moe":5.6,"some_college_pop":378,"some_college_below":18,"some_college_pct":4.8,"some_college_pct_moe":5.6,"bachelors_plus_pop":224,"bachelors_plus_below":2,"bachelors_plus_pct":0.9,"bachelors_plus_pct_moe":1.5,"employed_pop":2288,"employed_below":320,"employed_pct":14.0,"employed_pct_moe":7.5,"unemployed_pop":40,"unemployed_below":11,"unemployed_pct":27.5,"unemployed_pct_moe":28.5,"below_50pct_pop":246,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":2915,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930500","tract_display":"9305"},"39155930600":{"tract":"9306","total_pop":3717,"total_below":311,"total_pct":8.4,"total_pct_moe":4.8,"under_18_pop":833,"under_18_below":47,"under_18_pct":5.6,"under_18_pct_moe":7.4,"age_18_64_pop":2179,"age_18_64_below":216,"age_18_64_pct":9.9,"age_18_64_pct_moe":5.6,"age_65_plus_pop":705,"age_65_plus_below":48,"age_65_plus_pct":6.8,"age_65_plus_pct_moe":6.5,"male_pop":1769,"male_below":103,"male_pct":5.8,"male_pct_moe":4.5,"female_pop":1948,"female_below":208,"female_pct":10.7,"female_pct_moe":6.5,"white_pop":3554,"white_below":227,"white_pct":6.4,"white_pct_moe":3.0,"black_pop":26,"black_below":0,"black_pct":0.0,"black_pct_moe":62.5,"hispanic_pop":23,"hispanic_below":23,"hispanic_pct":100.0,"hispanic_pct_moe":66.4,"less_hs_pop":334,"less_hs_below":71,"less_hs_pct":21.3,"less_hs_pct_moe":18.8,"hs_grad_pop":1161,"hs_grad_below":100,"hs_grad_pct":8.6,"hs_grad_pct_moe":6.1,"some_college_pop":666,"some_college_below":40,"some_college_pct":6.0,"some_college_pct_moe":5.4,"bachelors_plus_pop":381,"bachelors_plus_below":14,"bachelors_plus_pct":3.7,"bachelors_plus_pct_moe":5.9,"employed_pop":1694,"employed_below":25,"employed_pct":1.5,"employed_pct_moe":1.4,"unemployed_pop":14,"unemployed_below":5,"unemployed_pct":35.7,"unemployed_pct_moe":59.6,"below_50pct_pop":188,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1041,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930600","tract_display":"9306"},"39155930700":{"tract":"9307","total_pop":4312,"total_below":597,"total_pct":13.8,"total_pct_moe":4.5,"under_18_pop":867,"under_18_below":210,"under_18_pct":24.2,"under_18_pct_moe":12.3,"age_18_64_pop":2674,"age_18_64_below":274,"age_18_64_pct":10.2,"age_18_64_pct_moe":4.3,"age_65_plus_pop":771,"age_65_plus_below":113,"age_65_plus_pct":14.7,"age_65_plus_pct_moe":7.2,"male_pop":2278,"male_below":278,"male_pct":12.2,"male_pct_moe":4.7,"female_pop":2034,"female_below":319,"female_pct":15.7,"female_pct_moe":5.4,"white_pop":4148,"white_below":570,"white_pct":13.7,"white_pct_moe":4.5,"black_pop":15,"black_below":7,"black_pct":46.7,"black_pct_moe":53.3,"hispanic_pop":30,"hispanic_below":6,"hispanic_pct":20.0,"hispanic_pct_moe":37.2,"less_hs_pop":225,"less_hs_below":49,"less_hs_pct":21.8,"less_hs_pct_moe":16.6,"hs_grad_pop":1486,"hs_grad_below":216,"hs_grad_pct":14.5,"hs_grad_pct_moe":6.6,"some_college_pop":947,"some_college_below":62,"some_college_pct":6.5,"some_college_pct_moe":5.1,"bachelors_plus_pop":522,"bachelors_plus_below":41,"bachelors_plus_pct":7.9,"bachelors_plus_pct_moe":7.8,"employed_pop":2307,"employed_below":81,"employed_pct":3.5,"employed_pct_moe":1.9,"unemployed_pop":165,"unemployed_below":7,"unemployed_pct":4.2,"unemployed_pct_moe":9.1,"below_50pct_pop":172,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1353,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930700","tract_display":"9307"},"39155930800":{"tract":"9308","total_pop":4659,"total_below":166,"total_pct":3.6,"total_pct_moe":2.0,"under_18_pop":969,"under_18_below":16,"under_18_pct":1.7,"under_18_pct_moe":2.5,"age_18_64_pop":2462,"age_18_64_below":89,"age_18_64_pct":3.6,"age_18_64_pct_moe":2.2,"age_65_plus_pop":1228,"age_65_plus_below":61,"age_65_plus_pct":5.0,"age_65_plus_pct_moe":4.8,"male_pop":2500,"male_below":63,"male_pct":2.5,"male_pct_moe":2.0,"female_pop":2159,"female_below":103,"female_pct":4.8,"female_pct_moe":2.9,"white_pop":4406,"white_below":156,"white_pct":3.5,"white_pct_moe":2.0,"black_pop":21,"black_below":10,"black_pct":47.6,"black_pct_moe":52.4,"hispanic_pop":63,"hispanic_below":10,"hispanic_pct":15.9,"hispanic_pct_moe":26.5,"less_hs_pop":185,"less_hs_below":10,"less_hs_pct":5.4,"less_hs_pct_moe":10.0,"hs_grad_pop":1723,"hs_grad_below":107,"hs_grad_pct":6.2,"hs_grad_pct_moe":3.9,"some_college_pop":883,"some_college_below":10,"some_college_pct":1.1,"some_college_pct_moe":1.8,"bachelors_plus_pop":617,"bachelors_plus_below":9,"bachelors_plus_pct":1.5,"bachelors_plus_pct_moe":2.6,"employed_pop":2018,"employed_below":48,"employed_pct":2.4,"employed_pct_moe":1.8,"unemployed_pop":85,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":33.9,"below_50pct_pop":43,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":833,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930800","tract_display":"9308"},"39155930900":{"tract":"9309","total_pop":6948,"total_below":645,"total_pct":9.3,"total_pct_moe":3.8,"under_18_pop":1502,"under_18_below":88,"under_18_pct":5.9,"under_18_pct_moe":5.6,"age_18_64_pop":3692,"age_18_64_below":176,"age_18_64_pct":4.8,"age_18_64_pct_moe":3.5,"age_65_plus_pop":1754,"age_65_plus_below":381,"age_65_plus_pct":21.7,"age_65_plus_pct_moe":12.0,"male_pop":3223,"male_below":282,"male_pct":8.7,"male_pct_moe":4.4,"female_pop":3725,"female_below":363,"female_pct":9.7,"female_pct_moe":4.2,"white_pop":6457,"white_below":586,"white_pct":9.1,"white_pct_moe":4.0,"black_pop":27,"black_below":13,"black_pct":48.1,"black_pct_moe":51.9,"hispanic_pop":47,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":46.5,"less_hs_pop":96,"less_hs_below":18,"less_hs_pct":18.8,"less_hs_pct_moe":33.0,"hs_grad_pop":1741,"hs_grad_below":353,"hs_grad_pct":20.3,"hs_grad_pct_moe":10.3,"some_college_pop":1219,"some_college_below":125,"some_college_pct":10.3,"some_college_pct_moe":7.5,"bachelors_plus_pop":1920,"bachelors_plus_below":39,"bachelors_plus_pct":2.0,"bachelors_plus_pct_moe":2.5,"employed_pop":3290,"employed_below":76,"employed_pct":2.3,"employed_pct_moe":2.2,"unemployed_pop":48,"unemployed_below":31,"unemployed_pct":64.6,"unemployed_pct_moe":48.7,"below_50pct_pop":113,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1588,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155930900","tract_display":"9309"},"39155931000":{"tract":"9310","total_pop":5948,"total_below":412,"total_pct":6.9,"total_pct_moe":3.2,"under_18_pop":1050,"under_18_below":0,"under_18_pct":0.0,"under_18_pct_moe":3.5,"age_18_64_pop":3225,"age_18_64_below":265,"age_18_64_pct":8.2,"age_18_64_pct_moe":5.3,"age_65_plus_pop":1673,"age_65_plus_below":147,"age_65_plus_pct":8.8,"age_65_plus_pct_moe":5.8,"male_pop":2916,"male_below":205,"male_pct":7.0,"male_pct_moe":3.8,"female_pop":3032,"female_below":207,"female_pct":6.8,"female_pct_moe":3.7,"white_pop":5613,"white_below":375,"white_pct":6.7,"white_pct_moe":3.3,"black_pop":129,"black_below":2,"black_pct":1.6,"black_pct_moe":2.2,"hispanic_pop":56,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":42.6,"less_hs_pop":313,"less_hs_below":98,"less_hs_pct":31.3,"less_hs_pct_moe":30.0,"hs_grad_pop":1495,"hs_grad_below":167,"hs_grad_pct":11.2,"hs_grad_pct_moe":7.7,"some_college_pop":1497,"some_college_below":126,"some_college_pct":8.4,"some_college_pct_moe":5.5,"bachelors_plus_pop":1287,"bachelors_plus_below":16,"bachelors_plus_pct":1.2,"bachelors_plus_pct_moe":2.1,"employed_pop":2859,"employed_below":35,"employed_pct":1.2,"employed_pct_moe":1.4,"unemployed_pop":26,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":62.5,"below_50pct_pop":103,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1055,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931000","tract_display":"9310"},"39155931100":{"tract":"9311","total_pop":2274,"total_below":254,"total_pct":11.2,"total_pct_moe":5.3,"under_18_pop":270,"under_18_below":55,"under_18_pct":20.4,"under_18_pct_moe":18.5,"age_18_64_pop":1488,"age_18_64_below":142,"age_18_64_pct":9.5,"age_18_64_pct_moe":5.9,"age_65_plus_pop":516,"age_65_plus_below":57,"age_65_plus_pct":11.0,"age_65_plus_pct_moe":7.9,"male_pop":1275,"male_below":116,"male_pct":9.1,"male_pct_moe":5.4,"female_pop":999,"female_below":138,"female_pct":13.8,"female_pct_moe":6.6,"white_pop":2246,"white_below":244,"white_pct":10.9,"white_pct_moe":5.2,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":59,"hispanic_below":59,"hispanic_pct":100.0,"hispanic_pct_moe":41.5,"less_hs_pop":129,"less_hs_below":45,"less_hs_pct":34.9,"less_hs_pct_moe":26.0,"hs_grad_pop":873,"hs_grad_below":122,"hs_grad_pct":14.0,"hs_grad_pct_moe":6.3,"some_college_pop":421,"some_college_below":32,"some_college_pct":7.6,"some_college_pct_moe":8.0,"bachelors_plus_pop":328,"bachelors_plus_below":0,"bachelors_plus_pct":0.0,"bachelors_plus_pct_moe":10.8,"employed_pop":1303,"employed_below":44,"employed_pct":3.4,"employed_pct_moe":3.4,"unemployed_pop":18,"unemployed_below":18,"unemployed_pct":100.0,"unemployed_pct_moe":75.1,"below_50pct_pop":173,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":545,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931100","tract_display":"9311"},"39155931200":{"tract":"9312","total_pop":4046,"total_below":281,"total_pct":6.9,"total_pct_moe":3.6,"under_18_pop":691,"under_18_below":77,"under_18_pct":11.1,"under_18_pct_moe":11.8,"age_18_64_pop":2307,"age_18_64_below":110,"age_18_64_pct":4.8,"age_18_64_pct_moe":2.9,"age_65_plus_pop":1048,"age_65_plus_below":94,"age_65_plus_pct":9.0,"age_65_plus_pct_moe":5.0,"male_pop":1907,"male_below":126,"male_pct":6.6,"male_pct_moe":4.0,"female_pop":2139,"female_below":155,"female_pct":7.2,"female_pct_moe":3.9,"white_pop":3864,"white_below":268,"white_pct":6.9,"white_pct_moe":3.7,"black_pop":3,"black_below":0,"black_pct":0.0,"black_pct_moe":100.0,"hispanic_pop":41,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":49.7,"less_hs_pop":104,"less_hs_below":21,"less_hs_pct":20.2,"less_hs_pct_moe":19.0,"hs_grad_pop":1095,"hs_grad_below":54,"hs_grad_pct":4.9,"hs_grad_pct_moe":3.6,"some_college_pop":959,"some_college_below":90,"some_college_pct":9.4,"some_college_pct_moe":5.5,"bachelors_plus_pop":881,"bachelors_plus_below":27,"bachelors_plus_pct":3.1,"bachelors_plus_pct_moe":3.4,"employed_pop":2013,"employed_below":53,"employed_pct":2.6,"employed_pct_moe":2.1,"unemployed_pop":121,"unemployed_below":11,"unemployed_pct":9.1,"unemployed_pct_moe":17.1,"below_50pct_pop":72,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":741,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931200","tract_display":"9312"},"39155931300":{"tract":"9313","total_pop":4257,"total_below":323,"total_pct":7.6,"total_pct_moe":3.5,"under_18_pop":676,"under_18_below":60,"under_18_pct":8.9,"under_18_pct_moe":8.0,"age_18_64_pop":2337,"age_18_64_below":225,"age_18_64_pct":9.6,"age_18_64_pct_moe":5.3,"age_65_plus_pop":1244,"age_65_plus_below":38,"age_65_plus_pct":3.1,"age_65_plus_pct_moe":3.0,"male_pop":2076,"male_below":124,"male_pct":6.0,"male_pct_moe":3.5,"female_pop":2181,"female_below":199,"female_pct":9.1,"female_pct_moe":5.0,"white_pop":4158,"white_below":321,"white_pct":7.7,"white_pct_moe":3.6,"black_pop":4,"black_below":2,"black_pct":50.0,"black_pct_moe":50.0,"hispanic_pop":19,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":73.1,"less_hs_pop":82,"less_hs_below":1,"less_hs_pct":1.2,"less_hs_pct_moe":6.8,"hs_grad_pop":1643,"hs_grad_below":118,"hs_grad_pct":7.2,"hs_grad_pct_moe":3.7,"some_college_pop":947,"some_college_below":77,"some_college_pct":8.1,"some_college_pct_moe":6.5,"bachelors_plus_pop":724,"bachelors_plus_below":42,"bachelors_plus_pct":5.8,"bachelors_plus_pct_moe":6.3,"employed_pop":1889,"employed_below":41,"employed_pct":2.2,"employed_pct_moe":2.0,"unemployed_pop":65,"unemployed_below":35,"unemployed_pct":53.8,"unemployed_pct_moe":32.1,"below_50pct_pop":145,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":925,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931300","tract_display":"9313"},"39155931400":{"tract":"9314","total_pop":3984,"total_below":638,"total_pct":16.0,"total_pct_moe":6.6,"under_18_pop":812,"under_18_below":162,"under_18_pct":20.0,"under_18_pct_moe":13.6,"age_18_64_pop":2403,"age_18_64_below":387,"age_18_64_pct":16.1,"age_18_64_pct_moe":7.7,"age_65_plus_pop":769,"age_65_plus_below":89,"age_65_plus_pct":11.6,"age_65_plus_pct_moe":7.4,"male_pop":2026,"male_below":312,"male_pct":15.4,"male_pct_moe":8.1,"female_pop":1958,"female_below":326,"female_pct":16.6,"female_pct_moe":7.2,"white_pop":3609,"white_below":548,"white_pct":15.2,"white_pct_moe":6.0,"black_pop":63,"black_below":0,"black_pct":0.0,"black_pct_moe":40.1,"hispanic_pop":30,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":58.2,"less_hs_pop":371,"less_hs_below":125,"less_hs_pct":33.7,"less_hs_pct_moe":21.0,"hs_grad_pop":1333,"hs_grad_below":163,"hs_grad_pct":12.2,"hs_grad_pct_moe":6.9,"some_college_pop":751,"some_college_below":154,"some_college_pct":20.5,"some_college_pct_moe":12.4,"bachelors_plus_pop":572,"bachelors_plus_below":21,"bachelors_plus_pct":3.7,"bachelors_plus_pct_moe":4.9,"employed_pop":1830,"employed_below":136,"employed_pct":7.4,"employed_pct_moe":5.0,"unemployed_pop":117,"unemployed_below":26,"unemployed_pct":22.2,"unemployed_pct_moe":27.0,"below_50pct_pop":179,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":2015,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931400","tract_display":"9314"},"39155931500":{"tract":"9315","total_pop":4067,"total_below":801,"total_pct":19.7,"total_pct_moe":10.3,"under_18_pop":789,"under_18_below":415,"under_18_pct":52.6,"under_18_pct_moe":23.4,"age_18_64_pop":1992,"age_18_64_below":257,"age_18_64_pct":12.9,"age_18_64_pct_moe":9.1,"age_65_plus_pop":1286,"age_65_plus_below":129,"age_65_plus_pct":10.0,"age_65_plus_pct_moe":6.1,"male_pop":2115,"male_below":332,"male_pct":15.7,"male_pct_moe":9.5,"female_pop":1952,"female_below":469,"female_pct":24.0,"female_pct_moe":12.3,"white_pop":3696,"white_below":743,"white_pct":20.1,"white_pct_moe":10.7,"black_pop":31,"black_below":11,"black_pct":35.5,"black_pct_moe":30.5,"hispanic_pop":157,"hispanic_below":66,"hispanic_pct":42.0,"hispanic_pct_moe":36.5,"less_hs_pop":99,"less_hs_below":0,"less_hs_pct":0.0,"less_hs_pct_moe":30.5,"hs_grad_pop":1527,"hs_grad_below":196,"hs_grad_pct":12.8,"hs_grad_pct_moe":9.9,"some_college_pop":898,"some_college_below":74,"some_college_pct":8.2,"some_college_pct_moe":8.1,"bachelors_plus_pop":559,"bachelors_plus_below":91,"bachelors_plus_pct":16.3,"bachelors_plus_pct_moe":13.4,"employed_pop":1740,"employed_below":205,"employed_pct":11.8,"employed_pct_moe":8.5,"unemployed_pop":57,"unemployed_below":31,"unemployed_pct":54.4,"unemployed_pct_moe":54.4,"below_50pct_pop":387,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1594,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931500","tract_display":"9315"},"39155931601":{"tract":"9316.01","total_pop":3923,"total_below":198,"total_pct":5.0,"total_pct_moe":5.2,"under_18_pop":363,"under_18_below":51,"under_18_pct":14.0,"under_18_pct_moe":21.5,"age_18_64_pop":2545,"age_18_64_below":111,"age_18_64_pct":4.4,"age_18_64_pct_moe":5.2,"age_65_plus_pop":1015,"age_65_plus_below":36,"age_65_plus_pct":3.5,"age_65_plus_pct_moe":3.6,"male_pop":1847,"male_below":51,"male_pct":2.8,"male_pct_moe":4.3,"female_pop":2076,"female_below":147,"female_pct":7.1,"female_pct_moe":6.4,"white_pop":3749,"white_below":198,"white_pct":5.3,"white_pct_moe":5.4,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":137,"hispanic_below":42,"hispanic_pct":30.7,"hispanic_pct_moe":41.4,"less_hs_pop":153,"less_hs_below":0,"less_hs_pct":0.0,"less_hs_pct_moe":21.5,"hs_grad_pop":1450,"hs_grad_below":8,"hs_grad_pct":0.6,"hs_grad_pct_moe":0.9,"some_college_pop":799,"some_college_below":70,"some_college_pct":8.8,"some_college_pct_moe":8.7,"bachelors_plus_pop":834,"bachelors_plus_below":0,"bachelors_plus_pct":0.0,"bachelors_plus_pct_moe":4.4,"employed_pop":2422,"employed_below":71,"employed_pct":2.9,"employed_pct_moe":3.2,"unemployed_pop":57,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":42.2,"below_50pct_pop":29,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":777,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931601","tract_display":"9316.01"},"39155931602":{"tract":"9316.02","total_pop":3018,"total_below":133,"total_pct":4.4,"total_pct_moe":3.0,"under_18_pop":706,"under_18_below":22,"under_18_pct":3.1,"under_18_pct_moe":4.6,"age_18_64_pop":1677,"age_18_64_below":105,"age_18_64_pct":6.3,"age_18_64_pct_moe":4.2,"age_65_plus_pop":635,"age_65_plus_below":6,"age_65_plus_pct":0.9,"age_65_plus_pct_moe":1.6,"male_pop":1467,"male_below":90,"male_pct":6.1,"male_pct_moe":4.3,"female_pop":1551,"female_below":43,"female_pct":2.8,"female_pct_moe":2.2,"white_pop":2840,"white_below":133,"white_pct":4.7,"white_pct_moe":3.2,"black_pop":53,"black_below":0,"black_pct":0.0,"black_pct_moe":43.8,"hispanic_pop":26,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":62.5,"less_hs_pop":44,"less_hs_below":11,"less_hs_pct":25.0,"less_hs_pct_moe":31.4,"hs_grad_pop":809,"hs_grad_below":36,"hs_grad_pct":4.4,"hs_grad_pct_moe":4.8,"some_college_pop":531,"some_college_below":24,"some_college_pct":4.5,"some_college_pct_moe":7.1,"bachelors_plus_pop":709,"bachelors_plus_below":16,"bachelors_plus_pct":2.3,"bachelors_plus_pct_moe":3.8,"employed_pop":1494,"employed_below":50,"employed_pct":3.3,"employed_pct_moe":3.1,"unemployed_pop":9,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":100.0,"below_50pct_pop":113,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":366,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931602","tract_display":"9316.02"},"39155931700":{"tract":"9317","total_pop":1855,"total_below":286,"total_pct":15.4,"total_pct_moe":8.8,"under_18_pop":278,"under_18_below":33,"under_18_pct":11.9,"under_18_pct_moe":9.3,"age_18_64_pop":1209,"age_18_64_below":179,"age_18_64_pct":14.8,"age_18_64_pct_moe":9.9,"age_65_plus_pop":368,"age_65_plus_below":74,"age_65_plus_pct":20.1,"age_65_plus_pct_moe":13.8,"male_pop":933,"male_below":132,"male_pct":14.1,"male_pct_moe":8.8,"female_pop":922,"female_below":154,"female_pct":16.7,"female_pct_moe":10.0,"white_pop":1639,"white_below":262,"white_pct":16.0,"white_pct_moe":9.8,"black_pop":179,"black_below":9,"black_pct":5.0,"black_pct_moe":10.5,"hispanic_pop":39,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":51.0,"less_hs_pop":97,"less_hs_below":38,"less_hs_pct":39.2,"less_hs_pct_moe":38.2,"hs_grad_pop":644,"hs_grad_below":55,"hs_grad_pct":8.5,"hs_grad_pct_moe":5.8,"some_college_pop":376,"some_college_below":42,"some_college_pct":11.2,"some_college_pct_moe":8.9,"bachelors_plus_pop":283,"bachelors_plus_below":73,"bachelors_plus_pct":25.8,"bachelors_plus_pct_moe":15.9,"employed_pop":853,"employed_below":32,"employed_pct":3.8,"employed_pct_moe":2.5,"unemployed_pop":88,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":33.2,"below_50pct_pop":116,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":755,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931700","tract_display":"9317"},"39155931900":{"tract":"9319","total_pop":5952,"total_below":1697,"total_pct":28.5,"total_pct_moe":11.4,"under_18_pop":1569,"under_18_below":930,"under_18_pct":59.3,"under_18_pct_moe":25.0,"age_18_64_pop":3203,"age_18_64_below":658,"age_18_64_pct":20.5,"age_18_64_pct_moe":7.9,"age_65_plus_pop":1180,"age_65_plus_below":109,"age_65_plus_pct":9.2,"age_65_plus_pct_moe":8.3,"male_pop":2670,"male_below":547,"male_pct":20.5,"male_pct_moe":9.0,"female_pop":3282,"female_below":1150,"female_pct":35.0,"female_pct_moe":14.7,"white_pop":3177,"white_below":412,"white_pct":13.0,"white_pct_moe":5.6,"black_pop":1554,"black_below":580,"black_pct":37.3,"black_pct_moe":24.1,"hispanic_pop":344,"hispanic_below":115,"hispanic_pct":33.4,"hispanic_pct_moe":39.9,"less_hs_pop":233,"less_hs_below":98,"less_hs_pct":42.1,"less_hs_pct_moe":29.0,"hs_grad_pop":1023,"hs_grad_below":135,"hs_grad_pct":13.2,"hs_grad_pct_moe":9.7,"some_college_pop":1722,"some_college_below":367,"some_college_pct":21.3,"some_college_pct_moe":10.9,"bachelors_plus_pop":954,"bachelors_plus_below":82,"bachelors_plus_pct":8.6,"bachelors_plus_pct_moe":7.4,"employed_pop":2597,"employed_below":385,"employed_pct":14.8,"employed_pct_moe":7.1,"unemployed_pop":152,"unemployed_below":16,"unemployed_pct":10.5,"unemployed_pct_moe":17.8,"below_50pct_pop":701,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":2828,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155931900","tract_display":"9319"},"39155932000":{"tract":"9320","total_pop":5540,"total_below":759,"total_pct":13.7,"total_pct_moe":13.9,"under_18_pop":1218,"under_18_below":402,"under_18_pct":33.0,"under_18_pct_moe":36.8,"age_18_64_pop":3207,"age_18_64_below":336,"age_18_64_pct":10.5,"age_18_64_pct_moe":8.5,"age_65_plus_pop":1115,"age_65_plus_below":21,"age_65_plus_pct":1.9,"age_65_plus_pct_moe":2.5,"male_pop":2610,"male_below":257,"male_pct":9.8,"male_pct_moe":11.4,"female_pop":2930,"female_below":502,"female_pct":17.1,"female_pct_moe":16.2,"white_pop":4904,"white_below":741,"white_pct":15.1,"white_pct_moe":15.5,"black_pop":304,"black_below":3,"black_pct":1.0,"black_pct_moe":1.3,"hispanic_pop":187,"hispanic_below":15,"hispanic_pct":8.0,"hispanic_pct_moe":21.6,"less_hs_pop":254,"less_hs_below":89,"less_hs_pct":35.0,"less_hs_pct_moe":37.0,"hs_grad_pop":1328,"hs_grad_below":84,"hs_grad_pct":6.3,"hs_grad_pct_moe":9.9,"some_college_pop":1403,"some_college_below":96,"some_college_pct":6.8,"some_college_pct_moe":7.1,"bachelors_plus_pop":1024,"bachelors_plus_below":73,"bachelors_plus_pct":7.1,"bachelors_plus_pct_moe":7.4,"employed_pop":2797,"employed_below":114,"employed_pct":4.1,"employed_pct_moe":4.9,"unemployed_pop":90,"unemployed_below":49,"unemployed_pct":54.4,"unemployed_pct_moe":54.4,"below_50pct_pop":737,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1597,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932000","tract_display":"9320"},"39155932200":{"tract":"9322","total_pop":2620,"total_below":717,"total_pct":27.4,"total_pct_moe":11.1,"under_18_pop":615,"under_18_below":103,"under_18_pct":16.7,"under_18_pct_moe":16.8,"age_18_64_pop":1558,"age_18_64_below":477,"age_18_64_pct":30.6,"age_18_64_pct_moe":12.6,"age_65_plus_pop":447,"age_65_plus_below":137,"age_65_plus_pct":30.6,"age_65_plus_pct_moe":20.0,"male_pop":1273,"male_below":335,"male_pct":26.3,"male_pct_moe":15.9,"female_pop":1347,"female_below":382,"female_pct":28.4,"female_pct_moe":11.8,"white_pop":2280,"white_below":612,"white_pct":26.8,"white_pct_moe":12.4,"black_pop":201,"black_below":37,"black_pct":18.4,"black_pct_moe":31.7,"hispanic_pop":116,"hispanic_below":64,"hispanic_pct":55.2,"hispanic_pct_moe":11.8,"less_hs_pop":98,"less_hs_below":55,"less_hs_pct":56.1,"less_hs_pct_moe":40.3,"hs_grad_pop":754,"hs_grad_below":269,"hs_grad_pct":35.7,"hs_grad_pct_moe":15.9,"some_college_pop":425,"some_college_below":85,"some_college_pct":20.0,"some_college_pct_moe":14.8,"bachelors_plus_pop":493,"bachelors_plus_below":55,"bachelors_plus_pct":11.2,"bachelors_plus_pct_moe":9.6,"employed_pop":995,"employed_below":58,"employed_pct":5.8,"employed_pct_moe":5.5,"unemployed_pop":103,"unemployed_below":50,"unemployed_pct":48.5,"unemployed_pct_moe":49.3,"below_50pct_pop":385,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1413,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932200","tract_display":"9322"},"39155932300":{"tract":"9323","total_pop":5756,"total_below":704,"total_pct":12.2,"total_pct_moe":6.3,"under_18_pop":1097,"under_18_below":247,"under_18_pct":22.5,"under_18_pct_moe":16.1,"age_18_64_pop":3558,"age_18_64_below":393,"age_18_64_pct":11.0,"age_18_64_pct_moe":5.6,"age_65_plus_pop":1101,"age_65_plus_below":64,"age_65_plus_pct":5.8,"age_65_plus_pct_moe":5.7,"male_pop":2485,"male_below":260,"male_pct":10.5,"male_pct_moe":6.1,"female_pop":3271,"female_below":444,"female_pct":13.6,"female_pct_moe":8.9,"white_pop":5534,"white_below":686,"white_pct":12.4,"white_pct_moe":6.5,"black_pop":133,"black_below":17,"black_pct":12.8,"black_pct_moe":21.4,"hispanic_pop":0,"hispanic_below":0,"hispanic_pct":null,"hispanic_pct_moe":null,"less_hs_pop":186,"less_hs_below":16,"less_hs_pct":8.6,"less_hs_pct_moe":13.0,"hs_grad_pop":1527,"hs_grad_below":108,"hs_grad_pct":7.1,"hs_grad_pct_moe":5.7,"some_college_pop":1435,"some_college_below":279,"some_college_pct":19.4,"some_college_pct_moe":11.0,"bachelors_plus_pop":958,"bachelors_plus_below":36,"bachelors_plus_pct":3.8,"bachelors_plus_pct_moe":4.5,"employed_pop":2691,"employed_below":141,"employed_pct":5.2,"employed_pct_moe":3.9,"unemployed_pop":72,"unemployed_below":20,"unemployed_pct":27.8,"unemployed_pct_moe":38.4,"below_50pct_pop":349,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1966,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932300","tract_display":"9323"},"39155932500":{"tract":"9325","total_pop":3127,"total_below":119,"total_pct":3.8,"total_pct_moe":2.6,"under_18_pop":576,"under_18_below":20,"under_18_pct":3.5,"under_18_pct_moe":5.0,"age_18_64_pop":1888,"age_18_64_below":40,"age_18_64_pct":2.1,"age_18_64_pct_moe":1.8,"age_65_plus_pop":663,"age_65_plus_below":59,"age_65_plus_pct":8.9,"age_65_plus_pct_moe":8.9,"male_pop":1428,"male_below":52,"male_pct":3.6,"male_pct_moe":4.0,"female_pop":1699,"female_below":67,"female_pct":3.9,"female_pct_moe":3.5,"white_pop":3053,"white_below":119,"white_pct":3.9,"white_pct_moe":2.7,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":0,"hispanic_below":0,"hispanic_pct":null,"hispanic_pct_moe":null,"less_hs_pop":146,"less_hs_below":38,"less_hs_pct":26.0,"less_hs_pct_moe":34.4,"hs_grad_pop":781,"hs_grad_below":42,"hs_grad_pct":5.4,"hs_grad_pct_moe":4.5,"some_college_pop":659,"some_college_below":13,"some_college_pct":2.0,"some_college_pct_moe":2.3,"bachelors_plus_pop":638,"bachelors_plus_below":6,"bachelors_plus_pct":0.9,"bachelors_plus_pct_moe":1.7,"employed_pop":1580,"employed_below":15,"employed_pct":0.9,"employed_pct_moe":1.2,"unemployed_pop":26,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":62.5,"below_50pct_pop":52,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":539,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932500","tract_display":"9325"},"39155932600":{"tract":"9326","total_pop":3552,"total_below":279,"total_pct":7.9,"total_pct_moe":3.7,"under_18_pop":520,"under_18_below":0,"under_18_pct":0.0,"under_18_pct_moe":7.0,"age_18_64_pop":2339,"age_18_64_below":205,"age_18_64_pct":8.8,"age_18_64_pct_moe":4.3,"age_65_plus_pop":693,"age_65_plus_below":74,"age_65_plus_pct":10.7,"age_65_plus_pct_moe":8.1,"male_pop":1700,"male_below":186,"male_pct":10.9,"male_pct_moe":6.2,"female_pop":1852,"female_below":93,"female_pct":5.0,"female_pct_moe":3.2,"white_pop":3285,"white_below":279,"white_pct":8.5,"white_pct_moe":4.0,"black_pop":9,"black_below":0,"black_pct":0.0,"black_pct_moe":100.0,"hispanic_pop":39,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":51.0,"less_hs_pop":161,"less_hs_below":19,"less_hs_pct":11.8,"less_hs_pct_moe":11.4,"hs_grad_pop":1308,"hs_grad_below":109,"hs_grad_pct":8.3,"hs_grad_pct_moe":5.0,"some_college_pop":673,"some_college_below":69,"some_college_pct":10.3,"some_college_pct_moe":10.0,"bachelors_plus_pop":428,"bachelors_plus_below":0,"bachelors_plus_pct":0.0,"bachelors_plus_pct_moe":8.4,"employed_pop":2109,"employed_below":76,"employed_pct":3.6,"employed_pct_moe":2.9,"unemployed_pop":133,"unemployed_below":60,"unemployed_pct":45.1,"unemployed_pct_moe":32.2,"below_50pct_pop":70,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1250,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932600","tract_display":"9326"},"39155932701":{"tract":"9327.01","total_pop":6140,"total_below":772,"total_pct":12.6,"total_pct_moe":4.4,"under_18_pop":980,"under_18_below":193,"under_18_pct":19.7,"under_18_pct_moe":11.7,"age_18_64_pop":3420,"age_18_64_below":424,"age_18_64_pct":12.4,"age_18_64_pct_moe":5.2,"age_65_plus_pop":1740,"age_65_plus_below":155,"age_65_plus_pct":8.9,"age_65_plus_pct_moe":5.9,"male_pop":2921,"male_below":198,"male_pct":6.8,"male_pct_moe":4.0,"female_pop":3219,"female_below":574,"female_pct":17.8,"female_pct_moe":6.9,"white_pop":5147,"white_below":462,"white_pct":9.0,"white_pct_moe":4.1,"black_pop":505,"black_below":76,"black_pct":15.0,"black_pct_moe":21.4,"hispanic_pop":365,"hispanic_below":156,"hispanic_pct":42.7,"hispanic_pct_moe":33.4,"less_hs_pop":279,"less_hs_below":92,"less_hs_pct":33.0,"less_hs_pct_moe":29.1,"hs_grad_pop":2126,"hs_grad_below":149,"hs_grad_pct":7.0,"hs_grad_pct_moe":4.7,"some_college_pop":1318,"some_college_below":173,"some_college_pct":13.1,"some_college_pct_moe":7.9,"bachelors_plus_pop":983,"bachelors_plus_below":33,"bachelors_plus_pct":3.4,"bachelors_plus_pct_moe":3.9,"employed_pop":2847,"employed_below":170,"employed_pct":6.0,"employed_pct_moe":4.4,"unemployed_pop":108,"unemployed_below":33,"unemployed_pct":30.6,"unemployed_pct_moe":32.3,"below_50pct_pop":529,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":2019,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932701","tract_display":"9327.01"},"39155932702":{"tract":"9327.02","total_pop":2321,"total_below":305,"total_pct":13.1,"total_pct_moe":4.2,"under_18_pop":386,"under_18_below":7,"under_18_pct":1.8,"under_18_pct_moe":4.9,"age_18_64_pop":1501,"age_18_64_below":176,"age_18_64_pct":11.7,"age_18_64_pct_moe":5.4,"age_65_plus_pop":434,"age_65_plus_below":122,"age_65_plus_pct":28.1,"age_65_plus_pct_moe":16.5,"male_pop":1053,"male_below":162,"male_pct":15.4,"male_pct_moe":6.7,"female_pop":1268,"female_below":143,"female_pct":11.3,"female_pct_moe":5.3,"white_pop":2070,"white_below":248,"white_pct":12.0,"white_pct_moe":4.6,"black_pop":42,"black_below":34,"black_pct":81.0,"black_pct_moe":44.9,"hispanic_pop":2,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":100.0,"less_hs_pop":181,"less_hs_below":35,"less_hs_pct":19.3,"less_hs_pct_moe":17.9,"hs_grad_pop":744,"hs_grad_below":190,"hs_grad_pct":25.5,"hs_grad_pct_moe":11.9,"some_college_pop":487,"some_college_below":37,"some_college_pct":7.6,"some_college_pct_moe":8.9,"bachelors_plus_pop":383,"bachelors_plus_below":25,"bachelors_plus_pct":6.5,"bachelors_plus_pct_moe":5.8,"employed_pop":1134,"employed_below":64,"employed_pct":5.6,"employed_pct_moe":4.7,"unemployed_pop":74,"unemployed_below":19,"unemployed_pct":25.7,"unemployed_pct_moe":29.6,"below_50pct_pop":176,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":923,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932702","tract_display":"9327.02"},"39155932801":{"tract":"9328.01","total_pop":2676,"total_below":228,"total_pct":8.5,"total_pct_moe":6.1,"under_18_pop":420,"under_18_below":35,"under_18_pct":8.3,"under_18_pct_moe":10.3,"age_18_64_pop":1723,"age_18_64_below":193,"age_18_64_pct":11.2,"age_18_64_pct_moe":7.6,"age_65_plus_pop":533,"age_65_plus_below":0,"age_65_plus_pct":0.0,"age_65_plus_pct_moe":6.8,"male_pop":1240,"male_below":44,"male_pct":3.5,"male_pct_moe":3.0,"female_pop":1436,"female_below":184,"female_pct":12.8,"female_pct_moe":10.2,"white_pop":2360,"white_below":211,"white_pct":8.9,"white_pct_moe":6.8,"black_pop":111,"black_below":17,"black_pct":15.3,"black_pct_moe":23.8,"hispanic_pop":13,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":88.4,"less_hs_pop":125,"less_hs_below":0,"less_hs_pct":0.0,"less_hs_pct_moe":25.5,"hs_grad_pop":1146,"hs_grad_below":117,"hs_grad_pct":10.2,"hs_grad_pct_moe":8.9,"some_college_pop":353,"some_college_below":28,"some_college_pct":7.9,"some_college_pct_moe":6.8,"bachelors_plus_pop":423,"bachelors_plus_below":8,"bachelors_plus_pct":1.9,"bachelors_plus_pct_moe":4.0,"employed_pop":1429,"employed_below":59,"employed_pct":4.1,"employed_pct_moe":3.5,"unemployed_pop":82,"unemployed_below":30,"unemployed_pct":36.6,"unemployed_pct_moe":33.8,"below_50pct_pop":137,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":830,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932801","tract_display":"9328.01"},"39155932802":{"tract":"9328.02","total_pop":3401,"total_below":742,"total_pct":21.8,"total_pct_moe":10.3,"under_18_pop":818,"under_18_below":305,"under_18_pct":37.3,"under_18_pct_moe":23.4,"age_18_64_pop":2113,"age_18_64_below":396,"age_18_64_pct":18.7,"age_18_64_pct_moe":8.7,"age_65_plus_pop":470,"age_65_plus_below":41,"age_65_plus_pct":8.7,"age_65_plus_pct_moe":6.5,"male_pop":1684,"male_below":399,"male_pct":23.7,"male_pct_moe":12.3,"female_pop":1717,"female_below":343,"female_pct":20.0,"female_pct_moe":9.5,"white_pop":3220,"white_below":661,"white_pct":20.5,"white_pct_moe":10.4,"black_pop":13,"black_below":13,"black_pct":100.0,"black_pct_moe":88.4,"hispanic_pop":54,"hispanic_below":39,"hispanic_pct":72.2,"hispanic_pct_moe":44.7,"less_hs_pop":390,"less_hs_below":136,"less_hs_pct":34.9,"less_hs_pct_moe":21.1,"hs_grad_pop":938,"hs_grad_below":184,"hs_grad_pct":19.6,"hs_grad_pct_moe":9.8,"some_college_pop":587,"some_college_below":37,"some_college_pct":6.3,"some_college_pct_moe":6.2,"bachelors_plus_pop":284,"bachelors_plus_below":17,"bachelors_plus_pct":6.0,"bachelors_plus_pct_moe":10.5,"employed_pop":1316,"employed_below":184,"employed_pct":14.0,"employed_pct_moe":8.7,"unemployed_pop":30,"unemployed_below":21,"unemployed_pct":70.0,"unemployed_pct_moe":53.4,"below_50pct_pop":382,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1813,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932802","tract_display":"9328.02"},"39155932900":{"tract":"9329","total_pop":2411,"total_below":438,"total_pct":18.2,"total_pct_moe":9.9,"under_18_pop":553,"under_18_below":198,"under_18_pct":35.8,"under_18_pct_moe":22.0,"age_18_64_pop":1421,"age_18_64_below":207,"age_18_64_pct":14.6,"age_18_64_pct_moe":8.1,"age_65_plus_pop":437,"age_65_plus_below":33,"age_65_plus_pct":7.6,"age_65_plus_pct_moe":5.2,"male_pop":1249,"male_below":224,"male_pct":17.9,"male_pct_moe":9.5,"female_pop":1162,"female_below":214,"female_pct":18.4,"female_pct_moe":11.4,"white_pop":2179,"white_below":399,"white_pct":18.3,"white_pct_moe":10.6,"black_pop":143,"black_below":0,"black_pct":0.0,"black_pct_moe":22.8,"hispanic_pop":12,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":92.0,"less_hs_pop":65,"less_hs_below":6,"less_hs_pct":9.2,"less_hs_pct_moe":17.2,"hs_grad_pop":590,"hs_grad_below":87,"hs_grad_pct":14.7,"hs_grad_pct_moe":10.1,"some_college_pop":402,"some_college_below":80,"some_college_pct":19.9,"some_college_pct_moe":14.5,"bachelors_plus_pop":595,"bachelors_plus_below":59,"bachelors_plus_pct":9.9,"bachelors_plus_pct_moe":10.0,"employed_pop":996,"employed_below":95,"employed_pct":9.5,"employed_pct_moe":7.3,"unemployed_pop":32,"unemployed_below":16,"unemployed_pct":50.0,"unemployed_pct_moe":50.0,"below_50pct_pop":117,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":674,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155932900","tract_display":"9329"},"39155933001":{"tract":"9330.01","total_pop":5643,"total_below":515,"total_pct":9.1,"total_pct_moe":5.7,"under_18_pop":1312,"under_18_below":180,"under_18_pct":13.7,"under_18_pct_moe":12.6,"age_18_64_pop":3034,"age_18_64_below":227,"age_18_64_pct":7.5,"age_18_64_pct_moe":6.6,"age_65_plus_pop":1297,"age_65_plus_below":108,"age_65_plus_pct":8.3,"age_65_plus_pct_moe":7.2,"male_pop":2737,"male_below":179,"male_pct":6.5,"male_pct_moe":5.7,"female_pop":2906,"female_below":336,"female_pct":11.6,"female_pct_moe":7.2,"white_pop":5208,"white_below":515,"white_pct":9.9,"white_pct_moe":6.1,"black_pop":83,"black_below":0,"black_pct":0.0,"black_pct_moe":34.5,"hispanic_pop":190,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":17.8,"less_hs_pop":12,"less_hs_below":5,"less_hs_pct":41.7,"less_hs_pct_moe":58.3,"hs_grad_pop":975,"hs_grad_below":56,"hs_grad_pct":5.7,"hs_grad_pct_moe":5.5,"some_college_pop":1092,"some_college_below":208,"some_college_pct":19.0,"some_college_pct_moe":16.4,"bachelors_plus_pop":1732,"bachelors_plus_below":52,"bachelors_plus_pct":3.0,"bachelors_plus_pct_moe":3.0,"employed_pop":2739,"employed_below":60,"employed_pct":2.2,"employed_pct_moe":3.1,"unemployed_pop":208,"unemployed_below":136,"unemployed_pct":65.4,"unemployed_pct_moe":51.9,"below_50pct_pop":101,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":840,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933001","tract_display":"9330.01"},"39155933002":{"tract":"9330.02","total_pop":3922,"total_below":91,"total_pct":2.3,"total_pct_moe":1.8,"under_18_pop":536,"under_18_below":29,"under_18_pct":5.4,"under_18_pct_moe":6.3,"age_18_64_pop":2280,"age_18_64_below":0,"age_18_64_pct":0.0,"age_18_64_pct_moe":1.6,"age_65_plus_pop":1106,"age_65_plus_below":62,"age_65_plus_pct":5.6,"age_65_plus_pct_moe":4.8,"male_pop":1898,"male_below":15,"male_pct":0.8,"male_pct_moe":0.9,"female_pop":2024,"female_below":76,"female_pct":3.8,"female_pct_moe":2.8,"white_pop":3574,"white_below":91,"white_pct":2.5,"white_pct_moe":1.9,"black_pop":132,"black_below":0,"black_pct":0.0,"black_pct_moe":24.4,"hispanic_pop":25,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":63.7,"less_hs_pop":147,"less_hs_below":0,"less_hs_pct":0.0,"less_hs_pct_moe":22.3,"hs_grad_pop":1080,"hs_grad_below":24,"hs_grad_pct":2.2,"hs_grad_pct_moe":2.2,"some_college_pop":924,"some_college_below":23,"some_college_pct":2.5,"some_college_pct_moe":2.4,"bachelors_plus_pop":1054,"bachelors_plus_below":15,"bachelors_plus_pct":1.4,"bachelors_plus_pct_moe":1.7,"employed_pop":2158,"employed_below":0,"employed_pct":0.0,"employed_pct_moe":1.7,"unemployed_pop":29,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":59.2,"below_50pct_pop":53,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":500,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933002","tract_display":"9330.02"},"39155933100":{"tract":"9331","total_pop":2099,"total_below":346,"total_pct":16.5,"total_pct_moe":8.7,"under_18_pop":468,"under_18_below":136,"under_18_pct":29.1,"under_18_pct_moe":22.8,"age_18_64_pop":1160,"age_18_64_below":180,"age_18_64_pct":15.5,"age_18_64_pct_moe":7.7,"age_65_plus_pop":471,"age_65_plus_below":30,"age_65_plus_pct":6.4,"age_65_plus_pct_moe":5.3,"male_pop":1036,"male_below":141,"male_pct":13.6,"male_pct_moe":7.7,"female_pop":1063,"female_below":205,"female_pct":19.3,"female_pct_moe":11.2,"white_pop":2046,"white_below":346,"white_pct":16.9,"white_pct_moe":8.9,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":5,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":100.0,"less_hs_pop":141,"less_hs_below":38,"less_hs_pct":27.0,"less_hs_pct_moe":23.3,"hs_grad_pop":812,"hs_grad_below":76,"hs_grad_pct":9.4,"hs_grad_pct_moe":5.3,"some_college_pop":345,"some_college_below":73,"some_college_pct":21.2,"some_college_pct_moe":15.3,"bachelors_plus_pop":78,"bachelors_plus_below":0,"bachelors_plus_pct":0.0,"bachelors_plus_pct_moe":35.8,"employed_pop":827,"employed_below":53,"employed_pct":6.4,"employed_pct_moe":5.0,"unemployed_pop":66,"unemployed_below":55,"unemployed_pct":83.3,"unemployed_pct_moe":18.3,"below_50pct_pop":55,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":778,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933100","tract_display":"9331"},"39155933301":{"tract":"9333.01","total_pop":1978,"total_below":329,"total_pct":16.6,"total_pct_moe":6.4,"under_18_pop":242,"under_18_below":50,"under_18_pct":20.7,"under_18_pct_moe":17.9,"age_18_64_pop":1114,"age_18_64_below":199,"age_18_64_pct":17.9,"age_18_64_pct_moe":8.8,"age_65_plus_pop":622,"age_65_plus_below":80,"age_65_plus_pct":12.9,"age_65_plus_pct_moe":8.0,"male_pop":1007,"male_below":154,"male_pct":15.3,"male_pct_moe":8.0,"female_pop":971,"female_below":175,"female_pct":18.0,"female_pct_moe":8.2,"white_pop":1884,"white_below":316,"white_pct":16.8,"white_pct_moe":6.5,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":0,"hispanic_below":0,"hispanic_pct":null,"hispanic_pct_moe":null,"less_hs_pop":133,"less_hs_below":29,"less_hs_pct":21.8,"less_hs_pct_moe":29.5,"hs_grad_pop":733,"hs_grad_below":158,"hs_grad_pct":21.6,"hs_grad_pct_moe":11.1,"some_college_pop":393,"some_college_below":65,"some_college_pct":16.5,"some_college_pct_moe":13.6,"bachelors_plus_pop":345,"bachelors_plus_below":27,"bachelors_plus_pct":7.8,"bachelors_plus_pct_moe":6.3,"employed_pop":829,"employed_below":46,"employed_pct":5.5,"employed_pct_moe":4.2,"unemployed_pop":52,"unemployed_below":16,"unemployed_pct":30.8,"unemployed_pct_moe":29.7,"below_50pct_pop":164,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":748,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933301","tract_display":"9333.01"},"39155933302":{"tract":"9333.02","total_pop":4650,"total_below":442,"total_pct":9.5,"total_pct_moe":6.9,"under_18_pop":884,"under_18_below":158,"under_18_pct":17.9,"under_18_pct_moe":17.4,"age_18_64_pop":2795,"age_18_64_below":207,"age_18_64_pct":7.4,"age_18_64_pct_moe":6.1,"age_65_plus_pop":971,"age_65_plus_below":77,"age_65_plus_pct":7.9,"age_65_plus_pct_moe":5.6,"male_pop":2412,"male_below":188,"male_pct":7.8,"male_pct_moe":6.4,"female_pop":2238,"female_below":254,"female_pct":11.3,"female_pct_moe":8.3,"white_pop":4491,"white_below":402,"white_pct":9.0,"white_pct_moe":6.5,"black_pop":0,"black_below":0,"black_pct":null,"black_pct_moe":null,"hispanic_pop":0,"hispanic_below":0,"hispanic_pct":null,"hispanic_pct_moe":null,"less_hs_pop":178,"less_hs_below":25,"less_hs_pct":14.0,"less_hs_pct_moe":14.5,"hs_grad_pop":1773,"hs_grad_below":197,"hs_grad_pct":11.1,"hs_grad_pct_moe":8.7,"some_college_pop":887,"some_college_below":28,"some_college_pct":3.2,"some_college_pct_moe":3.9,"bachelors_plus_pop":574,"bachelors_plus_below":10,"bachelors_plus_pct":1.7,"bachelors_plus_pct_moe":2.7,"employed_pop":2101,"employed_below":77,"employed_pct":3.7,"employed_pct_moe":3.4,"unemployed_pop":29,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":59.2,"below_50pct_pop":303,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1093,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933302","tract_display":"9333.02"},"39155933400":{"tract":"9334","total_pop":3329,"total_below":258,"total_pct":7.8,"total_pct_moe":5.3,"under_18_pop":554,"under_18_below":65,"under_18_pct":11.7,"under_18_pct_moe":16.6,"age_18_64_pop":1854,"age_18_64_below":141,"age_18_64_pct":7.6,"age_18_64_pct_moe":5.7,"age_65_plus_pop":921,"age_65_plus_below":52,"age_65_plus_pct":5.6,"age_65_plus_pct_moe":6.5,"male_pop":1586,"male_below":170,"male_pct":10.7,"male_pct_moe":7.9,"female_pop":1743,"female_below":88,"female_pct":5.0,"female_pct_moe":4.5,"white_pop":3159,"white_below":258,"white_pct":8.2,"white_pct_moe":5.7,"black_pop":40,"black_below":0,"black_pct":0.0,"black_pct_moe":50.4,"hispanic_pop":46,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":47.0,"less_hs_pop":318,"less_hs_below":38,"less_hs_pct":11.9,"less_hs_pct_moe":18.0,"hs_grad_pop":1066,"hs_grad_below":71,"hs_grad_pct":6.7,"hs_grad_pct_moe":5.3,"some_college_pop":743,"some_college_below":52,"some_college_pct":7.0,"some_college_pct_moe":10.8,"bachelors_plus_pop":428,"bachelors_plus_below":21,"bachelors_plus_pct":4.9,"bachelors_plus_pct_moe":5.7,"employed_pop":1414,"employed_below":108,"employed_pct":7.6,"employed_pct_moe":6.9,"unemployed_pop":33,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":55.5,"below_50pct_pop":160,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":773,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933400","tract_display":"9334"},"39155933500":{"tract":"9335","total_pop":3963,"total_below":424,"total_pct":10.7,"total_pct_moe":5.5,"under_18_pop":901,"under_18_below":174,"under_18_pct":19.3,"under_18_pct_moe":13.4,"age_18_64_pop":1924,"age_18_64_below":192,"age_18_64_pct":10.0,"age_18_64_pct_moe":5.7,"age_65_plus_pop":1138,"age_65_plus_below":58,"age_65_plus_pct":5.1,"age_65_plus_pct_moe":3.8,"male_pop":2076,"male_below":212,"male_pct":10.2,"male_pct_moe":6.4,"female_pop":1887,"female_below":212,"female_pct":11.2,"female_pct_moe":8.1,"white_pop":3792,"white_below":424,"white_pct":11.2,"white_pct_moe":5.7,"black_pop":43,"black_below":0,"black_pct":0.0,"black_pct_moe":48.6,"hispanic_pop":34,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":54.6,"less_hs_pop":323,"less_hs_below":49,"less_hs_pct":15.2,"less_hs_pct_moe":15.0,"hs_grad_pop":1172,"hs_grad_below":111,"hs_grad_pct":9.5,"hs_grad_pct_moe":5.7,"some_college_pop":916,"some_college_below":64,"some_college_pct":7.0,"some_college_pct_moe":6.6,"bachelors_plus_pop":440,"bachelors_plus_below":0,"bachelors_plus_pct":0.0,"bachelors_plus_pct_moe":8.2,"employed_pop":1494,"employed_below":76,"employed_pct":5.1,"employed_pct_moe":4.6,"unemployed_pop":79,"unemployed_below":36,"unemployed_pct":45.6,"unemployed_pct_moe":40.1,"below_50pct_pop":122,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":978,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933500","tract_display":"9335"},"39155933600":{"tract":"9336","total_pop":4550,"total_below":591,"total_pct":13.0,"total_pct_moe":4.4,"under_18_pop":685,"under_18_below":16,"under_18_pct":2.3,"under_18_pct_moe":4.4,"age_18_64_pop":2775,"age_18_64_below":467,"age_18_64_pct":16.8,"age_18_64_pct_moe":6.0,"age_65_plus_pop":1090,"age_65_plus_below":108,"age_65_plus_pct":9.9,"age_65_plus_pct_moe":6.8,"male_pop":2123,"male_below":221,"male_pct":10.4,"male_pct_moe":5.9,"female_pop":2427,"female_below":370,"female_pct":15.2,"female_pct_moe":7.0,"white_pop":4285,"white_below":542,"white_pct":12.6,"white_pct_moe":4.6,"black_pop":138,"black_below":49,"black_pct":35.5,"black_pct_moe":56.1,"hispanic_pop":101,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":30.1,"less_hs_pop":268,"less_hs_below":55,"less_hs_pct":20.5,"less_hs_pct_moe":13.7,"hs_grad_pop":1687,"hs_grad_below":440,"hs_grad_pct":26.1,"hs_grad_pct_moe":9.8,"some_college_pop":974,"some_college_below":34,"some_college_pct":3.5,"some_college_pct_moe":3.9,"bachelors_plus_pop":638,"bachelors_plus_below":16,"bachelors_plus_pct":2.5,"bachelors_plus_pct_moe":4.4,"employed_pop":2124,"employed_below":88,"employed_pct":4.1,"employed_pct_moe":3.9,"unemployed_pop":165,"unemployed_below":74,"unemployed_pct":44.8,"unemployed_pct_moe":34.9,"below_50pct_pop":315,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1674,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933600","tract_display":"9336"},"39155933700":{"tract":"9337","total_pop":2375,"total_below":362,"total_pct":15.2,"total_pct_moe":6.7,"under_18_pop":394,"under_18_below":105,"under_18_pct":26.6,"under_18_pct_moe":16.5,"age_18_64_pop":1207,"age_18_64_below":227,"age_18_64_pct":18.8,"age_18_64_pct_moe":7.1,"age_65_plus_pop":774,"age_65_plus_below":30,"age_65_plus_pct":3.9,"age_65_plus_pct_moe":4.3,"male_pop":1139,"male_below":173,"male_pct":15.2,"male_pct_moe":8.3,"female_pop":1236,"female_below":189,"female_pct":15.3,"female_pct_moe":7.6,"white_pop":2208,"white_below":324,"white_pct":14.7,"white_pct_moe":7.1,"black_pop":37,"black_below":0,"black_pct":0.0,"black_pct_moe":52.4,"hispanic_pop":84,"hispanic_below":38,"hispanic_pct":45.2,"hispanic_pct_moe":14.7,"less_hs_pop":182,"less_hs_below":45,"less_hs_pct":24.7,"less_hs_pct_moe":26.9,"hs_grad_pop":1016,"hs_grad_below":92,"hs_grad_pct":9.1,"hs_grad_pct_moe":6.9,"some_college_pop":441,"some_college_below":81,"some_college_pct":18.4,"some_college_pct_moe":13.1,"bachelors_plus_pop":223,"bachelors_plus_below":8,"bachelors_plus_pct":3.6,"bachelors_plus_pct_moe":6.4,"employed_pop":877,"employed_below":40,"employed_pct":4.6,"employed_pct_moe":4.3,"unemployed_pop":11,"unemployed_below":0,"unemployed_pct":0.0,"unemployed_pct_moe":96.0,"below_50pct_pop":135,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":635,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933700","tract_display":"9337"},"39155933800":{"tract":"9338","total_pop":2126,"total_below":1056,"total_pct":49.7,"total_pct_moe":14.1,"under_18_pop":497,"under_18_below":382,"under_18_pct":76.9,"under_18_pct_moe":25.2,"age_18_64_pop":1400,"age_18_64_below":606,"age_18_64_pct":43.3,"age_18_64_pct_moe":12.0,"age_65_plus_pop":229,"age_65_plus_below":68,"age_65_plus_pct":29.7,"age_65_plus_pct_moe":21.2,"male_pop":1101,"male_below":484,"male_pct":44.0,"male_pct_moe":14.0,"female_pop":1025,"female_below":572,"female_pct":55.8,"female_pct_moe":18.0,"white_pop":1403,"white_below":613,"white_pct":43.7,"white_pct_moe":19.0,"black_pop":609,"black_below":398,"black_pct":65.4,"black_pct_moe":25.2,"hispanic_pop":40,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":50.4,"less_hs_pop":115,"less_hs_below":82,"less_hs_pct":71.3,"less_hs_pct_moe":22.9,"hs_grad_pop":800,"hs_grad_below":241,"hs_grad_pct":30.1,"hs_grad_pct_moe":13.1,"some_college_pop":343,"some_college_below":161,"some_college_pct":46.9,"some_college_pct_moe":20.1,"bachelors_plus_pop":113,"bachelors_plus_below":0,"bachelors_plus_pct":0.0,"bachelors_plus_pct_moe":27.6,"employed_pop":703,"employed_below":201,"employed_pct":28.6,"employed_pct_moe":15.8,"unemployed_pop":74,"unemployed_below":25,"unemployed_pct":33.8,"unemployed_pct_moe":41.8,"below_50pct_pop":585,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":1529,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933800","tract_display":"9338"},"39155933900":{"tract":"9339","total_pop":1778,"total_below":451,"total_pct":25.4,"total_pct_moe":9.3,"under_18_pop":442,"under_18_below":145,"under_18_pct":32.8,"under_18_pct_moe":21.0,"age_18_64_pop":1003,"age_18_64_below":284,"age_18_64_pct":28.3,"age_18_64_pct_moe":10.0,"age_65_plus_pop":333,"age_65_plus_below":22,"age_65_plus_pct":6.6,"age_65_plus_pct_moe":6.0,"male_pop":912,"male_below":179,"male_pct":19.6,"male_pct_moe":9.5,"female_pop":866,"female_below":272,"female_pct":31.4,"female_pct_moe":11.4,"white_pop":1413,"white_below":350,"white_pct":24.8,"white_pct_moe":9.6,"black_pop":74,"black_below":14,"black_pct":18.9,"black_pct_moe":35.4,"hispanic_pop":50,"hispanic_below":0,"hispanic_pct":0.0,"hispanic_pct_moe":45.1,"less_hs_pop":213,"less_hs_below":94,"less_hs_pct":44.1,"less_hs_pct_moe":21.1,"hs_grad_pop":635,"hs_grad_below":152,"hs_grad_pct":23.9,"hs_grad_pct_moe":12.5,"some_college_pop":286,"some_college_below":28,"some_college_pct":9.8,"some_college_pct_moe":9.0,"bachelors_plus_pop":114,"bachelors_plus_below":23,"bachelors_plus_pct":20.2,"bachelors_plus_pct_moe":19.6,"employed_pop":724,"employed_below":78,"employed_pct":10.8,"employed_pct_moe":6.0,"unemployed_pop":28,"unemployed_below":28,"unemployed_pct":100.0,"unemployed_pct_moe":60.2,"below_50pct_pop":111,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":957,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155933900","tract_display":"9339"},"39155934000":{"tract":"9340","total_pop":4772,"total_below":2584,"total_pct":54.1,"total_pct_moe":9.2,"under_18_pop":1503,"under_18_below":1040,"under_18_pct":69.2,"under_18_pct_moe":14.6,"age_18_64_pop":2788,"age_18_64_below":1463,"age_18_64_pct":52.5,"age_18_64_pct_moe":11.3,"age_65_plus_pop":481,"age_65_plus_below":81,"age_65_plus_pct":16.8,"age_65_plus_pct_moe":12.8,"male_pop":2080,"male_below":1110,"male_pct":53.4,"male_pct_moe":11.2,"female_pop":2692,"female_below":1474,"female_pct":54.8,"female_pct_moe":11.3,"white_pop":1871,"white_below":1040,"white_pct":55.6,"white_pct_moe":17.1,"black_pop":2633,"black_below":1343,"black_pct":51.0,"black_pct_moe":15.2,"hispanic_pop":108,"hispanic_below":73,"hispanic_pct":67.6,"hispanic_pct_moe":49.6,"less_hs_pop":700,"less_hs_below":430,"less_hs_pct":61.4,"less_hs_pct_moe":20.0,"hs_grad_pop":1203,"hs_grad_below":478,"hs_grad_pct":39.7,"hs_grad_pct_moe":13.0,"some_college_pop":603,"some_college_below":271,"some_college_pct":44.9,"some_college_pct_moe":16.2,"bachelors_plus_pop":210,"bachelors_plus_below":19,"bachelors_plus_pct":9.0,"bachelors_plus_pct_moe":13.2,"employed_pop":1432,"employed_below":400,"employed_pct":27.9,"employed_pct_moe":10.7,"unemployed_pop":168,"unemployed_below":62,"unemployed_pct":36.9,"unemployed_pct_moe":31.1,"below_50pct_pop":1515,"below_50pct_below":null,"below_50pct_pct":null,"below_50pct_pct_moe":null,"below_200pct_pop":3863,"below_200pct_below":null,"below_200pct_pct":null,"below_200pct_pct_moe":null,"geoid":"39155934000","tract_display":"9340"}};
+
+  /* Census TIGERweb tract polygon endpoint.
+     - Layer 4 in Generalized_ACS2024 is "Census Tracts 500K" — Albers-projected
+       simplified polygons. About 5-10x smaller than the precise layer.
+     - Layer 0 in TIGERweb/Tracts_Blocks is the precise current vintage.
+     The query filters server-side by STATE=39 (Ohio) and COUNTY=155 (Trumbull),
+     so we get only the ~54 features we need. */
+  const TRACT_GEO_URL_GEN = 'https://tigerweb.geo.census.gov/arcgis/rest/services/Generalized_ACS2024/Tracts_Blocks/MapServer/1/query'
+    + '?where=' + encodeURIComponent("STATE='39' AND COUNTY='155'")
+    + '&outFields=GEOID,TRACT&outSR=4326&f=geojson';
+  const TRACT_GEO_URL_PRECISE = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Tracts_Blocks/MapServer/0/query'
+    + '?where=' + encodeURIComponent("STATE='39' AND COUNTY='155'")
+    + '&outFields=GEOID,TRACT&outSR=4326&f=geojson';
+
+  /* The tract layer lives in the 'poverty' pane already created above.
+     But the pane has pointerEvents:'none' so the muni fills don't grab
+     clicks from markers. We need tract polygons to be clickable. The
+     fix: create a SEPARATE pane just for tracts with pointer events on,
+     stacked just above the poverty fills but still below outlines/markers. */
+  const tractPane = map.createPane('tracts');
+  tractPane.style.zIndex = 345;
+  /* pointer events default to auto — leave them enabled */
+
+  let tractLayer = null;
+  let tractLayerLoaded = false;
+  let currentlySelectedTract = null;
+
+  function tractFillStyle(rate, isSelected) {
+    /* rate is a PERCENTAGE (e.g. 21.5 for 21.5%). povertyColor expects
+       a DECIMAL (e.g. 0.215). Convert here. */
+    const decimalRate = rate == null ? null : rate / 100;
+    return {
+      pane: 'tracts',
+      color: isSelected ? '#15294A' : '#3F4A5F',
+      weight: isSelected ? 2.5 : 0.8,
+      opacity: isSelected ? 1 : 0.55,
+      fillColor: povertyColor(decimalRate),
+      fillOpacity: 0.55
+    };
+  }
+
+  function loadTractLayer(url, isFallback) {
+    return fetch(url)
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .then(geo => {
+        if (!geo || !geo.features || !geo.features.length) {
+          throw new Error('No tract features returned');
+        }
+        tractLayer = L.geoJSON(geo, {
+          pane: 'tracts',
+          style: feature => {
+            const geoid = feature.properties && feature.properties.GEOID;
+            const rec = TRACT_DATA[geoid];
+            return tractFillStyle(rec ? rec.total_pct : null, false);
+          },
+          onEachFeature: (feature, layer) => {
+            const geoid = feature.properties && feature.properties.GEOID;
+            const rec = TRACT_DATA[geoid];
+            if (!rec) return;
+
+            const pct = (rec.total_pct != null) ? rec.total_pct.toFixed(1) + '%' : 'n/a';
+            layer.bindTooltip(
+              `<strong>Census Tract ${rec.tract}</strong><br>` +
+              `Poverty rate: <strong>${pct}</strong><br>` +
+              `<span style="opacity:.75">Click for full breakdown</span>`,
+              { sticky: true, className: 'boundary-tooltip', direction: 'top' }
+            );
+
+            layer.on('mouseover', () => {
+              if (layer !== currentlySelectedTract) {
+                layer.setStyle({ weight: 2, color: '#15294A', opacity: 0.9 });
+              }
+            });
+            layer.on('mouseout', () => {
+              if (layer !== currentlySelectedTract) {
+                tractLayer.resetStyle(layer);
+              }
+            });
+            layer.on('click', (e) => {
+              L.DomEvent.stopPropagation(e);
+              selectTract(layer, geoid);
+            });
+          }
+        });
+
+        /* Tracts cover the entire county at finer resolution than the muni/twp
+           choropleth, so the muni fills underneath would just bleed through
+           and confuse the colors. Hide them. They remain in the layer tree
+           as a fallback in case tracts ever fail to load, but won't render. */
+        povertyFillLayers.forEach(layer => {
+          if (layer.setStyle) {
+            layer.setStyle({ fillOpacity: 0 });
+          }
+        });
+
+        /* Only attach to map if poverty layer is currently visible */
+        if (povertyLayerVisible) tractLayer.addTo(map);
+        tractLayerLoaded = true;
+      })
+      .catch(err => {
+        if (!isFallback) {
+          /* Generalized service failed — fall back to precise layer */
+          console.warn('Generalized tract layer failed, trying precise:', err);
+          return loadTractLayer(TRACT_GEO_URL_PRECISE, true);
+        }
+        console.warn('Tract layer unavailable:', err);
+      });
+  }
+
+  /* Load tracts once, the first time poverty layer is enabled.
+     This keeps the initial page load fast. */
+  let tractLoadStarted = false;
+  function ensureTractsLoaded() {
+    if (tractLoadStarted) return;
+    tractLoadStarted = true;
+    loadTractLayer(TRACT_GEO_URL_GEN, false);
+  }
+
+  /* Hook into the poverty toggle: load + show/hide tract layer alongside,
+     and toggle the reference labels overlay to keep place names readable
+     on top of the choropleth fills. */
+  const _origSetPovertyVisible = setPovertyVisible;
+  setPovertyVisible = function(on) {
+    _origSetPovertyVisible(on);
+    if (on) {
+      ensureTractsLoaded();
+      if (tractLayer && !map.hasLayer(tractLayer)) tractLayer.addTo(map);
+      if (!map.hasLayer(referenceLabelsLayer)) referenceLabelsLayer.addTo(map);
+    } else {
+      if (tractLayer && map.hasLayer(tractLayer)) map.removeLayer(tractLayer);
+      if (map.hasLayer(referenceLabelsLayer)) map.removeLayer(referenceLabelsLayer);
+      /* Also clear any selected tract */
+      if (currentlySelectedTract && tractLayer) {
+        tractLayer.resetStyle(currentlySelectedTract);
+        currentlySelectedTract = null;
+      }
+    }
+  };
+
+  function selectTract(layer, geoid) {
+    /* Visually mark this tract; clear previous selection */
+    if (currentlySelectedTract && currentlySelectedTract !== layer && tractLayer) {
+      tractLayer.resetStyle(currentlySelectedTract);
+    }
+    currentlySelectedTract = layer;
+    const rec = TRACT_DATA[geoid];
+    if (!rec) return;
+    layer.setStyle(tractFillStyle(rec.total_pct, true));
+    if (layer.bringToFront) layer.bringToFront();
+    openTractDialog(rec);
+  }
+
+  /* ============ Dialog rendering ============ */
+  function fmtPct(v, moe) {
+    if (v == null) return '<span style="color:var(--ink-soft)">n/a</span>';
+    let s = v.toFixed(1) + '%';
+    if (moe != null && moe > 0) s += ` <span class="moe">± ${moe.toFixed(1)}</span>`;
+    return s;
+  }
+  function fmtInt(v) {
+    if (v == null) return '<span style="color:var(--ink-soft)">n/a</span>';
+    return v.toLocaleString();
+  }
+  function tierFromRate(r) {
+    /* r is a PERCENTAGE (e.g. 21.5). Colors match the choropleth legend.
+       textColor is chosen for adequate contrast against the chip bg. */
+    if (r == null) return { label:'No data', color:'#888',    textColor:'#fff' };
+    if (r > 25)   return { label:'>25% very high', color:'#A50F15', textColor:'#fff' };
+    if (r >= 20)  return { label:'20–25% high',    color:'#DE2D26', textColor:'#fff' };
+    if (r >= 16)  return { label:'16–20% elevated',color:'#FB6A4A', textColor:'#fff' };
+    if (r >= 12)  return { label:'12–16% moderate',color:'#FCAE91', textColor:'#5A1F0F' };
+    if (r >= 8)   return { label:'8–12% low',      color:'#FEE5D9', textColor:'#5A1F0F' };
+    return         { label:'<8% very low',         color:'#FFF7F3', textColor:'#5A1F0F' };
+  }
+
+  function row(label, pctVal, moeVal, popVal) {
+    return `
+      <div class="td-row">
+        <span class="label">${label}</span>
+        <span class="val">${fmtPct(pctVal, moeVal)}` +
+        (popVal != null ? `<span class="pop">of ${fmtInt(popVal)}</span>` : '') +
+        `</span>
+      </div>`;
+  }
+
+  function bar(label, pctVal, popVal) {
+    const w = pctVal != null ? Math.min(100, Math.max(0, pctVal)) : 0;
+    /* pctVal is a percentage (e.g. 21.5); povertyColor expects a decimal */
+    const decVal = pctVal == null ? null : pctVal / 100;
+    return `
+      <div class="td-row bar">
+        <div class="label-row">
+          <span class="label">${label}</span>
+          <span class="val">${fmtPct(pctVal)}` +
+          (popVal != null ? `<span class="pop">of ${fmtInt(popVal)}</span>` : '') +
+          `</span>
+        </div>
+        <div class="td-bar-track"><div class="td-bar-fill" style="width:${w}%;background:${povertyColor(decVal)}"></div></div>
+      </div>`;
+  }
+
+  function openTractDialog(rec) {
+    const tier = tierFromRate(rec.total_pct);
+    const backdrop = document.getElementById('tract-backdrop');
+    const dialog = document.getElementById('tract-dialog');
+
+    /* Headline: county rank — where does this tract fall vs the others? */
+    const allRates = Object.values(TRACT_DATA).map(r => r.total_pct).filter(v => v != null).sort((a,b) => b - a);
+    const rank = rec.total_pct != null ? allRates.indexOf(rec.total_pct) + 1 : null;
+    const rankStr = rank ? `<strong>#${rank}</strong> of ${allRates.length} tracts in the county` : '';
+
+    dialog.innerHTML = `
+      <header>
+        <button class="td-close" id="td-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <p class="td-eyebrow">Census Tract</p>
+        <h2 id="tract-title">Tract ${rec.tract}</h2>
+        <p class="td-sub">Trumbull County, Ohio &middot; GEOID ${rec.geoid}</p>
+      </header>
+      <div class="td-body">
+
+        <div class="td-headline">
+          <div>
+            <div class="big">${rec.total_pct != null ? rec.total_pct.toFixed(1) + '%' : 'n/a'}</div>
+            <div class="moe">poverty rate ${rec.total_pct_moe != null ? '± ' + rec.total_pct_moe.toFixed(1) + ' pp' : ''}</div>
+            <div class="moe" style="margin-top:4px">${rankStr}</div>
+          </div>
+          <span class="tier-chip" style="background:${tier.color};color:${tier.textColor};border:1px solid rgba(0,0,0,0.1)">${tier.label}</span>
+        </div>
+
+        <div class="td-section">
+          <h3>Population</h3>
+          <div class="td-grid">
+            <div class="td-row"><span class="label">Total (poverty status determined)</span><span class="val">${fmtInt(rec.total_pop)}</span></div>
+            <div class="td-row"><span class="label">Below poverty</span><span class="val">${fmtInt(rec.total_below)}</span></div>
+            <div class="td-row"><span class="label">Under 18</span><span class="val">${fmtInt(rec.under_18_pop)}</span></div>
+            <div class="td-row"><span class="label">18–64</span><span class="val">${fmtInt(rec.age_18_64_pop)}</span></div>
+            <div class="td-row"><span class="label">65 and over</span><span class="val">${fmtInt(rec.age_65_plus_pop)}</span></div>
+            <div class="td-row"><span class="label">Below 200% of poverty</span><span class="val">${fmtInt(rec.below_200pct_pop)}</span></div>
+          </div>
+        </div>
+
+        <div class="td-section">
+          <h3>Poverty rate by age</h3>
+          ${bar('Under 18',  rec.under_18_pct,    rec.under_18_pop)}
+          ${bar('18–64',     rec.age_18_64_pct,   rec.age_18_64_pop)}
+          ${bar('65 and over', rec.age_65_plus_pct, rec.age_65_plus_pop)}
+        </div>
+
+        <div class="td-section">
+          <h3>By sex</h3>
+          <div class="td-grid">
+            ${row('Male',   rec.male_pct,   rec.male_pct_moe,   rec.male_pop)}
+            ${row('Female', rec.female_pct, rec.female_pct_moe, rec.female_pop)}
+          </div>
+        </div>
+
+        <div class="td-section">
+          <h3>By race &amp; Hispanic origin</h3>
+          <div class="td-grid">
+            ${row('White alone',  rec.white_pct,    rec.white_pct_moe,    rec.white_pop)}
+            ${row('Black alone',  rec.black_pct,    rec.black_pct_moe,    rec.black_pop)}
+            ${row('Hispanic',     rec.hispanic_pct, rec.hispanic_pct_moe, rec.hispanic_pop)}
+          </div>
+        </div>
+
+        <div class="td-section">
+          <h3>By educational attainment (age 25+)</h3>
+          ${bar('Less than high school',  rec.less_hs_pct,         rec.less_hs_pop)}
+          ${bar('High school graduate',    rec.hs_grad_pct,         rec.hs_grad_pop)}
+          ${bar("Some college / assoc.",   rec.some_college_pct,    rec.some_college_pop)}
+          ${bar("Bachelor's or higher",    rec.bachelors_plus_pct,  rec.bachelors_plus_pop)}
+        </div>
+
+        <div class="td-section">
+          <h3>Employment status (civilian labor force, 16+)</h3>
+          <div class="td-grid">
+            ${row('Employed',   rec.employed_pct,   rec.employed_pct_moe,   rec.employed_pop)}
+            ${row('Unemployed', rec.unemployed_pct, rec.unemployed_pct_moe, rec.unemployed_pop)}
+          </div>
+        </div>
+
+        <p class="td-footnote">
+          Source: U.S. Census Bureau, American Community Survey 2019–2023 5-Year Estimates,
+          Table S1701. Margins of error (±) shown at 90% confidence. Small tracts may have
+          wide margins — interpret subgroup rates with caution. Tract geometry from Census
+          TIGERweb. <br>
+          The "200% of poverty" count is a useful threshold for low-income but
+          not-quite-impoverished households who often qualify for Medicaid, SNAP, and
+          sliding-scale clinic fees.
+        </p>
+
+        <div class="td-actions">
+          <button id="td-census-link">View on data.census.gov</button>
+          <button id="td-dismiss">Close</button>
+        </div>
+      </div>
+    `;
+
+    backdrop.classList.add('open');
+    backdrop.setAttribute('aria-hidden', 'false');
+
+    /* Wire actions */
+    document.getElementById('td-close').addEventListener('click', closeTractDialog);
+    document.getElementById('td-dismiss').addEventListener('click', closeTractDialog);
+    document.getElementById('td-census-link').addEventListener('click', () => {
+      const url = `https://data.census.gov/table/ACSST5Y2023.S1701?g=1400000US${rec.geoid}`;
+      window.open(url, '_blank', 'noopener');
+    });
+  }
+
+  function closeTractDialog() {
+    const backdrop = document.getElementById('tract-backdrop');
+    backdrop.classList.remove('open');
+    backdrop.setAttribute('aria-hidden', 'true');
+    if (currentlySelectedTract && tractLayer) {
+      tractLayer.resetStyle(currentlySelectedTract);
+      currentlySelectedTract = null;
+    }
+  }
+
+  /* Click outside the dialog → close */
+  document.getElementById('tract-backdrop').addEventListener('click', (e) => {
+    if (e.target.id === 'tract-backdrop') closeTractDialog();
+  });
+  /* Escape key → close */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('tract-backdrop').classList.contains('open')) {
+      closeTractDialog();
+    }
+  });
+
 } else {
   document.getElementById('map').innerHTML =
     '<div style="padding:32px;max-width:520px;margin:60px auto;background:white;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);text-align:center;">' +
