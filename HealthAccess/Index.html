@@ -421,6 +421,10 @@
     gap: 8px;
     letter-spacing: 0.02em;
   }
+  /* Second toggle, stacked below the first */
+  .layer-toggle-le {
+    top: 104px;
+  }
   .poverty-toggle:hover { background: var(--bg); }
   .poverty-toggle[aria-pressed="true"] {
     background: var(--navy);
@@ -432,6 +436,10 @@
     border-radius: 2px;
     background: linear-gradient(135deg, #FEE5D9 0%, #A50F15 100%);
     display: inline-block;
+  }
+  /* LE swatch uses a sand-to-teal gradient matching the LE choropleth */
+  .poverty-toggle .dot-le {
+    background: linear-gradient(135deg, #E8C56A 0%, #1E6F8E 100%);
   }
 
   .poverty-legend {
@@ -522,6 +530,7 @@
 
   @media (max-width: 720px) {
     .poverty-toggle { top: 56px; left: 8px; font-size: 0.72rem; padding: 6px 9px; }
+    .layer-toggle-le { top: 92px; }
     .poverty-legend { bottom: 24px; left: 8px; font-size: 0.68rem; }
     .poverty-legend .pl-header { padding: 8px 10px; font-size: 0.78rem; }
     .poverty-legend .pl-body { padding: 0 11px 10px; }
@@ -1262,7 +1271,7 @@
     </div>
     <div class="meta">
       <div class="credit">Created by <strong>Costarella Innovations, LLC</strong></div>
-      <div class="updated">Updated May 15, 2026 at 10:34 AM EDT</div>
+      <div class="updated">Updated May 18, 2026 at 8:07 AM EDT</div>
       <div class="count">Showing <strong id="count-shown">303</strong> of <strong>303</strong> resources</div>
     </div>
   </header>
@@ -1331,6 +1340,11 @@
         <span>Poverty rate</span>
       </button>
 
+      <button class="poverty-toggle layer-toggle-le" id="le-toggle" aria-pressed="false" aria-label="Toggle life expectancy overlay">
+        <span class="dot dot-le"></span>
+        <span>Life expectancy</span>
+      </button>
+
       <div class="poverty-legend" id="poverty-legend" aria-hidden="true">
         <button class="pl-header" id="poverty-legend-toggle" aria-expanded="true" aria-controls="poverty-legend-body">
           <span class="pl-title">Poverty rate by area</span>
@@ -1347,6 +1361,24 @@
           <div class="pl-row"><span class="pl-swatch" style="background:#FFF7F3"></span><span>&lt; 8%  (very low)</span></div>
           <div class="pl-row"><span class="pl-swatch" style="background:#E8E4DA"></span><span>No data</span></div>
           <div class="pl-note">ACS 5-yr estimates. Township figures are remainder-of-township where a city/village/CDP is carved out.</div>
+        </div>
+      </div>
+
+      <div class="poverty-legend" id="le-legend" aria-hidden="true">
+        <button class="pl-header" id="le-legend-toggle" aria-expanded="true" aria-controls="le-legend-body">
+          <span class="pl-title">Life expectancy by tract</span>
+          <svg class="pl-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="pl-body" id="le-legend-body">
+          <div class="pl-row"><span class="pl-swatch" style="background:#1E6F8E"></span><span>&ge; 80 yrs  (highest)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#4FA3B5"></span><span>77 – 80 yrs  (high)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#A5C8A0"></span><span>74 – 77 yrs  (moderate)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#E8C56A"></span><span>70 – 74 yrs  (low)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#D17A3F"></span><span>&lt; 70 yrs  (lowest)</span></div>
+          <div class="pl-row"><span class="pl-swatch" style="background:#E8E4DA"></span><span>No data</span></div>
+          <div class="pl-note">CDC/NCHS USALEEP, 2010–2015. Based on 2010 census tract boundaries; two tracts have no current polygon to map.</div>
         </div>
       </div>
 
@@ -2022,13 +2054,37 @@ if (leafletAvailable) {
             const rec = TRACT_DATA[geoid];
             if (!rec) return;
 
-            const pct = (rec.total_pct != null) ? rec.total_pct.toFixed(1) + '%' : 'n/a';
-            layer.bindTooltip(
-              `<strong>Census Tract ${rec.tract}</strong><br>` +
-              `Poverty rate: <strong>${pct}</strong><br>` +
-              `<span style="opacity:.75">Click for full breakdown</span>`,
-              { sticky: true, className: 'boundary-tooltip', direction: 'top' }
-            );
+            /* Build tooltip content based on which layer is currently
+               active. Re-evaluated each time the tooltip is rebuilt. */
+            function buildTooltip() {
+              const pct = (rec.total_pct != null) ? rec.total_pct.toFixed(1) + '%' : 'n/a';
+              const leRec = LE_DATA[geoid];
+              const leStr = leRec ? `${leRec.le.toFixed(1)} yrs` : 'n/a';
+              let html = `<strong>Census Tract ${rec.tract}</strong><br>`;
+              if (leLayerVisible) {
+                /* LE is the headline metric */
+                html += `Life expectancy: <strong>${leStr}</strong><br>`;
+                html += `Poverty rate: ${pct}<br>`;
+              } else {
+                /* Poverty is the headline (or layer is off — show both) */
+                html += `Poverty rate: <strong>${pct}</strong><br>`;
+                if (leRec) html += `Life expectancy: ${leStr}<br>`;
+              }
+              html += `<span style="opacity:.75">Click for full breakdown</span>`;
+              return html;
+            }
+
+            layer.bindTooltip(buildTooltip(), {
+              sticky: true,
+              className: 'boundary-tooltip',
+              direction: 'top'
+            });
+
+            /* Update the tooltip content right before each open, so it
+               reflects whichever layer is active at that moment. */
+            layer.on('tooltipopen', (e) => {
+              e.tooltip.setContent(buildTooltip());
+            });
 
             layer.on('mouseover', () => {
               if (layer !== currentlySelectedTract) {
@@ -2068,8 +2124,18 @@ if (leafletAvailable) {
           }
         });
 
-        /* Only attach to map if poverty layer is currently visible */
-        if (povertyLayerVisible) tractLayer.addTo(map);
+        /* Only attach to map if a choropleth layer is currently visible.
+           Critical: check BOTH layer flags (not just povertyLayerVisible).
+           The user may have clicked the LE toggle while tracts were still
+           loading — without this check, the first LE-toggle click would
+           kick off the fetch but never actually attach the tract layer
+           when the fetch resolved (because povertyLayerVisible is false).
+           Also apply the correct style for the active layer right away,
+           so the polygons render in LE colors, not poverty colors. */
+        if (povertyLayerVisible || leLayerVisible) {
+          tractLayer.addTo(map);
+          restyleTractsForActiveLayer();
+        }
         tractLayerLoaded = true;
       })
       .catch(err => {
@@ -2179,10 +2245,22 @@ if (leafletAvailable) {
     const backdrop = document.getElementById('tract-backdrop');
     const dialog = document.getElementById('tract-dialog');
 
+    /* Look up life-expectancy data for this tract (separate dataset).
+       Some tracts won't have LE data due to 2010-vs-2020 boundary
+       differences — we render the section anyway with a "not available"
+       note rather than hiding it, so the dialog layout stays consistent. */
+    const leRec = LE_DATA[rec.geoid] || null;
+    const leT = leTier(leRec ? leRec.le : null);
+
     /* Headline: county rank — where does this tract fall vs the others? */
     const allRates = Object.values(TRACT_DATA).map(r => r.total_pct).filter(v => v != null).sort((a,b) => b - a);
     const rank = rec.total_pct != null ? allRates.indexOf(rec.total_pct) + 1 : null;
     const rankStr = rank ? `<strong>#${rank}</strong> of ${allRates.length} tracts in the county` : '';
+
+    /* LE rank for context */
+    const allLE = Object.values(LE_DATA).map(r => r.le).filter(v => v != null).sort((a,b) => b - a);
+    const leRank = leRec ? allLE.indexOf(leRec.le) + 1 : null;
+    const leRankStr = leRank ? `<strong>#${leRank}</strong> of ${allLE.length} tracts (longest = #1)` : '';
 
     dialog.innerHTML = `
       <header>
@@ -2249,6 +2327,36 @@ if (leafletAvailable) {
         </div>
 
         <div class="td-section">
+          <h3>Health outcomes</h3>
+          ${leRec ? `
+            <div class="td-row">
+              <span class="label">Life expectancy at birth</span>
+              <span class="val">${leRec.le.toFixed(1)} <span class="pop">years</span></span>
+            </div>
+            <div class="td-row">
+              <span class="label">95% confidence interval</span>
+              <span class="val" style="font-size:.78rem">${leRec.ci || 'n/a'}</span>
+            </div>
+            <div class="td-row">
+              <span class="label">County rank</span>
+              <span class="val" style="font-size:.78rem">${leRankStr}</span>
+            </div>
+            <div class="td-row" style="margin-top:6px">
+              <span class="label">Tier</span>
+              <span class="tier-chip" style="background:${leT.color};color:${leT.textColor};border:1px solid rgba(0,0,0,0.1);padding:3px 8px;border-radius:999px;font-size:.66rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase">${leT.label}</span>
+            </div>
+          ` : `
+            <div class="td-row">
+              <span class="label">Life expectancy</span>
+              <span class="val" style="color:var(--ink-soft);font-style:italic;font-size:.78rem">Data not available for this tract</span>
+            </div>
+            <p style="font-size:.7rem;color:var(--ink-soft);margin:6px 0 0;line-height:1.4">
+              USALEEP uses 2010 tract boundaries; this tract was redrawn in the 2020 vintage.
+            </p>
+          `}
+        </div>
+
+        <div class="td-section">
           <h3>Employment status (civilian labor force, 16+)</h3>
           <div class="td-grid">
             ${row('Employed',   rec.employed_pct,   rec.employed_pct_moe,   rec.employed_pop)}
@@ -2257,10 +2365,13 @@ if (leafletAvailable) {
         </div>
 
         <p class="td-footnote">
-          Source: U.S. Census Bureau, American Community Survey 2019–2023 5-Year Estimates,
-          Table S1701. Margins of error (±) shown at 90% confidence. Small tracts may have
-          wide margins — interpret subgroup rates with caution. Tract geometry from Census
-          TIGERweb. <br>
+          <strong>Poverty data:</strong> U.S. Census Bureau, American Community Survey 2019–2023
+          5-Year Estimates, Table S1701. Margins of error (±) shown at 90% confidence. Small
+          tracts may have wide margins — interpret subgroup rates with caution.<br>
+          <strong>Life expectancy data:</strong> CDC/NCHS USALEEP, 2010–2015, based on 2010 tract
+          boundaries. Some tracts have been redrawn in the 2020 vintage and may not have a
+          matching LE estimate.<br>
+          <strong>Tract geometry:</strong> Census TIGERweb (2020 vintage).
           The "200% of poverty" count is a useful threshold for low-income but
           not-quite-impoverished households who often qualify for Medicaid, SNAP, and
           sliding-scale clinic fees.
@@ -2304,6 +2415,153 @@ if (leafletAvailable) {
     if (e.key === 'Escape' && document.getElementById('tract-backdrop').classList.contains('open')) {
       closeTractDialog();
     }
+  });
+
+  /* ====================================================================
+     LIFE EXPECTANCY DATA + LAYER
+     --------------------------------------------------------------------
+     Source: CDC/NCHS USALEEP (U.S. Small-area Life Expectancy Estimates
+     Project), 2010-2015. Tract-level life expectancy at birth.
+
+     Caveat: USALEEP uses 2010 census tract boundaries. The map polygons
+     we fetch from TIGERweb use a 2020 vintage. Two old tracts (9205,
+     9206) were merged out by 2020 — their LE data has no polygon. One
+     new 2020 tract (9340) has no LE data and shows as "no data".
+     53 of 54 mappable tracts have a matching LE value.
+
+     Color ramp is intentionally distinct from the poverty reds:
+       low LE  = warm (orange/sand)
+       high LE = cool (teal/blue)
+     Tier breaks placed at clinically meaningful thresholds against the
+     U.S. average of ~77 years (CDC).
+     ==================================================================== */
+  const LE_DATA = {"39155933001":{"tract":"9330.01","le":86.0,"ci":"81.7-97.5","se":2.4057},"39155931602":{"tract":"9316.02","le":82.3,"ci":"81.7-97.5","se":2.0943},"39155930500":{"tract":"9305.0","le":80.6,"ci":"79.6-81.6","se":1.2705},"39155933400":{"tract":"9334.0","le":80.4,"ci":"79.6-81.6","se":2.9164},"39155930800":{"tract":"9308.0","le":80.1,"ci":"79.6-81.6","se":1.3609},"39155932000":{"tract":"9320.0","le":79.7,"ci":"79.6-81.6","se":1.5371},"39155932200":{"tract":"9322.0","le":79.6,"ci":"79.6-81.6","se":2.5383},"39155933002":{"tract":"9330.02","le":79.4,"ci":"77.6-79.5","se":1.3681},"39155930101":{"tract":"9301.01","le":79.1,"ci":"77.6-79.5","se":2.0138},"39155930900":{"tract":"9309.0","le":79.0,"ci":"77.6-79.5","se":1.1977},"39155930600":{"tract":"9306.0","le":78.6,"ci":"77.6-79.5","se":1.4856},"39155931601":{"tract":"9316.01","le":78.5,"ci":"77.6-79.5","se":1.4619},"39155930300":{"tract":"9303.0","le":78.5,"ci":"77.6-79.5","se":1.2701},"39155931900":{"tract":"9319.0","le":78.4,"ci":"77.6-79.5","se":1.459},"39155921400":{"tract":"9214.0","le":77.9,"ci":"77.6-79.5","se":3.8265},"39155931200":{"tract":"9312.0","le":77.8,"ci":"77.6-79.5","se":1.3974},"39155932701":{"tract":"9327.01","le":77.6,"ci":"77.6-79.5","se":1.2287},"39155930102":{"tract":"9301.02","le":77.6,"ci":"77.6-79.5","se":2.0306},"39155930200":{"tract":"9302.0","le":77.6,"ci":"77.6-79.5","se":1.5515},"39155931500":{"tract":"9315.0","le":77.6,"ci":"77.6-79.5","se":1.6818},"39155932300":{"tract":"9323.0","le":77.5,"ci":"75.2-77.5","se":2.7205},"39155931300":{"tract":"9313.0","le":77.4,"ci":"75.2-77.5","se":1.1689},"39155931100":{"tract":"9311.0","le":77.4,"ci":"75.2-77.5","se":1.8029},"39155933500":{"tract":"9335.0","le":77.3,"ci":"75.2-77.5","se":0.9136},"39155931000":{"tract":"9310.0","le":77.3,"ci":"75.2-77.5","se":1.6946},"39155920300":{"tract":"9203.0","le":77.1,"ci":"75.2-77.5","se":1.4928},"39155932500":{"tract":"9325.0","le":77.0,"ci":"75.2-77.5","se":1.4541},"39155930400":{"tract":"9304.0","le":77.0,"ci":"75.2-77.5","se":1.4679},"39155932900":{"tract":"9329.0","le":76.7,"ci":"75.2-77.5","se":1.4454},"39155930700":{"tract":"9307.0","le":76.6,"ci":"75.2-77.5","se":0.9893},"39155933600":{"tract":"9336.0","le":76.6,"ci":"75.2-77.5","se":1.4541},"39155921200":{"tract":"9212.0","le":75.6,"ci":"75.2-77.5","se":2.0937},"39155933700":{"tract":"9337.0","le":75.2,"ci":"75.2-77.5","se":1.5637},"39155932802":{"tract":"9328.02","le":75.1,"ci":"56.9-75.1","se":1.4485},"39155933302":{"tract":"9333.02","le":75.1,"ci":"56.9-75.1","se":1.0011},"39155932801":{"tract":"9328.01","le":74.7,"ci":"56.9-75.1","se":1.6162},"39155931700":{"tract":"9317.0","le":74.6,"ci":"56.9-75.1","se":1.587},"39155932702":{"tract":"9327.02","le":74.1,"ci":"56.9-75.1","se":1.7991},"39155921500":{"tract":"9215.0","le":73.9,"ci":"56.9-75.1","se":1.3906},"39155933301":{"tract":"9333.01","le":73.6,"ci":"56.9-75.1","se":1.5217},"39155931400":{"tract":"9314.0","le":73.2,"ci":"56.9-75.1","se":1.3056},"39155933100":{"tract":"9331.0","le":73.2,"ci":"56.9-75.1","se":2.304},"39155921000":{"tract":"9210.0","le":72.8,"ci":"56.9-75.1","se":1.3416},"39155920500":{"tract":"9205.0","le":71.9,"ci":"56.9-75.1","se":3.2132},"39155920400":{"tract":"9204.0","le":71.6,"ci":"56.9-75.1","se":1.3246},"39155920700":{"tract":"9207.0","le":71.2,"ci":"56.9-75.1","se":1.4551},"39155932600":{"tract":"9326.0","le":70.8,"ci":"56.9-75.1","se":1.4654},"39155920900":{"tract":"9209.0","le":70.7,"ci":"56.9-75.1","se":1.783},"39155921600":{"tract":"9216.0","le":70.4,"ci":"56.9-75.1","se":1.2816},"39155921300":{"tract":"9213.0","le":69.7,"ci":"56.9-75.1","se":1.9747},"39155933900":{"tract":"9339.0","le":69.6,"ci":"56.9-75.1","se":1.9168},"39155921100":{"tract":"9211.0","le":69.2,"ci":"56.9-75.1","se":1.3769},"39155920600":{"tract":"9206.0","le":69.0,"ci":"56.9-75.1","se":1.387},"39155920800":{"tract":"9208.0","le":68.6,"ci":"56.9-75.1","se":1.9369},"39155933800":{"tract":"9338.0","le":63.2,"ci":"56.9-75.1","se":2.4654}};
+
+  function leColor(years) {
+    if (years == null) return '#E8E4DA';
+    if (years >= 80)  return '#1E6F8E';
+    if (years >= 77)  return '#4FA3B5';
+    if (years >= 74)  return '#A5C8A0';
+    if (years >= 70)  return '#E8C56A';
+    return '#D17A3F';
+  }
+
+  function leTier(years) {
+    if (years == null) return { label:'No data', color:'#888', textColor:'#fff' };
+    if (years >= 80)  return { label:'\u226580 yrs (highest)', color:'#1E6F8E', textColor:'#fff' };
+    if (years >= 77)  return { label:'77\u201380 yrs (high)',  color:'#4FA3B5', textColor:'#fff' };
+    if (years >= 74)  return { label:'74\u201377 yrs (moderate)', color:'#A5C8A0', textColor:'#1F3A1F' };
+    if (years >= 70)  return { label:'70\u201374 yrs (low)',   color:'#E8C56A', textColor:'#3A2A0F' };
+    return { label:'<70 yrs (lowest)', color:'#D17A3F', textColor:'#fff' };
+  }
+
+  /* Track which choropleth is active. Powered by the existing setPoverty-
+     Visible() flow (for poverty) plus a parallel one for LE, with mutual
+     exclusion: turning on one turns off the other. */
+  let leLayerVisible = false;
+
+  function tractFillStyleLE(years, isSelected) {
+    return {
+      pane: 'tracts',
+      color: isSelected ? '#15294A' : '#8A8B92',
+      weight: isSelected ? 2.5 : 0.6,
+      opacity: isSelected ? 1 : 0.45,
+      fillColor: leColor(years),
+      fillOpacity: 0.6
+    };
+  }
+
+  /* Re-style all tract polygons based on which layer is currently active.
+     Called whenever we switch layers or after the tract layer loads. */
+  function restyleTractsForActiveLayer() {
+    if (!tractLayer) return;
+    tractLayer.eachLayer(layer => {
+      if (layer === currentlySelectedTract) return;  /* preserve selection */
+      const geoid = layer.feature && layer.feature.properties && layer.feature.properties.GEOID;
+      if (leLayerVisible) {
+        const rec = LE_DATA[geoid];
+        layer.setStyle(tractFillStyleLE(rec ? rec.le : null, false));
+      } else if (povertyLayerVisible) {
+        const rec = TRACT_DATA[geoid];
+        layer.setStyle(tractFillStyle(rec ? rec.total_pct : null, false));
+      }
+    });
+  }
+
+  /* LE-version of setPovertyVisible. Mirrors that function's behavior:
+     loads tract polygons if needed, attaches them to the map, swaps the
+     style to LE colors, manages the legend, and turns off poverty layer
+     to enforce mutual exclusivity. */
+  function setLeVisible(on) {
+    if (on) {
+      /* Turn off poverty if it was on */
+      if (povertyLayerVisible) {
+        /* Call the original setter to clean up poverty state */
+        setPovertyVisible(false);
+      }
+      leLayerVisible = true;
+      ensureTractsLoaded();
+      if (tractLayer && !map.hasLayer(tractLayer)) tractLayer.addTo(map);
+      if (!map.hasLayer(referenceLabelsLayer)) referenceLabelsLayer.addTo(map);
+      restyleTractsForActiveLayer();
+    } else {
+      leLayerVisible = false;
+      if (tractLayer && map.hasLayer(tractLayer) && !povertyLayerVisible) {
+        map.removeLayer(tractLayer);
+      }
+      if (map.hasLayer(referenceLabelsLayer) && !povertyLayerVisible) {
+        map.removeLayer(referenceLabelsLayer);
+      }
+      if (currentlySelectedTract && tractLayer && !povertyLayerVisible) {
+        tractLayer.resetStyle(currentlySelectedTract);
+        currentlySelectedTract = null;
+      }
+    }
+    /* Update toggle button + legend visibility */
+    const leBtn = document.getElementById('le-toggle');
+    leBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const leLeg = document.getElementById('le-legend');
+    leLeg.classList.toggle('visible', on);
+    leLeg.setAttribute('aria-hidden', on ? 'false' : 'true');
+  }
+
+  /* Wrap the existing setPovertyVisible so that turning ON poverty also
+     turns OFF LE (enforce mutual exclusivity). We chain through the
+     existing wrapper that already exists. */
+  const _origPovOnLe = setPovertyVisible;
+  setPovertyVisible = function(on) {
+    if (on && leLayerVisible) {
+      /* Switching from LE to poverty: set the poverty flag FIRST so
+         that setLeVisible(false)'s "no other layer active" guards
+         don't remove the tract layer (which we're about to keep using).
+         Then turn off LE, then run the original poverty-on logic. */
+      povertyLayerVisible = true;   /* placeholder to prevent layer removal */
+      setLeVisible(false);
+      povertyLayerVisible = false;  /* let the original setter set it properly */
+    }
+    _origPovOnLe(on);
+    if (on) {
+      /* After the original handler attaches the tract layer, restyle
+         it for the (now-active) poverty layer */
+      restyleTractsForActiveLayer();
+    }
+  };
+
+  /* Wire the LE toggle button */
+  document.getElementById('le-toggle').addEventListener('click', () => {
+    setLeVisible(!leLayerVisible);
+  });
+
+  /* Wire the LE legend collapse/expand (mirrors the poverty legend logic) */
+  const leLegendEl = document.getElementById('le-legend');
+  const leLegendToggle = document.getElementById('le-legend-toggle');
+  function setLeLegendCollapsed(collapsed) {
+    leLegendEl.classList.toggle('collapsed', collapsed);
+    leLegendToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+  setLeLegendCollapsed(startCollapsed);  /* startCollapsed defined earlier */
+  leLegendToggle.addEventListener('click', () => {
+    setLeLegendCollapsed(!leLegendEl.classList.contains('collapsed'));
   });
 
   /* ====================================================================
