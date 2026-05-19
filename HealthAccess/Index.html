@@ -426,10 +426,19 @@
     align-items: center;
     gap: 8px;
     letter-spacing: 0.02em;
+    transition: opacity 0.2s, visibility 0.2s;
   }
   /* Second toggle, stacked below the first */
   .layer-toggle-le {
     top: 104px;
+  }
+  /* When the filter dropdown is open, hide the poverty/life-expectancy
+     toggles so they don't overlap the filter options. They reappear
+     when the filter panel closes. */
+  .map-wrap:has(.filter-panel.open) .poverty-toggle {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
   .poverty-toggle:hover { background: var(--bg); }
   .poverty-toggle[aria-pressed="true"] {
@@ -795,6 +804,20 @@
     height: 16px;
     cursor: pointer;
   }
+  .filter-search {
+    width: 100%;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 6px 8px;
+    font: 400 0.85rem 'Inter', sans-serif;
+    color: var(--ink);
+    background: white;
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .filter-search:focus { border-color: var(--navy); }
+  .filter-search::placeholder { color: var(--ink-soft); }
   .filter-clear {
     margin-top: 14px;
     border: 1px solid var(--rule);
@@ -1366,6 +1389,11 @@
             <div class="filter-group">
               <h3>Taxonomy</h3>
               <div class="filter-options" id="taxonomy-filters" style="max-height:220px;overflow-y:auto"></div>
+            </div>
+            <div class="filter-group">
+              <h3>Specialty</h3>
+              <input type="text" class="filter-search" id="specialty-search" placeholder="Search specialties…" aria-label="Search specialties">
+              <div class="filter-options" id="specialty-filters" style="max-height:200px;overflow-y:auto"></div>
             </div>
             <div class="filter-group">
               <h3>City</h3>
@@ -2839,6 +2867,7 @@ const activeFilters = {
   services: new Set(),
   access: new Set(),
   taxonomies: new Set(),
+  specialties: new Set(),
   cities: new Set()
 };
 
@@ -2876,6 +2905,36 @@ function buildFilters() {
     tf.appendChild(wrap);
   });
 
+  /* Specialty — derived from data, sorted by count. There are typically a
+     few hundred unique specialty values, so we render the full list but
+     wire a search input that hides labels not matching the query. */
+  const specCounts = {};
+  RESOURCES.forEach(r => {
+    if (r.specialty) specCounts[r.specialty] = (specCounts[r.specialty] || 0) + 1;
+  });
+  const specialties = Object.keys(specCounts).sort((a, b) => specCounts[b] - specCounts[a]);
+  const spf = document.getElementById('specialty-filters');
+  specialties.forEach(spec => {
+    const wrap = document.createElement('label');
+    wrap.dataset.searchText = spec.toLowerCase();
+    wrap.innerHTML = `<input type="checkbox" data-group="specialties" data-key="${spec.replace(/"/g, '&quot;')}"><span>${spec} (${specCounts[spec]})</span>`;
+    spf.appendChild(wrap);
+  });
+
+  /* Specialty search input — filters the visible labels. Checked items
+     stay in activeFilters even if hidden by the search, so users can
+     refine via search without losing their existing selections. */
+  const specSearch = document.getElementById('specialty-search');
+  if (specSearch) {
+    specSearch.addEventListener('input', () => {
+      const q = specSearch.value.toLowerCase().trim();
+      spf.querySelectorAll('label').forEach(lbl => {
+        const text = lbl.dataset.searchText || '';
+        lbl.style.display = (!q || text.includes(q)) ? '' : 'none';
+      });
+    });
+  }
+
   /* Cities — derived from data, sorted by count */
   const cityCounts = {};
   RESOURCES.forEach(r => {
@@ -2901,7 +2960,7 @@ function buildFilters() {
 }
 
 function updateFilterBadge() {
-  const total = activeFilters.services.size + activeFilters.access.size + activeFilters.taxonomies.size + activeFilters.cities.size;
+  const total = activeFilters.services.size + activeFilters.access.size + activeFilters.taxonomies.size + activeFilters.specialties.size + activeFilters.cities.size;
   const badge = document.getElementById('filter-badge');
   badge.textContent = total;
   badge.classList.toggle('visible', total > 0);
@@ -2911,8 +2970,15 @@ document.getElementById('filter-clear').addEventListener('click', () => {
   activeFilters.services.clear();
   activeFilters.access.clear();
   activeFilters.taxonomies.clear();
+  activeFilters.specialties.clear();
   activeFilters.cities.clear();
   document.querySelectorAll('.filter-options input').forEach(cb => cb.checked = false);
+  /* Also clear the specialty search input and unhide any rows */
+  const specSearch = document.getElementById('specialty-search');
+  if (specSearch) {
+    specSearch.value = '';
+    document.querySelectorAll('#specialty-filters label').forEach(lbl => lbl.style.display = '');
+  }
   updateFilterBadge();
   applyFilters();
 });
@@ -2991,6 +3057,9 @@ function matchesResource(r) {
 
   /* Taxonomy: must be in selected groupings (OR logic within group) */
   if (activeFilters.taxonomies.size > 0 && !activeFilters.taxonomies.has(r.tax_grouping)) return false;
+
+  /* Specialty: must be in selected specialties (OR logic within group) */
+  if (activeFilters.specialties.size > 0 && !activeFilters.specialties.has(r.specialty)) return false;
 
   /* City: must be in selected cities (OR logic within group) */
   if (activeFilters.cities.size > 0 && !activeFilters.cities.has(r.city)) return false;
