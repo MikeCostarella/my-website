@@ -767,10 +767,15 @@
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s cubic-bezier(.4,0,.2,1), padding 0.3s;
+    /* Allow momentum scrolling on iOS once the panel becomes scrollable */
+    -webkit-overflow-scrolling: touch;
   }
   .filter-panel.open {
     max-height: 600px;
     padding: 18px 20px;
+    /* Switch to internal scrolling once the panel is open, so tall
+       content (all five filter groups stacked on mobile) is reachable. */
+    overflow-y: auto;
   }
   .filter-grid {
     display: grid;
@@ -1218,6 +1223,14 @@
     .filter-toggle { padding: 0 10px; }
     .filter-toggle span:not(.badge):not(.chev) { display: none; }
     .filter-grid { grid-template-columns: 1fr; }
+    /* On mobile, all five filter groups stack into one column and can
+       easily exceed the viewport. Cap the open panel's height to the
+       space below the toolbar (toolbar top 8px + bar ~52px + gap 10px
+       ≈ 70px) so the user can scroll inside the panel to reach
+       Specialty, City, and the Clear button at the bottom. */
+    .filter-panel.open {
+      max-height: calc(100dvh - 80px);
+    }
     .modal-actions { grid-template-columns: 1fr; }
   }
 
