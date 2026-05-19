@@ -45,6 +45,39 @@ html, body {
 .legdot { width:12px; height:12px; border-radius:50%; display:inline-block; border:1px solid #999; }
 .legdot.s { background:#2b7de9; }
 .legdot.m { background:#e8420a; }
+.legdot.u { background:#22c55e; }
+
+/* You Are Here pulsing marker */
+.user-loc-marker {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+.user-loc-marker .dot {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 16px; height: 16px;
+  margin: -8px 0 0 -8px;
+  background: #22c55e;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(34,197,94,0.6), 0 2px 6px rgba(0,0,0,0.45);
+  z-index: 2;
+}
+.user-loc-marker .pulse {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 18px; height: 18px;
+  margin: -9px 0 0 -9px;
+  background: rgba(34,197,94,0.45);
+  border-radius: 50%;
+  z-index: 1;
+  animation: userPulse 1.8s ease-out infinite;
+}
+@keyframes userPulse {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
 #map {
   width: 100%;
   height: 100%;
@@ -196,7 +229,8 @@ html, body {
     <span>Multi-Tenant: <b id="sm"></b></span>
     <div class="leg">
       <span class="legdot s"></span> Single-Unit &nbsp;
-      <span class="legdot m"></span> Multi-Tenant
+      <span class="legdot m"></span> Multi-Tenant &nbsp;
+      <span class="legdot u"></span> You Are Here
     </div>
     <span id="updated"></span>
   </div>
@@ -388,6 +422,77 @@ function goToLoc(idx) {
   var marker = locMarkers[idx];
   if (marker) marker.openTooltip();
   openModal(loc);
+}
+
+// ===== "You Are Here" geolocation =====
+// Girard, Ohio bounding box (a bit generous to include immediate surroundings)
+var GIRARD_BOUNDS = {
+  minLat: 41.125, maxLat: 41.200,
+  minLng: -80.730, maxLng: -80.660
+};
+
+function isInGirard(lat, lng) {
+  return lat >= GIRARD_BOUNDS.minLat && lat <= GIRARD_BOUNDS.maxLat
+      && lng >= GIRARD_BOUNDS.minLng && lng <= GIRARD_BOUNDS.maxLng;
+}
+
+var userMarker = null;
+var userAccuracyCircle = null;
+
+function placeUserHere(lat, lng, accuracy) {
+  // Remove any existing user marker
+  if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
+  if (userAccuracyCircle) { map.removeLayer(userAccuracyCircle); userAccuracyCircle = null; }
+
+  var icon = L.divIcon({
+    className: '',
+    html: '<div class="user-loc-marker"><div class="pulse"></div><div class="dot"></div></div>',
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+    tooltipAnchor: [10, 0]
+  });
+
+  userMarker = L.marker([lat, lng], { icon: icon, zIndexOffset: 1000 }).addTo(map);
+  userMarker.bindTooltip(
+    '<b style="color:#15803d">&#128205; You Are Here</b><br>'
+    + '<span style="color:#555">Lat: ' + lat.toFixed(5) + ', Lng: ' + lng.toFixed(5) + '</span>'
+    + (accuracy ? '<br><span style="color:#888;font-size:0.85em">Accuracy: &plusmn;' + Math.round(accuracy) + ' m</span>' : ''),
+    { direction: 'right', opacity: 0.97 }
+  );
+
+  // Show accuracy circle if we have it and it's reasonable
+  if (accuracy && accuracy > 0 && accuracy < 500) {
+    userAccuracyCircle = L.circle([lat, lng], {
+      radius: accuracy,
+      color: '#22c55e',
+      weight: 1,
+      opacity: 0.5,
+      fillColor: '#22c55e',
+      fillOpacity: 0.08,
+      interactive: false
+    }).addTo(map);
+  }
+
+  // Zoom in on the user's current location at startup
+  map.setView([lat, lng], 17, { animate: true });
+}
+
+if ('geolocation' in navigator) {
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      var acc = pos.coords.accuracy;
+      if (isInGirard(lat, lng)) {
+        placeUserHere(lat, lng, acc);
+      }
+      // If not in Girard, do nothing — keep default view of the city.
+    },
+    function(err) {
+      // Permission denied or unavailable — silently keep default view.
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
 }
 </script>
 </body>
