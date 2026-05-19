@@ -1364,6 +1364,10 @@
               <div class="filter-options" id="access-filters"></div>
             </div>
             <div class="filter-group">
+              <h3>Taxonomy</h3>
+              <div class="filter-options" id="taxonomy-filters" style="max-height:220px;overflow-y:auto"></div>
+            </div>
+            <div class="filter-group">
               <h3>City</h3>
               <div class="filter-options" id="city-filters" style="max-height:220px;overflow-y:auto"></div>
             </div>
@@ -2834,6 +2838,7 @@ document.getElementById('legend-none').addEventListener('click', () => {
 const activeFilters = {
   services: new Set(),
   access: new Set(),
+  taxonomies: new Set(),
   cities: new Set()
 };
 
@@ -2854,6 +2859,21 @@ function buildFilters() {
     const wrap = document.createElement('label');
     wrap.innerHTML = `<input type="checkbox" id="${id}" data-group="access" data-key="${key}"><span>${label}</span>`;
     af.appendChild(wrap);
+  });
+
+  /* Taxonomy groupings — derived from data, sorted by count.
+     Each provider has one Taxonomy Grouping (the top of the NPPES hierarchy).
+     We use a data-key attribute to bind the checkbox to the grouping name. */
+  const taxCounts = {};
+  RESOURCES.forEach(r => {
+    if (r.tax_grouping) taxCounts[r.tax_grouping] = (taxCounts[r.tax_grouping] || 0) + 1;
+  });
+  const taxonomies = Object.keys(taxCounts).sort((a, b) => taxCounts[b] - taxCounts[a]);
+  const tf = document.getElementById('taxonomy-filters');
+  taxonomies.forEach(tax => {
+    const wrap = document.createElement('label');
+    wrap.innerHTML = `<input type="checkbox" data-group="taxonomies" data-key="${tax.replace(/"/g, '&quot;')}"><span>${tax} (${taxCounts[tax]})</span>`;
+    tf.appendChild(wrap);
   });
 
   /* Cities — derived from data, sorted by count */
@@ -2881,7 +2901,7 @@ function buildFilters() {
 }
 
 function updateFilterBadge() {
-  const total = activeFilters.services.size + activeFilters.access.size + activeFilters.cities.size;
+  const total = activeFilters.services.size + activeFilters.access.size + activeFilters.taxonomies.size + activeFilters.cities.size;
   const badge = document.getElementById('filter-badge');
   badge.textContent = total;
   badge.classList.toggle('visible', total > 0);
@@ -2890,6 +2910,7 @@ function updateFilterBadge() {
 document.getElementById('filter-clear').addEventListener('click', () => {
   activeFilters.services.clear();
   activeFilters.access.clear();
+  activeFilters.taxonomies.clear();
   activeFilters.cities.clear();
   document.querySelectorAll('.filter-options input').forEach(cb => cb.checked = false);
   updateFilterBadge();
@@ -2967,6 +2988,9 @@ function matchesResource(r) {
   for (const key of activeFilters.access) {
     if (r[key] !== 'Yes') return false;
   }
+
+  /* Taxonomy: must be in selected groupings (OR logic within group) */
+  if (activeFilters.taxonomies.size > 0 && !activeFilters.taxonomies.has(r.tax_grouping)) return false;
 
   /* City: must be in selected cities (OR logic within group) */
   if (activeFilters.cities.size > 0 && !activeFilters.cities.has(r.city)) return false;
