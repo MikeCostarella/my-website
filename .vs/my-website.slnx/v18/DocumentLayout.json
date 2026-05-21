@@ -3,6 +3,9 @@
   "WorkspaceRootPath": "C:\\costi\\AI\\Projects\\my-website\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\costi\\AI\\Projects\\Ohio\\Data\\Governments\\Girard\\Water\\Visualizations\\WaterSystemMap\\GirardOhioWaterAccountsMap - 001.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\costi\\AI\\Projects\\my-website\\Index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
@@ -39,12 +42,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "GirardOhioWaterAccountsMap - 001.html",
+              "DocumentMoniker": "C:\\costi\\AI\\Projects\\Ohio\\Data\\Governments\\Girard\\Water\\Visualizations\\WaterSystemMap\\GirardOhioWaterAccountsMap - 001.html",
+              "RelativeDocumentMoniker": "..\\Ohio\\Data\\Governments\\Girard\\Water\\Visualizations\\WaterSystemMap\\GirardOhioWaterAccountsMap - 001.html",
+              "ToolTip": "C:\\costi\\AI\\Projects\\Ohio\\Data\\Governments\\Girard\\Water\\Visualizations\\WaterSystemMap\\GirardOhioWaterAccountsMap - 001.html",
+              "RelativeToolTip": "..\\Ohio\\Data\\Governments\\Girard\\Water\\Visualizations\\WaterSystemMap\\GirardOhioWaterAccountsMap - 001.html",
+              "ViewState": "AgIAACMCAAAAAAAAAAAcwEYCAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-05-19T23:31:01.077Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Index.html",
               "DocumentMoniker": "C:\\costi\\AI\\Projects\\my-website\\Index.html",
               "RelativeDocumentMoniker": "Index.html",
               "ToolTip": "C:\\costi\\AI\\Projects\\my-website\\Index.html",
               "RelativeToolTip": "Index.html",
-              "ViewState": "AgIAAO4DAAAAAAAAAAAUwBEEAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAAEkDAAAAAAAAAAAUwFMDAABaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
               "WhenOpened": "2026-05-01T01:15:24.193Z",
               "EditorCaption": ""
