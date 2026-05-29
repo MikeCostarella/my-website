@@ -1,1051 +1,1338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Trumbull County Water Systems — A Civic Directory</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Newsreader:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-<style>
-  :root {
-    --ink: #0c1f2c;
-    --ink-soft: #1f3445;
-    --paper: #f5efe2;
-    --paper-warm: #ede4d1;
-    --rule: #d6cab1;
-    --water: #0a4a6e;
-    --water-deep: #052a40;
-    --water-bright: #1d8bbf;
-    --teal: #2a7a78;
-    --rust: #b04a1f;
-    --gold: #c9971f;
-    --shadow: 0 1px 0 rgba(12,31,44,.08);
-    --serif: "Fraunces", "Times New Roman", serif;
-    --read: "Newsreader", Georgia, serif;
-    --mono: "JetBrains Mono", ui-monospace, monospace;
-  }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trumbull County Water Systems — A Civic Directory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Newsreader:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --ink: #0c1f2c;
+            --ink-soft: #1f3445;
+            --paper: #f5efe2;
+            --paper-warm: #ede4d1;
+            --rule: #d6cab1;
+            --water: #0a4a6e;
+            --water-deep: #052a40;
+            --water-bright: #1d8bbf;
+            --teal: #2a7a78;
+            --rust: #b04a1f;
+            --gold: #c9971f;
+            --shadow: 0 1px 0 rgba(12,31,44,.08);
+            --serif: "Fraunces", "Times New Roman", serif;
+            --read: "Newsreader", Georgia, serif;
+            --mono: "JetBrains Mono", ui-monospace, monospace;
+        }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: var(--read);
-    background: var(--paper);
-    color: var(--ink);
-    line-height: 1.55;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(circle at 20% 0%, rgba(10,74,110,.06), transparent 50%),
-      radial-gradient(circle at 80% 100%, rgba(176,74,31,.04), transparent 50%);
-    background-attachment: fixed;
-  }
+        html {
+            scroll-behavior: smooth;
+        }
 
-  /* subtle paper grain */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    opacity: .35;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.12  0 0 0 0 0.18  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  }
+        body {
+            font-family: var(--read);
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.55;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 20% 0%, rgba(10,74,110,.06), transparent 50%), radial-gradient(circle at 80% 100%, rgba(176,74,31,.04), transparent 50%);
+            background-attachment: fixed;
+        }
 
-  /* ============ TOP BAR ============ */
-  .topbar {
-    position: sticky; top: 0; z-index: 50;
-    background: var(--ink);
-    color: var(--paper);
-    border-bottom: 3px double var(--gold);
-  }
-  .topbar-inner {
-    max-width: 1240px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 28px;
-    gap: 18px;
-  }
-  .brand {
-    display: flex; align-items: center; gap: 12px;
-    text-decoration: none; color: var(--paper);
-    flex-shrink: 0;
-  }
-  .brand-mark {
-    width: 38px; height: 38px;
-    display: grid; place-items: center;
-    background: var(--water-bright);
-    border-radius: 50%;
-    box-shadow: inset 0 0 0 2px var(--paper), 0 0 0 1px var(--water-bright);
-  }
-  .brand-mark svg { width: 22px; height: 22px; fill: var(--paper); }
-  .brand-text {
-    font-family: var(--serif);
-    font-weight: 800;
-    font-size: 18px;
-    line-height: 1;
-    letter-spacing: -.01em;
-  }
-  .brand-text small {
-    display: block;
-    font-family: var(--mono);
-    font-weight: 400;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .18em;
-    margin-top: 4px;
-    color: var(--gold);
-  }
+            /* subtle paper grain */
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 1;
+                opacity: .35;
+                mix-blend-mode: multiply;
+                background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.12  0 0 0 0 0.18  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+            }
 
-  .nav {
-    display: flex; align-items: center; gap: 4px;
-  }
-  .nav a {
-    color: var(--paper);
-    text-decoration: none;
-    font-family: var(--mono);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: .14em;
-    padding: 10px 14px;
-    border-radius: 2px;
-    transition: background .15s, color .15s;
-    position: relative;
-  }
-  .nav a:hover { background: var(--water-deep); color: var(--gold); }
-  .nav a.cta {
-    background: var(--gold);
-    color: var(--ink);
-    font-weight: 700;
-    margin-left: 8px;
-  }
-  .nav a.cta:hover { background: var(--paper); color: var(--ink); }
+        /* ============ TOP BAR ============ */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--ink);
+            color: var(--paper);
+            border-bottom: 3px double var(--gold);
+        }
 
-  .menu-toggle {
-    display: none;
-    background: none; border: 1px solid var(--paper); color: var(--paper);
-    padding: 8px 10px; cursor: pointer;
-    border-radius: 2px;
-  }
-  .menu-toggle svg { width: 22px; height: 22px; display: block; fill: var(--paper); }
+        .topbar-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 28px;
+            gap: 18px;
+        }
 
-  @media (max-width: 820px) {
-    .topbar-inner { padding: 12px 18px; }
-    .menu-toggle { display: inline-flex; }
-    .nav {
-      position: absolute; top: 100%; left: 0; right: 0;
-      flex-direction: column; align-items: stretch;
-      background: var(--ink);
-      border-bottom: 3px double var(--gold);
-      max-height: 0; overflow: hidden;
-      transition: max-height .35s ease;
-      gap: 0;
-    }
-    .nav.open { max-height: 420px; }
-    .nav a {
-      padding: 16px 24px;
-      border-top: 1px solid rgba(245,239,226,.08);
-      border-radius: 0;
-    }
-    .nav a.cta { margin: 12px 24px; text-align: center; }
-  }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--paper);
+            flex-shrink: 0;
+        }
 
-  /* ============ MASTHEAD ============ */
-  .masthead {
-    max-width: 1240px; margin: 0 auto;
-    padding: 56px 28px 28px;
-    border-bottom: 1px solid var(--rule);
-    position: relative;
-    z-index: 2;
-  }
-  .kicker {
-    font-family: var(--mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .25em;
-    color: var(--rust);
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 20px;
-  }
-  .kicker::after {
-    content: ""; flex: 1; height: 1px; background: var(--rule);
-  }
-  h1.title {
-    font-family: var(--serif);
-    font-weight: 800;
-    font-size: clamp(40px, 7vw, 84px);
-    line-height: .95;
-    letter-spacing: -.025em;
-    color: var(--water-deep);
-    font-variation-settings: "opsz" 144;
-  }
-  h1.title em {
-    font-style: italic;
-    color: var(--rust);
-    font-weight: 400;
-  }
-  .deck {
-    margin-top: 22px;
-    font-family: var(--read);
-    font-size: 19px;
-    max-width: 720px;
-    color: var(--ink-soft);
-    font-style: italic;
-  }
-  .meta-row {
-    display: flex; flex-wrap: wrap; gap: 28px;
-    margin-top: 32px;
-    padding-top: 20px;
-    border-top: 1px solid var(--rule);
-  }
-  .meta-stat {
-    font-family: var(--mono);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    color: var(--ink-soft);
-  }
-  .meta-stat strong {
-    display: block;
-    font-family: var(--serif);
-    font-size: 32px;
-    color: var(--water);
-    font-weight: 800;
-    margin-top: 4px;
-    text-transform: none;
-    letter-spacing: -.02em;
-  }
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            background: var(--water-bright);
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 2px var(--paper), 0 0 0 1px var(--water-bright);
+        }
 
-  /* ============ CONTROLS ============ */
-  .controls {
-    max-width: 1240px; margin: 0 auto;
-    padding: 32px 28px 12px;
-    display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
-    position: relative; z-index: 2;
-  }
-  .search-wrap {
-    flex: 1; min-width: 240px;
-    position: relative;
-  }
-  .search-wrap svg {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    width: 16px; height: 16px; fill: var(--ink-soft);
-    pointer-events: none;
-  }
-  .search-wrap input {
-    width: 100%;
-    padding: 12px 16px 12px 40px;
-    border: 1px solid var(--rule);
-    background: var(--paper-warm);
-    font-family: var(--read);
-    font-size: 15px;
-    color: var(--ink);
-    border-radius: 2px;
-    outline: none;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  .search-wrap input:focus {
-    border-color: var(--water);
-    box-shadow: 0 0 0 3px rgba(10,74,110,.15);
-  }
-  .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip {
-    font-family: var(--mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    padding: 9px 14px;
-    border: 1px solid var(--rule);
-    background: var(--paper);
-    color: var(--ink-soft);
-    cursor: pointer;
-    border-radius: 999px;
-    transition: all .15s;
-  }
-  .chip:hover { border-color: var(--water); color: var(--water); }
-  .chip.active {
-    background: var(--ink); color: var(--paper); border-color: var(--ink);
-  }
-  .chip .count {
-    margin-left: 6px;
-    opacity: .6;
-    font-weight: 400;
-  }
+            .brand-mark svg {
+                width: 22px;
+                height: 22px;
+                fill: var(--paper);
+            }
 
-  /* ============ TABLE ============ */
-  .table-wrap {
-    max-width: 1240px; margin: 0 auto;
-    padding: 8px 28px 60px;
-    position: relative; z-index: 2;
-  }
-  .legend {
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .14em;
-    color: var(--ink-soft);
-    margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .legend::before {
-    content: "→"; color: var(--rust); font-family: var(--serif); font-size: 14px;
-  }
+        .brand-text {
+            font-family: var(--serif);
+            font-weight: 800;
+            font-size: 18px;
+            line-height: 1;
+            letter-spacing: -.01em;
+        }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--paper-warm);
-    border: 1px solid var(--rule);
-    box-shadow: var(--shadow);
-  }
-  thead th {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .15em;
-    text-align: left;
-    padding: 14px 16px;
-    background: var(--ink);
-    color: var(--paper);
-    border-bottom: 2px solid var(--gold);
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-  }
-  thead th:hover { color: var(--gold); }
-  thead th.sorted::after {
-    content: " ↓"; color: var(--gold);
-  }
-  thead th.sorted.asc::after { content: " ↑"; }
+            .brand-text small {
+                display: block;
+                font-family: var(--mono);
+                font-weight: 400;
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: .18em;
+                margin-top: 4px;
+                color: var(--gold);
+            }
 
-  tbody tr {
-    border-bottom: 1px solid var(--rule);
-    cursor: pointer;
-    transition: background .12s;
-  }
-  tbody tr:hover {
-    background: var(--paper);
-  }
-  tbody tr:hover td:first-child { color: var(--water); }
-  tbody tr:last-child { border-bottom: none; }
-  tbody td {
-    padding: 16px;
-    vertical-align: top;
-    font-size: 15px;
-  }
-  tbody td:first-child {
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: 17px;
-    color: var(--water-deep);
-    letter-spacing: -.01em;
-    transition: color .12s;
-    width: 30%;
-  }
-  td .row-arrow {
-    display: inline-block;
-    margin-left: 6px;
-    color: var(--rust);
-    opacity: 0;
-    transition: opacity .12s, transform .12s;
-  }
-  tbody tr:hover .row-arrow { opacity: 1; transform: translateX(3px); }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-  .map-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px; height: 22px;
-    margin-left: 8px;
-    border-radius: 50%;
-    background: var(--gold);
-    color: var(--ink);
-    text-decoration: none;
-    vertical-align: middle;
-    transition: transform .18s, background .18s;
-    box-shadow: 0 0 0 2px var(--paper-warm);
-    position: relative;
-  }
-  .map-icon svg { width: 12px; height: 12px; fill: currentColor; }
-  .map-icon:hover { background: var(--rust); color: var(--paper); transform: scale(1.15); }
-  .map-icon::after {
-    content: "Map available";
-    position: absolute;
-    bottom: calc(100% + 6px); left: 50%;
-    transform: translateX(-50%);
-    background: var(--ink); color: var(--paper);
-    font-family: var(--mono);
-    font-size: 9px; font-weight: 500;
-    text-transform: uppercase; letter-spacing: .12em;
-    padding: 5px 8px;
-    border-radius: 2px;
-    white-space: nowrap;
-    opacity: 0; pointer-events: none;
-    transition: opacity .15s;
-  }
-  .map-icon:hover::after { opacity: 1; }
-  /* hide tooltip on touch devices to avoid sticky-tap weirdness */
-  @media (hover: none) { .map-icon::after { display: none; } }
+            .nav a {
+                color: var(--paper);
+                text-decoration: none;
+                font-family: var(--mono);
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: .14em;
+                padding: 10px 14px;
+                border-radius: 2px;
+                transition: background .15s, color .15s;
+                position: relative;
+            }
 
-  .badge {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-weight: 500;
-    border: 1px solid;
-    white-space: nowrap;
-  }
-  .badge.county {
-    color: var(--water-deep);
-    border-color: var(--water);
-    background: rgba(29,139,191,.1);
-  }
-  .badge.municipal {
-    color: var(--rust);
-    border-color: var(--rust);
-    background: rgba(176,74,31,.08);
-  }
+                .nav a:hover {
+                    background: var(--water-deep);
+                    color: var(--gold);
+                }
 
-  .empty {
-    text-align: center;
-    padding: 64px 20px;
-    color: var(--ink-soft);
-    font-style: italic;
-  }
+                .nav a.cta {
+                    background: var(--gold);
+                    color: var(--ink);
+                    font-weight: 700;
+                    margin-left: 8px;
+                }
 
-  /* mobile table → cards */
-  @media (max-width: 720px) {
-    thead { display: none; }
-    table, tbody, tr, td { display: block; width: 100%; }
-    tbody tr {
-      padding: 18px 18px;
-      margin-bottom: 12px;
-      border: 1px solid var(--rule);
-      background: var(--paper-warm);
-    }
-    tbody td { padding: 4px 0; border: none; }
-    tbody td:first-child { width: 100%; padding-bottom: 8px; }
-    tbody td[data-label]::before {
-      content: attr(data-label);
-      display: block;
-      font-family: var(--mono);
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: .14em;
-      color: var(--ink-soft);
-      margin-bottom: 2px;
-    }
-  }
+                    .nav a.cta:hover {
+                        background: var(--paper);
+                        color: var(--ink);
+                    }
 
-  /* ============ DIALOG ============ */
-  .dialog-backdrop {
-    position: fixed; inset: 0;
-    background: rgba(12,31,44,.55);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s;
-  }
-  .dialog-backdrop.show { opacity: 1; pointer-events: auto; }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: 1px solid var(--paper);
+            color: var(--paper);
+            padding: 8px 10px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
 
-  .dialog {
-    position: fixed;
-    top: 0; right: 0; bottom: 0;
-    width: min(560px, 100%);
-    background: var(--paper);
-    z-index: 101;
-    transform: translateX(100%);
-    transition: transform .35s cubic-bezier(.2,.8,.2,1);
-    box-shadow: -20px 0 60px rgba(12,31,44,.25);
-    overflow-y: auto;
-    display: flex; flex-direction: column;
-  }
-  .dialog.show { transform: translateX(0); }
+            .menu-toggle svg {
+                width: 22px;
+                height: 22px;
+                display: block;
+                fill: var(--paper);
+            }
 
-  .dialog-head {
-    background: var(--ink);
-    color: var(--paper);
-    padding: 28px 32px 24px;
-    border-bottom: 3px double var(--gold);
-    position: sticky; top: 0;
-    z-index: 1;
-  }
-  .dialog-close {
-    position: absolute; top: 16px; right: 16px;
-    background: transparent;
-    color: var(--paper);
-    border: 1px solid rgba(245,239,226,.3);
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background .15s, transform .2s;
-    display: grid; place-items: center;
-  }
-  .dialog-close:hover { background: var(--rust); border-color: var(--rust); transform: rotate(90deg); }
+        @media (max-width: 820px) {
+            .topbar-inner {
+                padding: 12px 18px;
+            }
 
-  .dialog-eyebrow {
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .2em;
-    color: var(--gold);
-    margin-bottom: 10px;
-  }
-  .dialog-title {
-    font-family: var(--serif);
-    font-size: 30px;
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -.02em;
-    margin-right: 40px;
-  }
-  .dialog-sub {
-    font-family: var(--read);
-    font-style: italic;
-    margin-top: 8px;
-    color: rgba(245,239,226,.75);
-    font-size: 15px;
-  }
+            .menu-toggle {
+                display: inline-flex;
+            }
 
-  .dialog-body { padding: 28px 32px 40px; }
-  .field {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--rule);
-  }
-  .field:last-child { border-bottom: none; }
-  .field-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .15em;
-    color: var(--ink-soft);
-    margin-bottom: 6px;
-  }
-  .field-value {
-    font-family: var(--read);
-    font-size: 16px;
-    color: var(--ink);
-    line-height: 1.5;
-    word-wrap: break-word;
-  }
-  .field-value a {
-    color: var(--water);
-    text-decoration: underline;
-    text-decoration-color: var(--gold);
-    text-underline-offset: 3px;
-    word-break: break-all;
-  }
-  .field-value a:hover { color: var(--rust); }
-  .coord-pair {
-    display: inline-flex; gap: 16px;
-    font-family: var(--mono);
-    font-size: 14px;
-  }
+            .nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                align-items: stretch;
+                background: var(--ink);
+                border-bottom: 3px double var(--gold);
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height .35s ease;
+                gap: 0;
+            }
 
-  .dialog-actions {
-    margin-top: 24px;
-    display: flex; gap: 10px; flex-wrap: wrap;
-  }
-  .dialog-actions a {
-    flex: 1; min-width: 160px;
-    text-align: center;
-    text-decoration: none;
-    padding: 14px 18px;
-    font-family: var(--mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .14em;
-    border-radius: 2px;
-    transition: transform .15s, background .15s;
-  }
-  .dialog-actions .btn-primary {
-    background: var(--water);
-    color: var(--paper);
-  }
-  .dialog-actions .btn-primary:hover { background: var(--water-deep); transform: translateY(-1px); }
-  .dialog-actions .btn-secondary {
-    background: transparent;
-    color: var(--ink);
-    border: 1px solid var(--ink);
-  }
-  .dialog-actions .btn-secondary:hover { background: var(--ink); color: var(--paper); }
-  .dialog-actions .btn-accent {
-    background: var(--gold);
-    color: var(--ink);
-    font-weight: 700;
-  }
-  .dialog-actions .btn-accent:hover { background: var(--rust); color: var(--paper); transform: translateY(-1px); }
+                .nav.open {
+                    max-height: 420px;
+                }
 
-  /* ============ FOOTER ============ */
-  footer {
-    background: var(--ink);
-    color: var(--paper);
-    padding: 40px 28px;
-    margin-top: 40px;
-    border-top: 3px double var(--gold);
-    position: relative; z-index: 2;
-  }
-  .footer-inner {
-    max-width: 1240px; margin: 0 auto;
-    display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap;
-    align-items: flex-end;
-  }
-  .colophon {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 18px;
-    max-width: 480px;
-    line-height: 1.4;
-  }
-  .colophon strong {
-    font-style: normal;
-    font-weight: 800;
-    display: block;
-    color: var(--gold);
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: .18em;
-    margin-bottom: 8px;
-  }
-  .footer-meta {
-    font-family: var(--mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    text-align: right;
-    color: rgba(245,239,226,.65);
-    line-height: 1.8;
-  }
-  .footer-meta strong { color: var(--paper); display: block; }
+                .nav a {
+                    padding: 16px 24px;
+                    border-top: 1px solid rgba(245,239,226,.08);
+                    border-radius: 0;
+                }
 
-  @media (max-width: 600px) {
-    .footer-meta { text-align: left; }
-    .masthead { padding: 36px 18px 22px; }
-    .controls, .table-wrap { padding-left: 18px; padding-right: 18px; }
-    .meta-row { gap: 20px; }
-    .meta-stat strong { font-size: 26px; }
-    .dialog-head { padding: 24px 22px 20px; }
-    .dialog-body { padding: 22px; }
-    .dialog-title { font-size: 24px; }
-  }
+                    .nav a.cta {
+                        margin: 12px 24px;
+                        text-align: center;
+                    }
+        }
 
-  /* keyboard focus */
-  tbody tr:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
-  button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+        /* ============ MASTHEAD ============ */
+        .masthead {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 56px 28px 28px;
+            border-bottom: 1px solid var(--rule);
+            position: relative;
+            z-index: 2;
+        }
 
-</style>
+        .kicker {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .25em;
+            color: var(--rust);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+            .kicker::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: var(--rule);
+            }
+
+        h1.title {
+            font-family: var(--serif);
+            font-weight: 800;
+            font-size: clamp(40px, 7vw, 84px);
+            line-height: .95;
+            letter-spacing: -.025em;
+            color: var(--water-deep);
+            font-variation-settings: "opsz" 144;
+        }
+
+            h1.title em {
+                font-style: italic;
+                color: var(--rust);
+                font-weight: 400;
+            }
+
+        .deck {
+            margin-top: 22px;
+            font-family: var(--read);
+            font-size: 19px;
+            max-width: 720px;
+            color: var(--ink-soft);
+            font-style: italic;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--rule);
+        }
+
+        .meta-stat {
+            font-family: var(--mono);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--ink-soft);
+        }
+
+            .meta-stat strong {
+                display: block;
+                font-family: var(--serif);
+                font-size: 32px;
+                color: var(--water);
+                font-weight: 800;
+                margin-top: 4px;
+                text-transform: none;
+                letter-spacing: -.02em;
+            }
+
+        /* ============ CONTROLS ============ */
+        .controls {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 32px 28px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .search-wrap {
+            flex: 1;
+            min-width: 240px;
+            position: relative;
+        }
+
+            .search-wrap svg {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 16px;
+                height: 16px;
+                fill: var(--ink-soft);
+                pointer-events: none;
+            }
+
+            .search-wrap input {
+                width: 100%;
+                padding: 12px 16px 12px 40px;
+                border: 1px solid var(--rule);
+                background: var(--paper-warm);
+                font-family: var(--read);
+                font-size: 15px;
+                color: var(--ink);
+                border-radius: 2px;
+                outline: none;
+                transition: border-color .15s, box-shadow .15s;
+            }
+
+                .search-wrap input:focus {
+                    border-color: var(--water);
+                    box-shadow: 0 0 0 3px rgba(10,74,110,.15);
+                }
+
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            padding: 9px 14px;
+            border: 1px solid var(--rule);
+            background: var(--paper);
+            color: var(--ink-soft);
+            cursor: pointer;
+            border-radius: 999px;
+            transition: all .15s;
+        }
+
+            .chip:hover {
+                border-color: var(--water);
+                color: var(--water);
+            }
+
+            .chip.active {
+                background: var(--ink);
+                color: var(--paper);
+                border-color: var(--ink);
+            }
+
+            .chip .count {
+                margin-left: 6px;
+                opacity: .6;
+                font-weight: 400;
+            }
+
+        /* ============ TABLE ============ */
+        .table-wrap {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 8px 28px 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .legend {
+            font-family: var(--mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: var(--ink-soft);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .legend::before {
+                content: "→";
+                color: var(--rust);
+                font-family: var(--serif);
+                font-size: 14px;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--paper-warm);
+            border: 1px solid var(--rule);
+            box-shadow: var(--shadow);
+        }
+
+        thead th {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .15em;
+            text-align: left;
+            padding: 14px 16px;
+            background: var(--ink);
+            color: var(--paper);
+            border-bottom: 2px solid var(--gold);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+            thead th:hover {
+                color: var(--gold);
+            }
+
+            thead th.sorted::after {
+                content: " ↓";
+                color: var(--gold);
+            }
+
+            thead th.sorted.asc::after {
+                content: " ↑";
+            }
+
+        tbody tr {
+            border-bottom: 1px solid var(--rule);
+            cursor: pointer;
+            transition: background .12s;
+        }
+
+            tbody tr:hover {
+                background: var(--paper);
+            }
+
+                tbody tr:hover td:first-child {
+                    color: var(--water);
+                }
+
+            tbody tr:last-child {
+                border-bottom: none;
+            }
+
+        tbody td {
+            padding: 16px;
+            vertical-align: top;
+            font-size: 15px;
+        }
+
+            tbody td:first-child {
+                font-family: var(--serif);
+                font-weight: 600;
+                font-size: 17px;
+                color: var(--water-deep);
+                letter-spacing: -.01em;
+                transition: color .12s;
+                width: 30%;
+            }
+
+        td .row-arrow {
+            display: inline-block;
+            margin-left: 6px;
+            color: var(--rust);
+            opacity: 0;
+            transition: opacity .12s, transform .12s;
+        }
+
+        tbody tr:hover .row-arrow {
+            opacity: 1;
+            transform: translateX(3px);
+        }
+
+        .map-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            margin-left: 8px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: var(--ink);
+            text-decoration: none;
+            vertical-align: middle;
+            transition: transform .18s, background .18s;
+            box-shadow: 0 0 0 2px var(--paper-warm);
+            position: relative;
+        }
+
+            .map-icon svg {
+                width: 12px;
+                height: 12px;
+                fill: currentColor;
+            }
+
+            .map-icon:hover {
+                background: var(--rust);
+                color: var(--paper);
+                transform: scale(1.15);
+            }
+
+            .map-icon::after {
+                content: "Map available";
+                position: absolute;
+                bottom: calc(100% + 6px);
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--ink);
+                color: var(--paper);
+                font-family: var(--mono);
+                font-size: 9px;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: .12em;
+                padding: 5px 8px;
+                border-radius: 2px;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .15s;
+            }
+
+            .map-icon:hover::after {
+                opacity: 1;
+            }
+        /* hide tooltip on touch devices to avoid sticky-tap weirdness */
+        @media (hover: none) {
+            .map-icon::after {
+                display: none;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 500;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+
+            .badge.county {
+                color: var(--water-deep);
+                border-color: var(--water);
+                background: rgba(29,139,191,.1);
+            }
+
+            .badge.municipal {
+                color: var(--rust);
+                border-color: var(--rust);
+                background: rgba(176,74,31,.08);
+            }
+
+        .empty {
+            text-align: center;
+            padding: 64px 20px;
+            color: var(--ink-soft);
+            font-style: italic;
+        }
+
+        /* mobile table → cards */
+        @media (max-width: 720px) {
+            thead {
+                display: none;
+            }
+
+            table, tbody, tr, td {
+                display: block;
+                width: 100%;
+            }
+
+                tbody tr {
+                    padding: 18px 18px;
+                    margin-bottom: 12px;
+                    border: 1px solid var(--rule);
+                    background: var(--paper-warm);
+                }
+
+                tbody td {
+                    padding: 4px 0;
+                    border: none;
+                }
+
+                    tbody td:first-child {
+                        width: 100%;
+                        padding-bottom: 8px;
+                    }
+
+                    tbody td[data-label]::before {
+                        content: attr(data-label);
+                        display: block;
+                        font-family: var(--mono);
+                        font-size: 9px;
+                        text-transform: uppercase;
+                        letter-spacing: .14em;
+                        color: var(--ink-soft);
+                        margin-bottom: 2px;
+                    }
+        }
+
+        /* ============ DIALOG ============ */
+        .dialog-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(12,31,44,.55);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s;
+        }
+
+            .dialog-backdrop.show {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+        .dialog {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(560px, 100%);
+            background: var(--paper);
+            z-index: 101;
+            transform: translateX(100%);
+            transition: transform .35s cubic-bezier(.2,.8,.2,1);
+            box-shadow: -20px 0 60px rgba(12,31,44,.25);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .dialog.show {
+                transform: translateX(0);
+            }
+
+        .dialog-head {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 28px 32px 24px;
+            border-bottom: 3px double var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .dialog-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: transparent;
+            color: var(--paper);
+            border: 1px solid rgba(245,239,226,.3);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background .15s, transform .2s;
+            display: grid;
+            place-items: center;
+        }
+
+            .dialog-close:hover {
+                background: var(--rust);
+                border-color: var(--rust);
+                transform: rotate(90deg);
+            }
+
+        .dialog-eyebrow {
+            font-family: var(--mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .2em;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .dialog-title {
+            font-family: var(--serif);
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -.02em;
+            margin-right: 40px;
+        }
+
+        .dialog-sub {
+            font-family: var(--read);
+            font-style: italic;
+            margin-top: 8px;
+            color: rgba(245,239,226,.75);
+            font-size: 15px;
+        }
+
+        .dialog-body {
+            padding: 28px 32px 40px;
+        }
+
+        .field {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--rule);
+        }
+
+            .field:last-child {
+                border-bottom: none;
+            }
+
+        .field-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .15em;
+            color: var(--ink-soft);
+            margin-bottom: 6px;
+        }
+
+        .field-value {
+            font-family: var(--read);
+            font-size: 16px;
+            color: var(--ink);
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+            .field-value a {
+                color: var(--water);
+                text-decoration: underline;
+                text-decoration-color: var(--gold);
+                text-underline-offset: 3px;
+                word-break: break-all;
+            }
+
+                .field-value a:hover {
+                    color: var(--rust);
+                }
+
+        .coord-pair {
+            display: inline-flex;
+            gap: 16px;
+            font-family: var(--mono);
+            font-size: 14px;
+        }
+
+        .dialog-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+            .dialog-actions a {
+                flex: 1;
+                min-width: 160px;
+                text-align: center;
+                text-decoration: none;
+                padding: 14px 18px;
+                font-family: var(--mono);
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: .14em;
+                border-radius: 2px;
+                transition: transform .15s, background .15s;
+            }
+
+            .dialog-actions .btn-primary {
+                background: var(--water);
+                color: var(--paper);
+            }
+
+                .dialog-actions .btn-primary:hover {
+                    background: var(--water-deep);
+                    transform: translateY(-1px);
+                }
+
+            .dialog-actions .btn-secondary {
+                background: transparent;
+                color: var(--ink);
+                border: 1px solid var(--ink);
+            }
+
+                .dialog-actions .btn-secondary:hover {
+                    background: var(--ink);
+                    color: var(--paper);
+                }
+
+            .dialog-actions .btn-accent {
+                background: var(--gold);
+                color: var(--ink);
+                font-weight: 700;
+            }
+
+                .dialog-actions .btn-accent:hover {
+                    background: var(--rust);
+                    color: var(--paper);
+                    transform: translateY(-1px);
+                }
+
+        /* ============ FOOTER ============ */
+        footer {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 40px 28px;
+            margin-top: 40px;
+            border-top: 3px double var(--gold);
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .colophon {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 18px;
+            max-width: 480px;
+            line-height: 1.4;
+        }
+
+            .colophon strong {
+                font-style: normal;
+                font-weight: 800;
+                display: block;
+                color: var(--gold);
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: .18em;
+                margin-bottom: 8px;
+            }
+
+        .footer-meta {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            text-align: right;
+            color: rgba(245,239,226,.65);
+            line-height: 1.8;
+        }
+
+            .footer-meta strong {
+                color: var(--paper);
+                display: block;
+            }
+
+        @media (max-width: 600px) {
+            .footer-meta {
+                text-align: left;
+            }
+
+            .masthead {
+                padding: 36px 18px 22px;
+            }
+
+            .controls, .table-wrap {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .meta-row {
+                gap: 20px;
+            }
+
+            .meta-stat strong {
+                font-size: 26px;
+            }
+
+            .dialog-head {
+                padding: 24px 22px 20px;
+            }
+
+            .dialog-body {
+                padding: 22px;
+            }
+
+            .dialog-title {
+                font-size: 24px;
+            }
+        }
+
+        /* keyboard focus */
+        tbody tr:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: -2px;
+        }
+
+        button:focus-visible, a:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 2px;
+        }
+    </style>
 </head>
 <body>
 
-<!-- ============ TOP BAR ============ -->
-<header class="topbar">
-  <div class="topbar-inner">
-    <a href="#" class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M12 2C9 7 5 11 5 15a7 7 0 0014 0c0-4-4-8-7-13z"/></svg>
-      </span>
-      <span class="brand-text">
-        Trumbull Waterworks
-        <small>A Civic Directory</small>
-      </span>
-    </a>
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">
-      <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-    </button>
-    <nav class="nav" id="nav">
-      <a href="#directory">Directory</a>
-      <a href="#about">About</a>
-      <a href="#colophon">Colophon</a>
-      <a href="https://www.co.trumbull.oh.us/Sanitary-Engineer/" class="cta" target="_blank" rel="noopener">County Office ↗</a>
-    </nav>
-  </div>
-</header>
-
-<!-- ============ MASTHEAD ============ -->
-<section class="masthead" id="directory">
-  <div class="kicker">Vol. I · No. 1 · Trumbull County, Ohio</div>
-  <h1 class="title">A Directory of <em>Public Water</em><br/>Systems, Catalogued.</h1>
-  <p class="deck">
-    Fourteen distinct utilities serve the cities, villages, and townships of Trumbull
-    County — from the bulk operations of the Sanitary Engineer to small village
-    departments. Browse the directory below; tap any entry for full details and a
-    direct link to its Consumer Confidence Report.
-  </p>
-  <div class="meta-row">
-    <div class="meta-stat">Systems Indexed <strong id="statTotal">14</strong></div>
-    <div class="meta-stat">County Districts <strong id="statCounty">7</strong></div>
-    <div class="meta-stat">Municipal Depts <strong id="statMuni">7</strong></div>
-    <div class="meta-stat">Providers Mapped <strong id="statMapped">0</strong></div>
-    <div class="meta-stat">Region <strong>NE&nbsp;Ohio</strong></div>
-  </div>
-</section>
-
-<!-- ============ CONTROLS ============ -->
-<section class="controls">
-  <div class="search-wrap">
-    <svg viewBox="0 0 24 24"><path d="M10 4a6 6 0 014.47 10.03l4.75 4.75-1.41 1.41-4.75-4.75A6 6 0 1110 4zm0 2a4 4 0 100 8 4 4 0 000-8z"/></svg>
-    <input type="search" id="searchInput" placeholder="Search by name, township, city, or category…" />
-  </div>
-  <div class="filter-group" id="filterGroup">
-    <button class="chip active" data-filter="all">All <span class="count">14</span></button>
-    <button class="chip" data-filter="County Water District">County Districts <span class="count">7</span></button>
-    <button class="chip" data-filter="Municipal Water Department">Municipal <span class="count">7</span></button>
-    <button class="chip" data-filter="__mapped">Mapped <span class="count" id="chipMappedCount">0</span></button>
-  </div>
-</section>
-
-<!-- ============ TABLE ============ -->
-<section class="table-wrap">
-  <div class="legend">Tap any row for full details</div>
-  <table id="systemsTable" aria-label="Water systems directory">
-    <thead>
-      <tr>
-        <th data-sort="Water System Name" class="sorted asc">Water Provider</th>
-        <th data-sort="Category">Category</th>
-        <th data-sort="Service Area">Service Area</th>
-        <th data-sort="Geocodio City">City</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-  <div id="emptyState" class="empty" hidden>No water systems match that search.</div>
-</section>
-
-<!-- ============ DIALOG ============ -->
-<div class="dialog-backdrop" id="backdrop"></div>
-<aside class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-  <div class="dialog-head">
-    <div class="dialog-eyebrow" id="dialogEyebrow">— Entry —</div>
-    <h2 class="dialog-title" id="dialogTitle">—</h2>
-    <div class="dialog-sub" id="dialogSub"></div>
-    <button class="dialog-close" id="dialogClose" aria-label="Close details">✕</button>
-  </div>
-  <div class="dialog-body" id="dialogBody"></div>
-</aside>
-
-<!-- ============ FOOTER ============ -->
-<footer id="colophon">
-  <div class="footer-inner">
-    <div class="colophon">
-      <strong>Colophon</strong>
-      Set in Fraunces &amp; Newsreader, with monospace accents in JetBrains Mono.
-      Composed as a public reference for the residents of Trumbull County.
-    </div>
-    <div class="footer-meta">
-      <strong>Created by Mike Costarella</strong>
-      Last updated <span id="lastUpdated">—</span>
-    </div>
-  </div>
-</footer>
-
-<script>
-  // ============ DATA ============
-  const DATA = [{"Id":"a6106363-c2ca-4897-9c4f-835bd3c0a75a","Water System Name":"Bazetta/Champion Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Bazetta Township / Champion Township","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/CH.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US","Main Phone":"(330) 675-2775","Billing Phone":"(330) 675-2475","Email":"senewbro@co.trumbull.oh.us","Contact / Department":"Gary Newbrough, Sanitary Engineer","Contact Source":"co.trumbull.oh.us/Sanitary-Engineer/"},{"Id":"ff50f336-e06b-4c07-a7c0-744960f82bb6","Water System Name":"Braceville Township Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Braceville Township","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/BR.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US","Main Phone":"(330) 675-2775","Billing Phone":"(330) 675-2475","Email":"senewbro@co.trumbull.oh.us","Contact / Department":"Gary Newbrough, Sanitary Engineer","Contact Source":"co.trumbull.oh.us/Sanitary-Engineer/"},{"Id":"541357cf-4757-438a-b030-8ccee47deff0","Water System Name":"Howland Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Howland Township","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/HO.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US","Main Phone":"(330) 675-2775","Billing Phone":"(330) 675-2475","Email":"senewbro@co.trumbull.oh.us","Contact / Department":"Gary Newbrough, Sanitary Engineer","Contact Source":"co.trumbull.oh.us/Sanitary-Engineer/"},{"Id":"c7d24a83-f034-43cc-b6bd-8b45e4e60444","Water System Name":"Mineral Ridge Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Mineral Ridge area (Weathersfield Township)","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/MI.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US","Main Phone":"(330) 675-2775","Billing Phone":"(330) 675-2475","Email":"senewbro@co.trumbull.oh.us","Contact / Department":"Gary Newbrough, Sanitary Engineer","Contact Source":"co.trumbull.oh.us/Sanitary-Engineer/"},{"Id":"44a878bf-758e-4b71-aba5-22a4f356388f","Water System Name":"Mosquito Creek Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Mosquito Creek area","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/MC.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US","Main Phone":"(330) 675-2775","Billing Phone":"(330) 675-2475","Email":"senewbro@co.trumbull.oh.us","Contact / Department":"Gary Newbrough, Sanitary Engineer","Contact Source":"co.trumbull.oh.us/Sanitary-Engineer/"},{"Id":"b9afbd43-1a5b-477d-ac3e-0efbd7846b8f","Water System Name":"Southeast Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Southeastern Trumbull County","Category":"County Water District","Notes":"Operated under ORC Chapter 6103; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/SE.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US","Main Phone":"(330) 675-2775","Billing Phone":"(330) 675-2475","Email":"senewbro@co.trumbull.oh.us","Contact / Department":"Gary Newbrough, Sanitary Engineer","Contact Source":"co.trumbull.oh.us/Sanitary-Engineer/"},{"Id":"ebf64646-34ed-4bde-b58e-a14bb06336e0","Water System Name":"Warren Township Water District","Type / Operator":"County - Trumbull County Sanitary Engineer","Service Area":"Warren Township (unincorporated)","Category":"County Water District","Notes":"Separate from City of Warren system; CCR published annually","Consumer Confidence Report":"https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/WA.pdf","Billing Address":"Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473","Geocodio Latitude":41.240269,"Geocodio Longitude":-80.66361,"Street Number":842,"Street Name":"Youngstown Kingsville Rd","Geocodio City":"Vienna","Geocodio State":"OH","County":"Trumbull County","Postal Code":44473,"Country":"US","Main Phone":"(330) 675-2775","Billing Phone":"(330) 675-2475","Email":"senewbro@co.trumbull.oh.us","Contact / Department":"Gary Newbrough, Sanitary Engineer","Contact Source":"co.trumbull.oh.us/Sanitary-Engineer/"},{"Id":"cb6b962d-bfa1-4f9c-b1ed-0b4090834763","Water System Name":"City of Warren Water Department","Type / Operator":"Municipal","Service Area":"City of Warren","Category":"Municipal Water Department","Notes":"2323 Main Avenue SW, Warren OH; supplies bulk water to some county districts","Consumer Confidence Report":"https://www.warren.org/water_department/annual_report.php","Billing Address":"City of Warren Water Dept, 2323 Main Ave SW, Warren, OH 44481","Geocodio Latitude":41.202075,"Geocodio Longitude":-80.81282,"Street Number":2323,"Street Name":"Main Ave SW","Geocodio City":"Warren","Geocodio State":"OH","County":"Trumbull County","Postal Code":44481,"Country":"US","Main Phone":"(330) 841-2531","Billing Phone":"(330) 841-2531","Email":"flucarelli@warren.org","Contact / Department":"Franco Lucarelli, Director of Utilities","Contact Source":"warren.org/water_department/"},{"Id":"4dd3231a-6bbb-44b4-bac5-9ad400030030","Water System Name":"City of Niles Water Department","Type / Operator":"Municipal","Service Area":"City of Niles","Category":"Municipal Water Department","Notes":"Operates own municipal water system","Consumer Confidence Report":"https://thecityofniles.com/","Billing Address":"City of Niles Water Department, 34 W State St, Niles, OH 44446","Geocodio Latitude":41.179495,"Geocodio Longitude":-80.766403,"Street Number":34,"Street Name":"W State St","Geocodio City":"Niles","Geocodio State":"OH","County":"Trumbull County","Postal Code":44446,"Country":"US","Main Phone":"(330) 544-9000 x 1150","Billing Phone":"(330) 544-9000 x 1150","Email":"mail@thecityofniles.com","Contact / Department":"Utility Billing Office","Contact Source":"thecityofniles.com/services/billing/"},{"Id":"ef592e78-3cff-4fdc-8d5d-1d7f2882703c","Water System Name":"City of Girard Water Department","Type / Operator":"Municipal","Service Area":"City of Girard","Category":"Municipal Water Department","Notes":"100 W Main St, Ste 3, Girard OH","Consumer Confidence Report":"https://cityofgirardoh.gov/blog/ova_dep/water-department/","Billing Address":"City of Girard Water Dept, 100 West Main Street, Girard, OH 44420","Geocodio Latitude":41.155527,"Geocodio Longitude":-80.703711,"Street Number":100,"Street Name":"W Main St","Geocodio City":"Girard","Geocodio State":"OH","County":"Trumbull County","Postal Code":44420,"Country":"US","Main Phone":"(330) 545-5857","Billing Phone":"(330) 539-7242","Email":"water@cityofgirardoh.gov","Contact / Department":"Water Department / Ashley Alejars, Foreman","Contact Source":"cityofgirardoh.gov/blog/ova_dep/water-department/"},{"Id":"09d2e929-d932-4161-91aa-e2c3c38bb7a5","Water System Name":"City of Hubbard Water Department","Type / Operator":"Municipal","Service Area":"City of Hubbard","Category":"Municipal Water Department","Notes":"824 North Main Street, Hubbard OH","Consumer Confidence Report":"https://cityofhubbard-oh.gov/water/","Billing Address":"City of Hubbard Municipal Building, 220 West Liberty Street, Hubbard, OH 44425","Geocodio Latitude":41.156569,"Geocodio Longitude":-80.573215,"Street Number":220,"Street Name":"W Liberty St","Geocodio City":"Hubbard","Geocodio State":"OH","County":"Trumbull County","Postal Code":44425,"Country":"US","Main Phone":"(330) 534-3636","Billing Phone":"(330) 534-3054","Email":"m.hallapy@cityofhubbard.com","Contact / Department":"Bob Dietz (Water Foreman); Marianne Hallapy (Billing)","Contact Source":"cityofhubbard-oh.gov/water/"},{"Id":"6ed52c0d-96ae-4e8c-a261-805096e0a8f8","Water System Name":"City of Newton Falls Water Department","Type / Operator":"Municipal","Service Area":"City of Newton Falls","Category":"Municipal Water Department","Notes":"Operates own municipal water system","Consumer Confidence Report":"https://ci.newtonfalls.oh.us/water-utility-services/","Billing Address":"City of Newton Falls Utility Billing, 612 West Broad Street, Newton Falls, OH 44444","Geocodio Latitude":41.189084,"Geocodio Longitude":-80.984698,"Street Number":612,"Street Name":"W Broad St","Geocodio City":"Newton Falls","Geocodio State":"OH","County":"Trumbull County","Postal Code":44444,"Country":"US","Main Phone":"(330) 872-0806","Billing Phone":"(330) 872-0806","Email":"info@ci.newtonfalls.oh.us","Contact / Department":"Susan Barker, Billing Administrator","Contact Source":"ci.newtonfalls.oh.us/utility-billing/"},{"Id":"0dd52f30-0492-4b8b-ae82-e5efe6b27391","Water System Name":"City of Cortland Water Department","Type / Operator":"Municipal","Service Area":"City of Cortland","Category":"Municipal Water Department","Notes":"Operates own municipal water system","Consumer Confidence Report":"https://www.cortlandoh.gov/drinking-water-consumer-confidence-report/","Billing Address":"City of Cortland Administration, 400 North High Street, Cortland, OH 44410","Geocodio Latitude":41.338256,"Geocodio Longitude":-80.723489,"Street Number":400,"Street Name":"N High St","Geocodio City":"Cortland","Geocodio State":"OH","County":"Trumbull County","Postal Code":44410,"Country":"US","Main Phone":"(330) 637-3916","Billing Phone":"(330) 637-3916","Email":"info@cityofcortland.org","Contact / Department":"Cortland City Hall / Water Dept","Contact Source":"cortlandoh.gov/contact/"},{"Id":"0026748f-15a2-43d7-8192-4176957a1084","Water System Name":"Village of McDonald Water Department","Type / Operator":"Municipal","Service Area":"Village of McDonald","Category":"Municipal Water Department","Notes":"Small village water system","Consumer Confidence Report":"https://mcdonaldvillage.com/offices/water-department/","Billing Address":"Village of McDonald Municipal Building, 451 Ohio Ave, McDonald, OH 44437","Geocodio Latitude":41.163543,"Geocodio Longitude":-80.723552,"Street Number":451,"Street Name":"Ohio Ave","Geocodio City":"McDonald","Geocodio State":"OH","County":"Trumbull County","Postal Code":44437,"Country":"US","Main Phone":"(330) 530-5472","Billing Phone":"(330) 530-5472","Email":"OfficeManager@mcdonaldvillageoh.gov","Contact / Department":"Marijo Pinter, Water Billing Clerk","Contact Source":"mcdonaldvillage.com/offices/water-department/"}];
-  // ============ MAP LINKS ============
-  // Keyed by exact "Water System Name" — add more entries here as additional
-  // system maps become available.
-  const MAP_URLS = {
-    "City of Girard Water Department":
-      "https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Water/",
-    "Village of McDonald Water Department":
-      "https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Municipalities/McDonald/WaterSystemMap/Index.html"
-  };
-
-  const MAP_ICON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>';
-
-  // ============ STATE ============
-  let currentFilter = "all";
-  let currentSearch = "";
-  let sortKey = "Water System Name";
-  let sortAsc = true;
-
-  // ============ DOM ============
-  const tableBody = document.getElementById("tableBody");
-  const searchInput = document.getElementById("searchInput");
-  const filterGroup = document.getElementById("filterGroup");
-  const emptyState = document.getElementById("emptyState");
-  const dialog = document.getElementById("dialog");
-  const backdrop = document.getElementById("backdrop");
-  const dialogClose = document.getElementById("dialogClose");
-  const menuToggle = document.getElementById("menuToggle");
-  const nav = document.getElementById("nav");
-
-  // ============ NAV ============
-  menuToggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
-    menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-  nav.addEventListener("click", e => {
-    if (e.target.tagName === "A" && window.innerWidth <= 820) {
-      nav.classList.remove("open");
-      menuToggle.setAttribute("aria-expanded", "false");
-    }
-  });
-
-  // ============ RENDER ============
-  function badge(category) {
-    const cls = category.startsWith("County") ? "county" : "municipal";
-    const label = category.startsWith("County") ? "County District" : "Municipal";
-    return `<span class="badge ${cls}">${label}</span>`;
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-
-  function render() {
-    let rows = DATA.slice();
-
-    // filter
-    if (currentFilter === "__mapped") {
-      rows = rows.filter(r => MAP_URLS[r["Water System Name"]]);
-    } else if (currentFilter !== "all") {
-      rows = rows.filter(r => r.Category === currentFilter);
-    }
-
-    // search
-    if (currentSearch) {
-      const q = currentSearch.toLowerCase();
-      rows = rows.filter(r =>
-        r["Water System Name"].toLowerCase().includes(q) ||
-        r["Service Area"].toLowerCase().includes(q) ||
-        r["Geocodio City"].toLowerCase().includes(q) ||
-        r["Category"].toLowerCase().includes(q) ||
-        (r["Notes"] || "").toLowerCase().includes(q)
-      );
-    }
-
-    // sort
-    rows.sort((a, b) => {
-      const A = (a[sortKey] || "").toString().toLowerCase();
-      const B = (b[sortKey] || "").toString().toLowerCase();
-      if (A < B) return sortAsc ? -1 : 1;
-      if (A > B) return sortAsc ? 1 : -1;
-      return 0;
-    });
-
-    if (rows.length === 0) {
-      tableBody.innerHTML = "";
-      emptyState.hidden = false;
-      return;
-    }
-    emptyState.hidden = true;
-
-    tableBody.innerHTML = rows.map((r, i) => {
-      const idx = DATA.indexOf(r);
-      const mapUrl = MAP_URLS[r["Water System Name"]];
-      const isMobile = window.matchMedia("(max-width: 820px)").matches;
-      const target = isMobile ? "_self" : "_blank";
-      const ariaLabel = isMobile
-        ? `Open ${r["Water System Name"]} map`
-        : `Open ${r["Water System Name"]} map in new tab`;
-      const relAttr = isMobile ? "" : ' rel="noopener"';
-      const mapIcon = mapUrl
-        ? `<a href="${escapeHtml(mapUrl)}" target="${target}"${relAttr} class="map-icon" aria-label="${escapeHtml(ariaLabel)}" data-map-link>${MAP_ICON_SVG}</a>`
-        : "";
-      return `
-        <tr tabindex="0" data-index="${idx}">
-          <td data-label="System">${escapeHtml(r["Water System Name"])}${mapIcon}<span class="row-arrow">→</span></td>
-          <td data-label="Category">${badge(r.Category)}</td>
-          <td data-label="Service Area">${escapeHtml(r["Service Area"])}</td>
-          <td data-label="City">${escapeHtml(r["Geocodio City"])}, ${escapeHtml(r["Geocodio State"])}</td>
-        </tr>
-      `;
-    }).join("");
-
-    // bind rows
-    tableBody.querySelectorAll("tr").forEach(tr => {
-      const idx = parseInt(tr.dataset.index, 10);
-      tr.addEventListener("click", e => {
-        // ignore clicks on the map icon — let the link navigate normally
-        if (e.target.closest("[data-map-link]")) return;
-        openDialog(idx);
-      });
-      tr.addEventListener("keydown", e => {
-        if ((e.key === "Enter" || e.key === " ") && !e.target.closest("[data-map-link]")) {
-          e.preventDefault();
-          openDialog(idx);
-        }
-      });
-    });
-
-    // sort header indicator
-    document.querySelectorAll("thead th").forEach(th => {
-      th.classList.remove("sorted", "asc");
-      if (th.dataset.sort === sortKey) {
-        th.classList.add("sorted");
-        if (sortAsc) th.classList.add("asc");
-      }
-    });
-  }
-
-  // ============ INTERACTIONS ============
-  searchInput.addEventListener("input", e => {
-    currentSearch = e.target.value.trim();
-    render();
-  });
-
-  filterGroup.addEventListener("click", e => {
-    const btn = e.target.closest(".chip");
-    if (!btn) return;
-    filterGroup.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-    btn.classList.add("active");
-    currentFilter = btn.dataset.filter;
-    render();
-  });
-
-  document.querySelectorAll("thead th").forEach(th => {
-    th.addEventListener("click", () => {
-      const key = th.dataset.sort;
-      if (sortKey === key) sortAsc = !sortAsc;
-      else { sortKey = key; sortAsc = true; }
-      render();
-    });
-  });
-
-  // Re-render when the viewport crosses the mobile breakpoint so the map
-  // icon's target attribute (_self on mobile, _blank on desktop) stays in sync.
-  window.matchMedia("(max-width: 820px)").addEventListener("change", () => render());
-
-  // ============ DIALOG ============
-  // mode: "text" | "url" | "tel" | "email" | "domain"
-  // For "domain", value is a bare domain like "warren.org/water_department/" and is
-  // rendered as a clickable link to https://<domain>.
-  function field(label, value, mode = "text") {
-    if (value === "" || value == null) return "";
-    const raw = String(value);
-    let v;
-    if (mode === "url") {
-      v = `<a href="${escapeHtml(raw)}" target="_blank" rel="noopener">${escapeHtml(raw)} ↗</a>`;
-    } else if (mode === "tel") {
-      const tel = raw.replace(/[^\d+x]/gi, "");
-      v = `<a href="tel:${escapeHtml(tel)}">${escapeHtml(raw)}</a>`;
-    } else if (mode === "email") {
-      v = `<a href="mailto:${escapeHtml(raw)}">${escapeHtml(raw)}</a>`;
-    } else if (mode === "domain") {
-      const href = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
-      v = `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(raw)} ↗</a>`;
-    } else {
-      v = escapeHtml(raw);
-    }
-    return `
-      <div class="field">
-        <div class="field-label">${label}</div>
-        <div class="field-value">${v}</div>
-      </div>
-    `;
-  }
-
-  // Renders Main Phone and Billing Phone together when they differ; collapses
-  // into a single "Phone" row when they're identical (common for smaller
-  // departments with one number for everything).
-  function phoneFields(main, billing) {
-    const m = (main || "").trim();
-    const b = (billing || "").trim();
-    if (!m && !b) return "";
-    if (m && b && m === b) return field("Phone", m, "tel");
-    return field("Main Phone", m, "tel") + field("Billing Phone", b, "tel");
-  }
-
-  function openDialog(idx) {
-    const r = DATA[idx];
-    document.getElementById("dialogEyebrow").textContent = "— " + r.Category + " —";
-    document.getElementById("dialogTitle").textContent = r["Water System Name"];
-    document.getElementById("dialogSub").textContent = r["Service Area"];
-
-    const lat = r["Geocodio Latitude"];
-    const lng = r["Geocodio Longitude"];
-    const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-    const systemMapUrl = MAP_URLS[r["Water System Name"]];
-    const systemMapBtn = systemMapUrl
-      ? `<a class="btn-accent" href="${escapeHtml(systemMapUrl)}" target="_blank" rel="noopener">View System Map ↗</a>`
-      : "";
-
-    const phone = (r["Main Phone"] || "").trim();
-    const email = (r["Email"] || "").trim();
-    const callBtn = phone
-      ? `<a class="btn-secondary" href="tel:${escapeHtml(phone.replace(/[^\d+x]/gi, ""))}">Call</a>`
-      : "";
-    const emailBtn = email
-      ? `<a class="btn-secondary" href="mailto:${escapeHtml(email)}">Email</a>`
-      : "";
-
-    document.getElementById("dialogBody").innerHTML = `
-      ${field("Operator / Type", r["Type / Operator"])}
-      ${field("Notes", r["Notes"])}
-      ${field("Contact / Department", r["Contact / Department"])}
-      ${phoneFields(r["Main Phone"], r["Billing Phone"])}
-      ${field("Email", r["Email"], "email")}
-      ${field("Billing Address", r["Billing Address"])}
-      ${field("City / State / ZIP", `${r["Geocodio City"]}, ${r["Geocodio State"]} ${r["Postal Code"]}`)}
-      <div class="field">
-        <div class="field-label">Coordinates</div>
-        <div class="field-value">
-          <span class="coord-pair">
-            <span>${lat}°N</span>
-            <span>${Math.abs(lng)}°W</span>
-          </span>
+    <!-- ============ TOP BAR ============ -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a href="#" class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C9 7 5 11 5 15a7 7 0 0014 0c0-4-4-8-7-13z" /></svg>
+                </span>
+                <span class="brand-text">
+                    Trumbull Waterworks
+                    <small>A Civic Directory</small>
+                </span>
+            </a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" /></svg>
+            </button>
+            <nav class="nav" id="nav">
+                <a href="#directory">Directory</a>
+                <a href="#about">About</a>
+                <a href="#colophon">Colophon</a>
+                <a href="https://www.co.trumbull.oh.us/Sanitary-Engineer/" class="cta" target="_blank" rel="noopener">County Office ↗</a>
+            </nav>
         </div>
-      </div>
-      ${field("Consumer Confidence Report", r["Consumer Confidence Report"], "url")}
-      ${field("Contact Source", r["Contact Source"], "domain")}
-      <div class="dialog-actions">
-        ${systemMapBtn}
-        <a class="btn-primary" href="${escapeHtml(r["Consumer Confidence Report"])}" target="_blank" rel="noopener">View CCR</a>
-        ${callBtn}
-        ${emailBtn}
-        <a class="btn-secondary" href="${mapsUrl}" target="_blank" rel="noopener">Open in Maps</a>
-      </div>
-    `;
+    </header>
 
-    backdrop.classList.add("show");
-    dialog.classList.add("show");
-    document.body.style.overflow = "hidden";
-    setTimeout(() => dialogClose.focus(), 350);
-  }
+    <!-- ============ MASTHEAD ============ -->
+    <section class="masthead" id="directory">
+        <div class="kicker">Vol. I · No. 1 · Trumbull County, Ohio</div>
+        <h1 class="title">A Directory of <em>Public Water</em><br />Systems, Catalogued.</h1>
+        <p class="deck">
+            Fourteen distinct utilities serve the cities, villages, and townships of Trumbull
+            County — from the bulk operations of the Sanitary Engineer to small village
+            departments. Browse the directory below; tap any entry for full details and a
+            direct link to its Consumer Confidence Report.
+        </p>
+        <div class="meta-row">
+            <div class="meta-stat">Systems Indexed <strong id="statTotal">14</strong></div>
+            <div class="meta-stat">County Districts <strong id="statCounty">7</strong></div>
+            <div class="meta-stat">Municipal Depts <strong id="statMuni">7</strong></div>
+            <div class="meta-stat">Providers Mapped <strong id="statMapped">0</strong></div>
+            <div class="meta-stat">Region <strong>NE&nbsp;Ohio</strong></div>
+        </div>
+    </section>
 
-  function closeDialog() {
-    backdrop.classList.remove("show");
-    dialog.classList.remove("show");
-    document.body.style.overflow = "";
-  }
+    <!-- ============ CONTROLS ============ -->
+    <section class="controls">
+        <div class="search-wrap">
+            <svg viewBox="0 0 24 24"><path d="M10 4a6 6 0 014.47 10.03l4.75 4.75-1.41 1.41-4.75-4.75A6 6 0 1110 4zm0 2a4 4 0 100 8 4 4 0 000-8z" /></svg>
+            <input type="search" id="searchInput" placeholder="Search by name, township, city, or category…" />
+        </div>
+        <div class="filter-group" id="filterGroup">
+            <button class="chip active" data-filter="all">All <span class="count">14</span></button>
+            <button class="chip" data-filter="County Water District">County Districts <span class="count">7</span></button>
+            <button class="chip" data-filter="Municipal Water Department">Municipal <span class="count">7</span></button>
+            <button class="chip" data-filter="__mapped">Mapped <span class="count" id="chipMappedCount">0</span></button>
+        </div>
+    </section>
 
-  dialogClose.addEventListener("click", closeDialog);
-  backdrop.addEventListener("click", closeDialog);
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && dialog.classList.contains("show")) closeDialog();
-  });
+    <!-- ============ TABLE ============ -->
+    <section class="table-wrap">
+        <div class="legend">Tap any row for full details</div>
+        <table id="systemsTable" aria-label="Water systems directory">
+            <thead>
+                <tr>
+                    <th data-sort="Water System Name" class="sorted asc">Water Provider</th>
+                    <th data-sort="Category">Category</th>
+                    <th data-sort="Service Area">Service Area</th>
+                    <th data-sort="Geocodio City">City</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty" hidden>No water systems match that search.</div>
+    </section>
 
-  // ============ STATS & TIMESTAMP ============
-  const total = DATA.length;
-  const county = DATA.filter(d => d.Category === "County Water District").length;
-  const muni = DATA.filter(d => d.Category === "Municipal Water Department").length;
-  const mapped = DATA.filter(d => MAP_URLS[d["Water System Name"]]).length;
-  document.getElementById("statTotal").textContent = total;
-  document.getElementById("statCounty").textContent = county;
-  document.getElementById("statMuni").textContent = muni;
-  document.getElementById("statMapped").textContent = mapped;
-  document.getElementById("chipMappedCount").textContent = mapped;
+    <!-- ============ DIALOG ============ -->
+    <div class="dialog-backdrop" id="backdrop"></div>
+    <aside class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+        <div class="dialog-head">
+            <div class="dialog-eyebrow" id="dialogEyebrow">— Entry —</div>
+            <h2 class="dialog-title" id="dialogTitle">—</h2>
+            <div class="dialog-sub" id="dialogSub"></div>
+            <button class="dialog-close" id="dialogClose" aria-label="Close details">✕</button>
+        </div>
+        <div class="dialog-body" id="dialogBody"></div>
+    </aside>
 
-  const now = new Date();
-  const dateStr = now.toLocaleString("en-US", {
-    year: "numeric", month: "long", day: "numeric",
-    hour: "numeric", minute: "2-digit", timeZoneName: "short"
-  });
-  document.getElementById("lastUpdated").textContent = dateStr;
+    <!-- ============ FOOTER ============ -->
+    <footer id="colophon">
+        <div class="footer-inner">
+            <div class="colophon">
+                <strong>Colophon</strong>
+                Set in Fraunces &amp; Newsreader, with monospace accents in JetBrains Mono.
+                Composed as a public reference for the residents of Trumbull County.
+            </div>
+            <div class="footer-meta">
+                <strong>Created by Mike Costarella</strong>
+                Last updated <span id="lastUpdated">—</span>
+            </div>
+        </div>
+    </footer>
 
-  // initial render
-  render();
-</script>
+    <script>
+        // ============ DATA ============
+        const DATA = [{ "Id": "a6106363-c2ca-4897-9c4f-835bd3c0a75a", "Water System Name": "Bazetta/Champion Water District", "Type / Operator": "County - Trumbull County Sanitary Engineer", "Service Area": "Bazetta Township / Champion Township", "Category": "County Water District", "Notes": "Operated under ORC Chapter 6103; CCR published annually", "Consumer Confidence Report": "https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/CH.pdf", "Billing Address": "Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473", "Geocodio Latitude": 41.240269, "Geocodio Longitude": -80.66361, "Street Number": 842, "Street Name": "Youngstown Kingsville Rd", "Geocodio City": "Vienna", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44473, "Country": "US", "Main Phone": "(330) 675-2775", "Billing Phone": "(330) 675-2475", "Email": "senewbro@co.trumbull.oh.us", "Contact / Department": "Gary Newbrough, Sanitary Engineer", "Contact Source": "co.trumbull.oh.us/Sanitary-Engineer/" }, { "Id": "ff50f336-e06b-4c07-a7c0-744960f82bb6", "Water System Name": "Braceville Township Water District", "Type / Operator": "County - Trumbull County Sanitary Engineer", "Service Area": "Braceville Township", "Category": "County Water District", "Notes": "Operated under ORC Chapter 6103; CCR published annually", "Consumer Confidence Report": "https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/BR.pdf", "Billing Address": "Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473", "Geocodio Latitude": 41.240269, "Geocodio Longitude": -80.66361, "Street Number": 842, "Street Name": "Youngstown Kingsville Rd", "Geocodio City": "Vienna", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44473, "Country": "US", "Main Phone": "(330) 675-2775", "Billing Phone": "(330) 675-2475", "Email": "senewbro@co.trumbull.oh.us", "Contact / Department": "Gary Newbrough, Sanitary Engineer", "Contact Source": "co.trumbull.oh.us/Sanitary-Engineer/" }, { "Id": "541357cf-4757-438a-b030-8ccee47deff0", "Water System Name": "Howland Water District", "Type / Operator": "County - Trumbull County Sanitary Engineer", "Service Area": "Howland Township", "Category": "County Water District", "Notes": "Operated under ORC Chapter 6103; CCR published annually", "Consumer Confidence Report": "https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/HO.pdf", "Billing Address": "Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473", "Geocodio Latitude": 41.240269, "Geocodio Longitude": -80.66361, "Street Number": 842, "Street Name": "Youngstown Kingsville Rd", "Geocodio City": "Vienna", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44473, "Country": "US", "Main Phone": "(330) 675-2775", "Billing Phone": "(330) 675-2475", "Email": "senewbro@co.trumbull.oh.us", "Contact / Department": "Gary Newbrough, Sanitary Engineer", "Contact Source": "co.trumbull.oh.us/Sanitary-Engineer/" }, { "Id": "c7d24a83-f034-43cc-b6bd-8b45e4e60444", "Water System Name": "Mineral Ridge Water District", "Type / Operator": "County - Trumbull County Sanitary Engineer", "Service Area": "Mineral Ridge area (Weathersfield Township)", "Category": "County Water District", "Notes": "Operated under ORC Chapter 6103; CCR published annually", "Consumer Confidence Report": "https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/MI.pdf", "Billing Address": "Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473", "Geocodio Latitude": 41.240269, "Geocodio Longitude": -80.66361, "Street Number": 842, "Street Name": "Youngstown Kingsville Rd", "Geocodio City": "Vienna", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44473, "Country": "US", "Main Phone": "(330) 675-2775", "Billing Phone": "(330) 675-2475", "Email": "senewbro@co.trumbull.oh.us", "Contact / Department": "Gary Newbrough, Sanitary Engineer", "Contact Source": "co.trumbull.oh.us/Sanitary-Engineer/" }, { "Id": "44a878bf-758e-4b71-aba5-22a4f356388f", "Water System Name": "Mosquito Creek Water District", "Type / Operator": "County - Trumbull County Sanitary Engineer", "Service Area": "Mosquito Creek area", "Category": "County Water District", "Notes": "Operated under ORC Chapter 6103; CCR published annually", "Consumer Confidence Report": "https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/MC.pdf", "Billing Address": "Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473", "Geocodio Latitude": 41.240269, "Geocodio Longitude": -80.66361, "Street Number": 842, "Street Name": "Youngstown Kingsville Rd", "Geocodio City": "Vienna", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44473, "Country": "US", "Main Phone": "(330) 675-2775", "Billing Phone": "(330) 675-2475", "Email": "senewbro@co.trumbull.oh.us", "Contact / Department": "Gary Newbrough, Sanitary Engineer", "Contact Source": "co.trumbull.oh.us/Sanitary-Engineer/" }, { "Id": "b9afbd43-1a5b-477d-ac3e-0efbd7846b8f", "Water System Name": "Southeast Water District", "Type / Operator": "County - Trumbull County Sanitary Engineer", "Service Area": "Southeastern Trumbull County", "Category": "County Water District", "Notes": "Operated under ORC Chapter 6103; CCR published annually", "Consumer Confidence Report": "https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/SE.pdf", "Billing Address": "Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473", "Geocodio Latitude": 41.240269, "Geocodio Longitude": -80.66361, "Street Number": 842, "Street Name": "Youngstown Kingsville Rd", "Geocodio City": "Vienna", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44473, "Country": "US", "Main Phone": "(330) 675-2775", "Billing Phone": "(330) 675-2475", "Email": "senewbro@co.trumbull.oh.us", "Contact / Department": "Gary Newbrough, Sanitary Engineer", "Contact Source": "co.trumbull.oh.us/Sanitary-Engineer/" }, { "Id": "ebf64646-34ed-4bde-b58e-a14bb06336e0", "Water System Name": "Warren Township Water District", "Type / Operator": "County - Trumbull County Sanitary Engineer", "Service Area": "Warren Township (unincorporated)", "Category": "County Water District", "Notes": "Separate from City of Warren system; CCR published annually", "Consumer Confidence Report": "https://www.co.trumbull.oh.us/Sanitary-Engineer/ccr/WA.pdf", "Billing Address": "Trumbull County Sanitary Engineer, 842 Youngstown-Kingsville Rd, Vienna, OH 44473", "Geocodio Latitude": 41.240269, "Geocodio Longitude": -80.66361, "Street Number": 842, "Street Name": "Youngstown Kingsville Rd", "Geocodio City": "Vienna", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44473, "Country": "US", "Main Phone": "(330) 675-2775", "Billing Phone": "(330) 675-2475", "Email": "senewbro@co.trumbull.oh.us", "Contact / Department": "Gary Newbrough, Sanitary Engineer", "Contact Source": "co.trumbull.oh.us/Sanitary-Engineer/" }, { "Id": "cb6b962d-bfa1-4f9c-b1ed-0b4090834763", "Water System Name": "City of Warren Water Department", "Type / Operator": "Municipal", "Service Area": "City of Warren", "Category": "Municipal Water Department", "Notes": "2323 Main Avenue SW, Warren OH; supplies bulk water to some county districts", "Consumer Confidence Report": "https://www.warren.org/water_department/annual_report.php", "Billing Address": "City of Warren Water Dept, 2323 Main Ave SW, Warren, OH 44481", "Geocodio Latitude": 41.202075, "Geocodio Longitude": -80.81282, "Street Number": 2323, "Street Name": "Main Ave SW", "Geocodio City": "Warren", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44481, "Country": "US", "Main Phone": "(330) 841-2531", "Billing Phone": "(330) 841-2531", "Email": "flucarelli@warren.org", "Contact / Department": "Franco Lucarelli, Director of Utilities", "Contact Source": "warren.org/water_department/" }, { "Id": "4dd3231a-6bbb-44b4-bac5-9ad400030030", "Water System Name": "City of Niles Water Department", "Type / Operator": "Municipal", "Service Area": "City of Niles", "Category": "Municipal Water Department", "Notes": "Operates own municipal water system", "Consumer Confidence Report": "https://thecityofniles.com/", "Billing Address": "City of Niles Water Department, 34 W State St, Niles, OH 44446", "Geocodio Latitude": 41.179495, "Geocodio Longitude": -80.766403, "Street Number": 34, "Street Name": "W State St", "Geocodio City": "Niles", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44446, "Country": "US", "Main Phone": "(330) 544-9000 x 1150", "Billing Phone": "(330) 544-9000 x 1150", "Email": "mail@thecityofniles.com", "Contact / Department": "Utility Billing Office", "Contact Source": "thecityofniles.com/services/billing/" }, { "Id": "ef592e78-3cff-4fdc-8d5d-1d7f2882703c", "Water System Name": "City of Girard Water Department", "Type / Operator": "Municipal", "Service Area": "City of Girard", "Category": "Municipal Water Department", "Notes": "100 W Main St, Ste 3, Girard OH", "Consumer Confidence Report": "https://cityofgirardoh.gov/blog/ova_dep/water-department/", "Billing Address": "City of Girard Water Dept, 100 West Main Street, Girard, OH 44420", "Geocodio Latitude": 41.155527, "Geocodio Longitude": -80.703711, "Street Number": 100, "Street Name": "W Main St", "Geocodio City": "Girard", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44420, "Country": "US", "Main Phone": "(330) 545-5857", "Billing Phone": "(330) 539-7242", "Email": "water@cityofgirardoh.gov", "Contact / Department": "Water Department / Ashley Alejars, Foreman", "Contact Source": "cityofgirardoh.gov/blog/ova_dep/water-department/" }, { "Id": "09d2e929-d932-4161-91aa-e2c3c38bb7a5", "Water System Name": "City of Hubbard Water Department", "Type / Operator": "Municipal", "Service Area": "City of Hubbard", "Category": "Municipal Water Department", "Notes": "824 North Main Street, Hubbard OH", "Consumer Confidence Report": "https://cityofhubbard-oh.gov/water/", "Billing Address": "City of Hubbard Municipal Building, 220 West Liberty Street, Hubbard, OH 44425", "Geocodio Latitude": 41.156569, "Geocodio Longitude": -80.573215, "Street Number": 220, "Street Name": "W Liberty St", "Geocodio City": "Hubbard", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44425, "Country": "US", "Main Phone": "(330) 534-3636", "Billing Phone": "(330) 534-3054", "Email": "m.hallapy@cityofhubbard.com", "Contact / Department": "Bob Dietz (Water Foreman); Marianne Hallapy (Billing)", "Contact Source": "cityofhubbard-oh.gov/water/" }, { "Id": "6ed52c0d-96ae-4e8c-a261-805096e0a8f8", "Water System Name": "City of Newton Falls Water Department", "Type / Operator": "Municipal", "Service Area": "City of Newton Falls", "Category": "Municipal Water Department", "Notes": "Operates own municipal water system", "Consumer Confidence Report": "https://ci.newtonfalls.oh.us/water-utility-services/", "Billing Address": "City of Newton Falls Utility Billing, 612 West Broad Street, Newton Falls, OH 44444", "Geocodio Latitude": 41.189084, "Geocodio Longitude": -80.984698, "Street Number": 612, "Street Name": "W Broad St", "Geocodio City": "Newton Falls", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44444, "Country": "US", "Main Phone": "(330) 872-0806", "Billing Phone": "(330) 872-0806", "Email": "info@ci.newtonfalls.oh.us", "Contact / Department": "Susan Barker, Billing Administrator", "Contact Source": "ci.newtonfalls.oh.us/utility-billing/" }, { "Id": "0dd52f30-0492-4b8b-ae82-e5efe6b27391", "Water System Name": "City of Cortland Water Department", "Type / Operator": "Municipal", "Service Area": "City of Cortland", "Category": "Municipal Water Department", "Notes": "Operates own municipal water system", "Consumer Confidence Report": "https://www.cortlandoh.gov/drinking-water-consumer-confidence-report/", "Billing Address": "City of Cortland Administration, 400 North High Street, Cortland, OH 44410", "Geocodio Latitude": 41.338256, "Geocodio Longitude": -80.723489, "Street Number": 400, "Street Name": "N High St", "Geocodio City": "Cortland", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44410, "Country": "US", "Main Phone": "(330) 637-3916", "Billing Phone": "(330) 637-3916", "Email": "info@cityofcortland.org", "Contact / Department": "Cortland City Hall / Water Dept", "Contact Source": "cortlandoh.gov/contact/" }, { "Id": "0026748f-15a2-43d7-8192-4176957a1084", "Water System Name": "Village of McDonald Water Department", "Type / Operator": "Municipal", "Service Area": "Village of McDonald", "Category": "Municipal Water Department", "Notes": "Small village water system", "Consumer Confidence Report": "https://mcdonaldvillage.com/offices/water-department/", "Billing Address": "Village of McDonald Municipal Building, 451 Ohio Ave, McDonald, OH 44437", "Geocodio Latitude": 41.163543, "Geocodio Longitude": -80.723552, "Street Number": 451, "Street Name": "Ohio Ave", "Geocodio City": "McDonald", "Geocodio State": "OH", "County": "Trumbull County", "Postal Code": 44437, "Country": "US", "Main Phone": "(330) 530-5472", "Billing Phone": "(330) 530-5472", "Email": "OfficeManager@mcdonaldvillageoh.gov", "Contact / Department": "Marijo Pinter, Water Billing Clerk", "Contact Source": "mcdonaldvillage.com/offices/water-department/" }];
+        // ============ MAP LINKS ============
+        // Keyed by exact "Water System Name" — add more entries here as additional
+        // system maps become available.
+        const MAP_URLS = {
+            "City of Girard Water Department":
+                "https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Girard/Water/",
+            "City of Niles Water Department":
+                "https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Municipalities/Niles/WaterLocationsMap/Index.html",
+            "Village of McDonald Water Department":
+                "https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Municipalities/McDonald/WaterSystemMap/Index.html"
+        };
+
+        const MAP_ICON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>';
+
+        // ============ STATE ============
+        let currentFilter = "all";
+        let currentSearch = "";
+        let sortKey = "Water System Name";
+        let sortAsc = true;
+
+        // ============ DOM ============
+        const tableBody = document.getElementById("tableBody");
+        const searchInput = document.getElementById("searchInput");
+        const filterGroup = document.getElementById("filterGroup");
+        const emptyState = document.getElementById("emptyState");
+        const dialog = document.getElementById("dialog");
+        const backdrop = document.getElementById("backdrop");
+        const dialogClose = document.getElementById("dialogClose");
+        const menuToggle = document.getElementById("menuToggle");
+        const nav = document.getElementById("nav");
+
+        // ============ NAV ============
+        menuToggle.addEventListener("click", () => {
+            const open = nav.classList.toggle("open");
+            menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+        nav.addEventListener("click", e => {
+            if (e.target.tagName === "A" && window.innerWidth <= 820) {
+                nav.classList.remove("open");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        // ============ RENDER ============
+        function badge(category) {
+            const cls = category.startsWith("County") ? "county" : "municipal";
+            const label = category.startsWith("County") ? "County District" : "Municipal";
+            return `<span class="badge ${cls}">${label}</span>`;
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[c]));
+        }
+
+        function render() {
+            let rows = DATA.slice();
+
+            // filter
+            if (currentFilter === "__mapped") {
+                rows = rows.filter(r => MAP_URLS[r["Water System Name"]]);
+            } else if (currentFilter !== "all") {
+                rows = rows.filter(r => r.Category === currentFilter);
+            }
+
+            // search
+            if (currentSearch) {
+                const q = currentSearch.toLowerCase();
+                rows = rows.filter(r =>
+                    r["Water System Name"].toLowerCase().includes(q) ||
+                    r["Service Area"].toLowerCase().includes(q) ||
+                    r["Geocodio City"].toLowerCase().includes(q) ||
+                    r["Category"].toLowerCase().includes(q) ||
+                    (r["Notes"] || "").toLowerCase().includes(q)
+                );
+            }
+
+            // sort
+            rows.sort((a, b) => {
+                const A = (a[sortKey] || "").toString().toLowerCase();
+                const B = (b[sortKey] || "").toString().toLowerCase();
+                if (A < B) return sortAsc ? -1 : 1;
+                if (A > B) return sortAsc ? 1 : -1;
+                return 0;
+            });
+
+            if (rows.length === 0) {
+                tableBody.innerHTML = "";
+                emptyState.hidden = false;
+                return;
+            }
+            emptyState.hidden = true;
+
+            tableBody.innerHTML = rows.map((r, i) => {
+                const idx = DATA.indexOf(r);
+                const mapUrl = MAP_URLS[r["Water System Name"]];
+                const isMobile = window.matchMedia("(max-width: 820px)").matches;
+                const target = isMobile ? "_self" : "_blank";
+                const ariaLabel = isMobile
+                    ? `Open ${r["Water System Name"]} map`
+                    : `Open ${r["Water System Name"]} map in new tab`;
+                const relAttr = isMobile ? "" : ' rel="noopener"';
+                const mapIcon = mapUrl
+                    ? `<a href="${escapeHtml(mapUrl)}" target="${target}"${relAttr} class="map-icon" aria-label="${escapeHtml(ariaLabel)}" data-map-link>${MAP_ICON_SVG}</a>`
+                    : "";
+                return `
+            <tr tabindex="0" data-index="${idx}">
+              <td data-label="System">${escapeHtml(r["Water System Name"])}${mapIcon}<span class="row-arrow">→</span></td>
+              <td data-label="Category">${badge(r.Category)}</td>
+              <td data-label="Service Area">${escapeHtml(r["Service Area"])}</td>
+              <td data-label="City">${escapeHtml(r["Geocodio City"])}, ${escapeHtml(r["Geocodio State"])}</td>
+            </tr>
+          `;
+            }).join("");
+
+            // bind rows
+            tableBody.querySelectorAll("tr").forEach(tr => {
+                const idx = parseInt(tr.dataset.index, 10);
+                tr.addEventListener("click", e => {
+                    // ignore clicks on the map icon — let the link navigate normally
+                    if (e.target.closest("[data-map-link]")) return;
+                    openDialog(idx);
+                });
+                tr.addEventListener("keydown", e => {
+                    if ((e.key === "Enter" || e.key === " ") && !e.target.closest("[data-map-link]")) {
+                        e.preventDefault();
+                        openDialog(idx);
+                    }
+                });
+            });
+
+            // sort header indicator
+            document.querySelectorAll("thead th").forEach(th => {
+                th.classList.remove("sorted", "asc");
+                if (th.dataset.sort === sortKey) {
+                    th.classList.add("sorted");
+                    if (sortAsc) th.classList.add("asc");
+                }
+            });
+        }
+
+        // ============ INTERACTIONS ============
+        searchInput.addEventListener("input", e => {
+            currentSearch = e.target.value.trim();
+            render();
+        });
+
+        filterGroup.addEventListener("click", e => {
+            const btn = e.target.closest(".chip");
+            if (!btn) return;
+            filterGroup.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilter = btn.dataset.filter;
+            render();
+        });
+
+        document.querySelectorAll("thead th").forEach(th => {
+            th.addEventListener("click", () => {
+                const key = th.dataset.sort;
+                if (sortKey === key) sortAsc = !sortAsc;
+                else { sortKey = key; sortAsc = true; }
+                render();
+            });
+        });
+
+        // Re-render when the viewport crosses the mobile breakpoint so the map
+        // icon's target attribute (_self on mobile, _blank on desktop) stays in sync.
+        window.matchMedia("(max-width: 820px)").addEventListener("change", () => render());
+
+        // ============ DIALOG ============
+        // mode: "text" | "url" | "tel" | "email" | "domain"
+        // For "domain", value is a bare domain like "warren.org/water_department/" and is
+        // rendered as a clickable link to https://<domain>.
+        function field(label, value, mode = "text") {
+            if (value === "" || value == null) return "";
+            const raw = String(value);
+            let v;
+            if (mode === "url") {
+                v = `<a href="${escapeHtml(raw)}" target="_blank" rel="noopener">${escapeHtml(raw)} ↗</a>`;
+            } else if (mode === "tel") {
+                const tel = raw.replace(/[^\d+x]/gi, "");
+                v = `<a href="tel:${escapeHtml(tel)}">${escapeHtml(raw)}</a>`;
+            } else if (mode === "email") {
+                v = `<a href="mailto:${escapeHtml(raw)}">${escapeHtml(raw)}</a>`;
+            } else if (mode === "domain") {
+                const href = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+                v = `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(raw)} ↗</a>`;
+            } else {
+                v = escapeHtml(raw);
+            }
+            return `
+          <div class="field">
+            <div class="field-label">${label}</div>
+            <div class="field-value">${v}</div>
+          </div>
+        `;
+        }
+
+        // Renders Main Phone and Billing Phone together when they differ; collapses
+        // into a single "Phone" row when they're identical (common for smaller
+        // departments with one number for everything).
+        function phoneFields(main, billing) {
+            const m = (main || "").trim();
+            const b = (billing || "").trim();
+            if (!m && !b) return "";
+            if (m && b && m === b) return field("Phone", m, "tel");
+            return field("Main Phone", m, "tel") + field("Billing Phone", b, "tel");
+        }
+
+        function openDialog(idx) {
+            const r = DATA[idx];
+            document.getElementById("dialogEyebrow").textContent = "— " + r.Category + " —";
+            document.getElementById("dialogTitle").textContent = r["Water System Name"];
+            document.getElementById("dialogSub").textContent = r["Service Area"];
+
+            const lat = r["Geocodio Latitude"];
+            const lng = r["Geocodio Longitude"];
+            const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+            const systemMapUrl = MAP_URLS[r["Water System Name"]];
+            const systemMapBtn = systemMapUrl
+                ? `<a class="btn-accent" href="${escapeHtml(systemMapUrl)}" target="_blank" rel="noopener">View System Map ↗</a>`
+                : "";
+
+            const phone = (r["Main Phone"] || "").trim();
+            const email = (r["Email"] || "").trim();
+            const callBtn = phone
+                ? `<a class="btn-secondary" href="tel:${escapeHtml(phone.replace(/[^\d+x]/gi, ""))}">Call</a>`
+                : "";
+            const emailBtn = email
+                ? `<a class="btn-secondary" href="mailto:${escapeHtml(email)}">Email</a>`
+                : "";
+
+            document.getElementById("dialogBody").innerHTML = `
+          ${field("Operator / Type", r["Type / Operator"])}
+          ${field("Notes", r["Notes"])}
+          ${field("Contact / Department", r["Contact / Department"])}
+          ${phoneFields(r["Main Phone"], r["Billing Phone"])}
+          ${field("Email", r["Email"], "email")}
+          ${field("Billing Address", r["Billing Address"])}
+          ${field("City / State / ZIP", `${r["Geocodio City"]}, ${r["Geocodio State"]} ${r["Postal Code"]}`)}
+          <div class="field">
+            <div class="field-label">Coordinates</div>
+            <div class="field-value">
+              <span class="coord-pair">
+                <span>${lat}°N</span>
+                <span>${Math.abs(lng)}°W</span>
+              </span>
+            </div>
+          </div>
+          ${field("Consumer Confidence Report", r["Consumer Confidence Report"], "url")}
+          ${field("Contact Source", r["Contact Source"], "domain")}
+          <div class="dialog-actions">
+            ${systemMapBtn}
+            <a class="btn-primary" href="${escapeHtml(r["Consumer Confidence Report"])}" target="_blank" rel="noopener">View CCR</a>
+            ${callBtn}
+            ${emailBtn}
+            <a class="btn-secondary" href="${mapsUrl}" target="_blank" rel="noopener">Open in Maps</a>
+          </div>
+        `;
+
+            backdrop.classList.add("show");
+            dialog.classList.add("show");
+            document.body.style.overflow = "hidden";
+            setTimeout(() => dialogClose.focus(), 350);
+        }
+
+        function closeDialog() {
+            backdrop.classList.remove("show");
+            dialog.classList.remove("show");
+            document.body.style.overflow = "";
+        }
+
+        dialogClose.addEventListener("click", closeDialog);
+        backdrop.addEventListener("click", closeDialog);
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape" && dialog.classList.contains("show")) closeDialog();
+        });
+
+        // ============ STATS & TIMESTAMP ============
+        const total = DATA.length;
+        const county = DATA.filter(d => d.Category === "County Water District").length;
+        const muni = DATA.filter(d => d.Category === "Municipal Water Department").length;
+        const mapped = DATA.filter(d => MAP_URLS[d["Water System Name"]]).length;
+        document.getElementById("statTotal").textContent = total;
+        document.getElementById("statCounty").textContent = county;
+        document.getElementById("statMuni").textContent = muni;
+        document.getElementById("statMapped").textContent = mapped;
+        document.getElementById("chipMappedCount").textContent = mapped;
+
+        const now = new Date();
+        const dateStr = now.toLocaleString("en-US", {
+            year: "numeric", month: "long", day: "numeric",
+            hour: "numeric", minute: "2-digit", timeZoneName: "short"
+        });
+        document.getElementById("lastUpdated").textContent = dateStr;
+
+        // initial render
+        render();
+    </script>
 
 </body>
 </html>
