@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City of Niles · Information Home Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0e2438;
+            --ink-2: #1f3a52;
+            --ink-soft: #4a5e74;
+            --paper: #f5f0e6;
+            --paper-2: #ebe4d4;
+            --paper-3: #e0d7c2;
+            --rule: #c8bda6;
+            --rule-soft: #d8cfb9;
+            --teal: #1a6e6e;
+            --gold: #b48a3c;
+            --shadow: 0 1px 0 rgba(14, 36, 56, 0.04), 0 12px 32px -16px rgba(14, 36, 56, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter Tight', -apple-system, sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(circle at 1px 1px, rgba(14, 36, 56, 0.04) 1px, transparent 0);
+            background-size: 24px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Masthead ──────────────────────────────────────── */
+        .masthead {
+            border-bottom: 3px double var(--ink);
+            padding: 40px 48px 28px;
+            background: var(--paper);
+        }
+
+        .masthead-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--ink-soft);
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--rule);
+            padding-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+            .breadcrumb a {
+                color: var(--ink-soft);
+                text-decoration: none;
+                transition: color 0.15s;
+            }
+
+                .breadcrumb a:hover {
+                    color: var(--gold);
+                }
+
+            .breadcrumb .sep {
+                color: var(--rule);
+            }
+
+        .masthead-title {
+            font-family: 'Fraunces', serif;
+            font-weight: 900;
+            font-size: clamp(40px, 6vw, 64px);
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            font-variation-settings: 'opsz' 144;
+        }
+
+            .masthead-title .article {
+                font-style: italic;
+                font-weight: 400;
+                color: var(--gold);
+                font-variation-settings: 'opsz' 144;
+            }
+
+        .masthead-sub {
+            margin-top: 12px;
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 19px;
+            color: var(--ink-2);
+            font-weight: 400;
+            max-width: 760px;
+        }
+
+        .masthead-meta {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-soft);
+            letter-spacing: 0.04em;
+            padding-top: 16px;
+            border-top: 1px solid var(--rule);
+        }
+
+            .masthead-meta .meta-item {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .masthead-meta .meta-label {
+                font-size: 9px;
+                text-transform: uppercase;
+                letter-spacing: 0.2em;
+                color: var(--gold);
+                font-weight: 600;
+            }
+
+            .masthead-meta .meta-value {
+                color: var(--ink);
+                font-weight: 500;
+            }
+
+        /* ── Main content ─────────────────────────────────── */
+        main {
+            padding: 48px 48px 32px;
+            max-width: 1100px;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* ── Section headers ─────────────────────────────── */
+        .section {
+            margin-bottom: 48px;
+        }
+
+            .section:last-of-type {
+                margin-bottom: 32px;
+            }
+
+        .section-head {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--rule);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-head-text {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .section-eyebrow {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 30px;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+        }
+
+        .section-desc {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            color: var(--ink-soft);
+            margin-top: 6px;
+            font-size: 16px;
+            max-width: 720px;
+        }
+
+        .section-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-soft);
+            letter-spacing: 0.04em;
+            padding-bottom: 6px;
+            white-space: nowrap;
+        }
+
+            .section-count strong {
+                color: var(--ink);
+                font-weight: 600;
+            }
+
+        /* ── Project cards (link list) ────────────────────── */
+        .projects {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--rule);
+            border: 1px solid var(--rule);
+            box-shadow: var(--shadow);
+        }
+
+        .project {
+            display: flex;
+            align-items: stretch;
+            background: var(--paper);
+            text-decoration: none;
+            color: var(--ink);
+            transition: background 0.15s, color 0.15s;
+            position: relative;
+        }
+
+            .project:hover {
+                background: var(--paper-2);
+            }
+
+                .project:hover .project-arrow {
+                    color: var(--gold);
+                    transform: translateX(4px);
+                }
+
+                .project:hover .external-icon {
+                    opacity: 1;
+                    color: var(--gold);
+                }
+
+        .project-marker {
+            width: 88px;
+            flex-shrink: 0;
+            background: var(--ink);
+            color: var(--paper);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 18px 8px;
+            border-right: 1px solid var(--rule);
+        }
+
+            .project-marker .marker-icon {
+                font-family: 'Fraunces', serif;
+                font-style: italic;
+                font-weight: 600;
+                font-size: 22px;
+                color: var(--gold);
+                line-height: 1;
+                margin-bottom: 6px;
+            }
+
+            .project-marker .marker-type {
+                font-family: 'Inter Tight', sans-serif;
+                font-size: 9px;
+                text-transform: uppercase;
+                letter-spacing: 0.14em;
+                font-weight: 600;
+                text-align: center;
+                color: rgba(245, 240, 230, 0.85);
+            }
+
+        .project-body {
+            flex: 1;
+            padding: 20px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .project-title {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 21px;
+            letter-spacing: -0.005em;
+            color: var(--ink);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .project-desc {
+            font-size: 13px;
+            color: var(--ink-soft);
+            margin-bottom: 6px;
+            line-height: 1.45;
+            max-width: 560px;
+        }
+
+        .project-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-soft);
+            letter-spacing: 0.02em;
+            word-break: break-all;
+        }
+
+        .project-arrow {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            font-family: 'Fraunces', serif;
+            font-size: 28px;
+            color: var(--ink-soft);
+            transition: transform 0.15s, color 0.15s;
+            font-style: italic;
+        }
+
+        .external-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 14px;
+            height: 14px;
+            color: var(--ink-soft);
+            opacity: 0.45;
+            transition: opacity 0.15s;
+        }
+
+        /* ── About callout ────────────────────────────────── */
+        .about {
+            background: var(--paper-2);
+            border-left: 3px solid var(--gold);
+            padding: 18px 24px;
+            margin-bottom: 48px;
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            color: var(--ink-2);
+            font-size: 15px;
+            line-height: 1.55;
+        }
+
+            .about strong {
+                color: var(--ink);
+                font-weight: 600;
+                font-style: normal;
+                font-family: 'Inter Tight', sans-serif;
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                display: block;
+                margin-bottom: 6px;
+            }
+
+        /* ── Footer ───────────────────────────────────────── */
+        footer {
+            border-top: 3px double var(--ink);
+            margin-top: auto;
+            padding: 24px 48px;
+            font-size: 12px;
+            color: var(--ink-soft);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: var(--paper);
+        }
+
+            footer strong {
+                color: var(--ink);
+                font-weight: 600;
+            }
+
+            footer .footer-credit {
+                font-family: 'Fraunces', serif;
+                font-style: italic;
+                font-size: 13px;
+            }
+
+            footer .footer-time {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 11px;
+                letter-spacing: 0.04em;
+            }
+
+            footer a {
+                color: var(--ink-soft);
+                text-decoration: none;
+                border-bottom: 1px solid var(--rule);
+                transition: color 0.15s, border-color 0.15s;
+            }
+
+                footer a:hover {
+                    color: var(--gold);
+                    border-color: var(--gold);
+                }
+
+        /* ── Responsive ───────────────────────────────────── */
+        @media (max-width: 700px) {
+            .masthead, main, footer {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .masthead {
+                padding-top: 28px;
+                padding-bottom: 20px;
+            }
+
+            main {
+                padding-top: 32px;
+            }
+
+            .project {
+                flex-direction: column;
+            }
+
+            .project-marker {
+                width: 100%;
+                flex-direction: row;
+                gap: 12px;
+                padding: 10px 16px;
+                border-right: none;
+                border-bottom: 1px solid var(--rule);
+                justify-content: flex-start;
+            }
+
+                .project-marker .marker-icon {
+                    margin-bottom: 0;
+                }
+
+            .project-arrow {
+                display: none;
+            }
+
+            .project-body {
+                padding: 16px 20px;
+            }
+
+            .section-count {
+                display: none;
+            }
+
+            footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="masthead">
+        <div class="masthead-top">
+            <div class="breadcrumb">
+                <a href="../../../../../Index.html">Project Index</a>
+                <span class="sep">·</span>
+                <span>Ohio</span>
+                <span class="sep">·</span>
+                <span>Trumbull County</span>
+            </div>
+            <span>Information Home Page</span>
+        </div>
+        <h1 class="masthead-title">City <span class="article">of</span> Niles</h1>
+        <p class="masthead-sub">A central directory of public-records dashboards, infrastructure maps, and finance reports for the City of Niles, Ohio — gathered in one place for residents, officials, and researchers.</p>
+
+        <div class="masthead-meta">
+            <div class="meta-item">
+                <span class="meta-label">County</span>
+                <span class="meta-value">Trumbull</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">State</span>
+                <span class="meta-value">Ohio</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Type</span>
+                <span class="meta-value">Municipality · City</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Active Projects</span>
+                <span class="meta-value">1</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <div class="about">
+            <strong>About this page</strong>
+            Each project below opens in a new tab. Maps are interactive and built from publicly available records.
+        </div>
+
+        <section class="section">
+            <div class="section-head">
+                <div class="section-head-text">
+                    <div class="section-eyebrow">Section One · Infrastructure</div>
+                    <h2 class="section-title">Utilities</h2>
+                    <p class="section-desc">City-managed utility infrastructure, mapped at the account level.</p>
+                </div>
+                <div class="section-count"><strong>1</strong> project</div>
+            </div>
+
+            <div class="projects">
+                <a class="project" href="https://mikecostarella.github.io/my-website/Governments/Ohio/Trumbull/Municipalities/Niles/WaterLocationsMap/Index.html" target="_blank" rel="noopener noreferrer">
+                    <div class="project-marker">
+                        <div class="marker-icon">≈</div>
+                        <div class="marker-type">Map</div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-title">Water Account Locations Map</div>
+                        <div class="project-desc">Interactive map of water service accounts within the City of Niles service area.</div>
+                        <div class="project-meta">WaterLocationsMap/Index.html</div>
+                    </div>
+                    <div class="project-arrow">→</div>
+                    <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 17L17 7M17 7H8M17 7V16" />
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-credit">Compiled by <strong>Mike Costarella</strong> · <a href="../../../../../Index.html">Back to Project Index</a></div>
+        <div class="footer-time">Last updated · May 28, 2026</div>
+    </footer>
+
+</body>
+</html>
