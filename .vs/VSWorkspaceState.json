@@ -1,11 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Governments",
     "\\Governments\\Ohio",
-    "\\Governments\\Ohio\\Trumbull\\Girard",
-    "\\HealthAccess"
+    "\\Governments\\Ohio\\Trumbull",
+    "\\Governments\\Ohio\\Trumbull\\WaterProviders"
   ],
-  "SelectedNode": "\\HealthAccess",
+  "SelectedNode": "\\Index.html",
   "PreviewInSolutionExplorer": false
 }
