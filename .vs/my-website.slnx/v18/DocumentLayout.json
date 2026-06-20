@@ -1,16 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\costi\\AI\\Projects\\my-website\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\costi\\AI\\Projects\\my-website\\Governments\\Ohio\\Trumbull\\WaterProviders\\Index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Governments\\Ohio\\Trumbull\\WaterProviders\\Index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\costi\\AI\\Projects\\my-website\\Index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -18,7 +9,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -39,31 +30,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Index.html",
-              "DocumentMoniker": "C:\\costi\\AI\\Projects\\my-website\\Governments\\Ohio\\Trumbull\\WaterProviders\\Index.html",
-              "RelativeDocumentMoniker": "Governments\\Ohio\\Trumbull\\WaterProviders\\Index.html",
-              "ToolTip": "C:\\costi\\AI\\Projects\\my-website\\Governments\\Ohio\\Trumbull\\WaterProviders\\Index.html",
-              "RelativeToolTip": "Governments\\Ohio\\Trumbull\\WaterProviders\\Index.html",
-              "ViewState": "AgIAABYFAAAAAAAAAAAUwDkFAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2026-05-29T15:36:48.033Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Index.html",
-              "DocumentMoniker": "C:\\costi\\AI\\Projects\\my-website\\Index.html",
-              "RelativeDocumentMoniker": "Index.html",
-              "ToolTip": "C:\\costi\\AI\\Projects\\my-website\\Index.html",
-              "RelativeToolTip": "Index.html",
-              "ViewState": "AgIAAMoCAAAAAAAAAAAQwCIEAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2026-05-01T01:15:24.193Z"
             }
           ]
         }
